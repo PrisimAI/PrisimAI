@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -259,27 +258,35 @@
             return loadingWrapper;
         }
 
-        // Fetch models
-        async function fetchModels() {
-            const models = [
-                { name: "gemini", description: "Gemini 2.5 Flash Lite (api.navy)" },
-                { name: "openai", description: "OpenAI GPT-5 Nano" },
-                { name: "openai-fast", description: "OpenAI GPT-4.1 Nano" },
-                { name: "openai-large", description: "OpenAI GPT-4.1" },
-                { name: "midijourney", description: "MIDIjourney" },
-                { name: "qwen-coder", description: "Qwen 2.5 Coder 32B" },
-                { name: "bidara", description: "BIDARA (NASA)" }
-            ];
+        // Fetch models from Pollinations API
+async function fetchModels() {
+    try {
+        modelSelector.innerHTML = `<option disabled selected>Loading models...</option>`;
+        
+        const response = await fetch('https://text.pollinations.ai/models');
+        if (!response.ok) throw new Error(`Failed to fetch models: ${response.status}`);
+        
+        const models = await response.json();
 
-            modelSelector.innerHTML = '';
+        modelSelector.innerHTML = ''; // Clear placeholder
+
+        if (Array.isArray(models) && models.length > 0) {
             models.forEach(model => {
                 const option = document.createElement('option');
-                option.value = model.name;
-                option.textContent = model.description;
+                option.value = model.id || model.name || model.model || model;
+                option.textContent = model.description || model.name || model.id || model;
                 modelSelector.appendChild(option);
             });
-            modelSelector.value = 'openai';
+            modelSelector.value = models[0].id || models[0].name || models[0].model;
+        } else {
+            modelSelector.innerHTML = `<option disabled>No models available</option>`;
         }
+    } catch (error) {
+        console.error('Error fetching models:', error);
+        modelSelector.innerHTML = `<option disabled>Error loading models</option>`;
+    }
+}
+
 
         // Stream text response
         async function streamTextResponse() {
