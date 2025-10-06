@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -114,17 +115,11 @@
             <div class="flex items-center space-x-3 p-3 hover:bg-blue-500/10 rounded-xl transition-all duration-200 cursor-pointer active:scale-95">
                 <img src="https://placehold.co/40x40" alt="Profile" class="w-10 h-10 rounded-full border-2 border-blue-400/30 shadow">
                 <div>
-                    <div class="font-semibold text-gray-900 dark:text-white">Random Stranger</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Free User</div>
+                    <div class="font-semibold text-gray-900 dark:text-white">Stranger</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Free</div>
                 </div>
             </div>
         </div>
-    <div id="auth-section" class="mt-6">
-  <input id="email" type="email" placeholder="Email" class="w-full p-2 mb-2 rounded-lg" />
-  <input id="password" type="password" placeholder="Password" class="w-full p-2 mb-2 rounded-lg" />
-  <button id="login-btn" class="w-full p-2 bg-blue-500 text-white rounded-lg">Login / Signup</button>
-  <button id="logout-btn" class="hidden w-full p-2 bg-red-500 text-white rounded-lg mt-2">Logout</button>
-</div>
     </aside>
 
     <!-- Main Content -->
@@ -158,54 +153,8 @@
             </div>
         </div>
     </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = "https://pzbuyeysrqckwuindxoh.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6YnV5ZXlzcnFja3d1aW5keG9oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NTQ5NTIsImV4cCI6MjA3NTMzMDk1Mn0.pSrv0khZQOlW0Gp3tf3k9fCl71BjwKc--Cuo2FdFbeY";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-</script>
 
     <script>
-        // Auth handling
-const loginBtn = document.getElementById("login-btn");
-const logoutBtn = document.getElementById("logout-btn");
-
-loginBtn.addEventListener("click", async () => {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-  if (error && error.message.includes("Invalid login credentials")) {
-    // try signup if login fails
-    const { error: signUpError } = await supabase.auth.signUp({ email, password });
-    if (signUpError) alert(signUpError.message);
-    else alert("Account created! You can now log in.");
-  } else if (error) {
-    alert(error.message);
-  } else {
-    alert("Logged in!");
-    loadUserProfile();
-  }
-});
-
-logoutBtn.addEventListener("click", async () => {
-  await supabase.auth.signOut();
-  alert("Logged out!");
-  location.reload();
-});
-
-// Load profile info
-async function loadUserProfile() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user) {
-    document.querySelector("#auth-section").classList.add("hidden");
-    logoutBtn.classList.remove("hidden");
-    document.querySelector(".font-semibold").textContent = user.email.split("@")[0];
-    loadChatHistoryFromDB(user.id);
-  }
-}
-
         // Dark mode toggle
         const darkModeToggle = document.getElementById('dark-mode-toggle');
         if (darkModeToggle) {
@@ -259,29 +208,22 @@ async function loadUserProfile() {
             return messageWrapper;
         }
 
-        async function saveChatHistory() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
-  await supabase.from("chats").insert({
-    user_id: user.id,
-    message: chatMessages
-  });
-}
+        // Save/load chat history
+        function saveChatHistory() {
+            sessionStorage.setItem('chatMessages', JSON.stringify(chatMessages));
+        }
 
-async function loadChatHistoryFromDB(userId) {
-  const { data, error } = await supabase
-    .from("chats")
-    .select("message")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(1);
-
-  if (data && data.length > 0) {
-    chatMessages = data[0].message;
-    chatMessages.forEach(msg => addMessage(msg.content, msg.role));
-  }
-}
-
+        function loadChatHistory() {
+            const savedHistory = sessionStorage.getItem('chatMessages');
+            if (savedHistory) {
+                chatMessages = JSON.parse(savedHistory);
+                chatMessages.forEach(msg => addMessage(msg.content, msg.role));
+            }
+            if (chatHistory.children.length === 0) {
+                welcomeMessage.classList.remove('hidden');
+                chatHistory.classList.add('hidden');
+            }
+        }
 
         // Clear chat
         function clearChatHistory() {
