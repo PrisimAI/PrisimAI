@@ -81,44 +81,38 @@
             animation: fadeIn 0.3s ease-out forwards;
         }
 
-        /* Style for active chat history item */
-        .chat-history-item.bg-blue-500\/20,
-        .chat-history-item.font-semibold,
-        .chat-history-item.text-blue-400 {
-            /* These are handled by Tailwind classes added via JS */
-        }
         /* Tutorial Overlay styles */
-#tutorial-overlay {
-    display: flex; /* Use flex for centering */
-    opacity: 0; /* Start hidden */
-    visibility: hidden; /* Start hidden */
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-}
+        #tutorial-overlay {
+            display: flex; /* Use flex for centering */
+            opacity: 0; /* Start hidden */
+            visibility: hidden; /* Start hidden */
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
 
-#tutorial-overlay.visible {
-    opacity: 1;
-    visibility: visible;
-}
+        #tutorial-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
 
-#tutorial-overlay .bg-opacity-70 {
-    /* Tailwind already provides this */
-}
+        #tutorial-overlay .bg-opacity-70 {
+            /* Tailwind already provides this */
+        }
 
-#tutorial-overlay .backdrop-blur-sm {
-    /* Tailwind already provides this */
-}
+        #tutorial-overlay .backdrop-blur-sm {
+            /* Tailwind already provides this */
+        }
 
-#tutorial-overlay .rounded-3xl {
-    /* Tailwind already provides this */
-}
+        #tutorial-overlay .rounded-3xl {
+            /* Tailwind already provides this */
+        }
 
-#tutorial-overlay .shadow-2xl {
-    /* Tailwind already provides this */
-}
+        #tutorial-overlay .shadow-2xl {
+            /* Tailwind already provides this */
+        }
 
-#tutorial-overlay .max-w-xl {
-    /* Tailwind already provides this */
-}
+        #tutorial-overlay .max-w-xl {
+            /* Tailwind already provides this */
+        }
     </style>
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -231,6 +225,64 @@
         </div>
     </main>
 
+    <!-- Tutorial Overlay -->
+    <div id="tutorial-overlay" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 hidden items-center justify-center transition-opacity duration-500">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl max-w-xl w-full text-center relative">
+            <button id="tutorial-close-btn" class="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold mb-4 text-blue-600 dark:text-blue-400">Welcome to PrisimAI!</h2>
+            <p class="text-lg mb-6 text-gray-700 dark:text-gray-300">Let's get you started with a quick tour:</p>
+
+            <div id="tutorial-steps" class="space-y-4 text-left">
+                <!-- Step 1 -->
+                <div class="flex items-start space-x-4">
+                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">1</span>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Start a New Chat</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Click the <strong class="font-medium">+ New Chat</strong> button in the sidebar to begin a fresh conversation. Each chat is saved automatically.</p>
+                    </div>
+                </div>
+                <!-- Step 2 -->
+                <div class="flex items-start space-x-4">
+                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">2</span>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Chat with the AI</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Type your message in the input box at the bottom and press Enter or click the send button. The AI's response will appear on the right.</p>
+                    </div>
+                </div>
+                <!-- Step 3 -->
+                <div class="flex items-start space-x-4">
+                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">3</span>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Explore Chat History</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Your previous conversations are listed in the sidebar. Click on any chat to revisit it.</p>
+                    </div>
+                </div>
+                <!-- Step 4 -->
+                <div class="flex items-start space-x-4">
+                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">4</span>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Image Generation</h3>
+                        <p class="text-gray-600 dark:text-gray-400">To generate an image, type <code>/image</code> followed by your prompt (e.g., <code>/image a cat wearing a hat</code>).</p>
+                    </div>
+                </div>
+                <!-- NEW Step 5 -->
+                <div class="flex items-start space-x-4">
+                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">5</span>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Model Selection</h3>
+                        <p class="text-gray-600 dark:text-gray-400">In the sidebar, you can select different AI models to experiment with their unique responses.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button id="tutorial-done-btn" class="mt-8 px-6 py-2 bg-blue-600 text-white font-semibold rounded-xl shadow-md hover:bg-blue-700 transition-all duration-200 active:scale-95">Got It!</button>
+        </div>
+    </div>
+
     <script>
         // Dark mode toggle
         const darkModeToggle = document.getElementById('dark-mode-toggle');
@@ -258,10 +310,10 @@
         let allChats = {}; // Stores all chat data, keyed by chatId
 
         // API Configuration
-const apiKey = 'ScdTyGr9t5KJxW_c'; // Replace with your actual API key if different
-const referrer = 'https://prisimai.github.io/PrisimAI'; // Your website URL
-const textApiUrl = 'https://text.pollinations.ai/openai';
-const imageApiUrl = 'https://image.pollinations.ai/prompt/';
+        const apiKey = 'ScdTyGr9t5KJxW_c'; // Replace with your actual API key if different
+        const referrer = 'https://prisimai.github.io/PrisimAI'; // Your website URL
+        const textApiUrl = 'https://text.pollinations.ai/openai';
+        const imageApiUrl = 'https://image.pollinations.ai/prompt/';
 
         // Function to generate a unique ID for a new chat
         function generateChatId() {
@@ -697,6 +749,33 @@ const imageApiUrl = 'https://image.pollinations.ai/prompt/';
             chatInput.style.height = `${chatInput.scrollHeight}px`;
         }
 
+        // --- Tutorial Overlay Logic ---
+        const tutorialOverlay = document.getElementById('tutorial-overlay');
+        const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
+        const tutorialDoneBtn = document.getElementById('tutorial-done-btn');
+        const TUTORIAL_SEEN_KEY = 'prisimaiTutorialSeen';
+
+        function showTutorial() {
+            if (!localStorage.getItem(TUTORIAL_SEEN_KEY)) {
+                tutorialOverlay.classList.add('visible');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling while tutorial is shown
+            }
+        }
+
+        function hideTutorial() {
+            tutorialOverlay.classList.remove('visible');
+            document.body.style.overflow = ''; // Restore scrolling
+            localStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
+        }
+
+        if (tutorialCloseBtn) {
+            tutorialCloseBtn.addEventListener('click', hideTutorial);
+        }
+
+        if (tutorialDoneBtn) {
+            tutorialDoneBtn.addEventListener('click', hideTutorial);
+        }
+
         // Event listeners
         chatForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -719,47 +798,11 @@ const imageApiUrl = 'https://image.pollinations.ai/prompt/';
             }
         });
 
-        // --- Tutorial Overlay Logic ---
-const tutorialOverlay = document.getElementById('tutorial-overlay');
-const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
-const tutorialDoneBtn = document.getElementById('tutorial-done-btn');
-const TUTORIAL_SEEN_KEY = 'prisimaiTutorialSeen';
-
-function showTutorial() {
-    if (!localStorage.getItem(TUTORIAL_SEEN_KEY)) {
-        tutorialOverlay.classList.add('visible');
-        document.body.style.overflow = 'hidden'; // Prevent scrolling while tutorial is shown
-    }
-}
-
-function hideTutorial() {
-    tutorialOverlay.classList.remove('visible');
-    document.body.style.overflow = ''; // Restore scrolling
-    localStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
-}
-
-if (tutorialCloseBtn) {
-    tutorialCloseBtn.addEventListener('click', hideTutorial);
-}
-
-if (tutorialDoneBtn) {
-    tutorialDoneBtn.addEventListener('click', hideTutorial);
-}
-
-// Call showTutorial when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-    loadAllChats();
-    fetchModels();
-    showTutorial(); // Show tutorial on initial load if not seen
-});
-
-// --- End of Tutorial Overlay Logic ---
-
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            loadAllChats(); // Load saved chats first
-            // If no chats were loaded, ensure a new chat is started (loadAllChats handles this internally now)
+            loadAllChats();
             fetchModels();
+            showTutorial(); // Show tutorial on initial load if not seen
         });
 
         // Service Worker
@@ -771,55 +814,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     </script>
-<!-- Tutorial Overlay -->
-<div id="tutorial-overlay" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 hidden items-center justify-center transition-opacity duration-500">
-    <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl max-w-xl w-full text-center relative">
-        <button id="tutorial-close-btn" class="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
-        <h2 class="text-2xl font-bold mb-4 text-blue-600 dark:text-blue-400">Welcome to PrisimAI!</h2>
-        <p class="text-lg mb-6 text-gray-700 dark:text-gray-300">Let's get you started with a quick tour:</p>
 
-        <div id="tutorial-steps" class="space-y-4 text-left">
-            <!-- Step 1 -->
-            <div class="flex items-start space-x-4">
-                <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">1</span>
-                <div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white">Start a New Chat</h3>
-                    <p class="text-gray-600 dark:text-gray-400">Click the <strong class="font-medium">"+ New Chat"</strong> button in the sidebar to begin a fresh conversation. Each chat is saved automatically.</p>
-                </div>
-            </div>
-            <!-- Step 2 -->
-            <div class="flex items-start space-x-4">
-                <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">2</span>
-                <div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white">Chat with the AI</h3>
-                    <p class="text-gray-600 dark:text-gray-400">Type your message in the input box at the bottom and press Enter or click the send button. The AI's response will appear on the right.</p>
-                </div>
-            </div>
-            <!-- Step 3 -->
-            <div class="flex items-start space-x-4">
-                <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">3</span>
-                <div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white">Explore Chat History</h3>
-                    <p class="text-gray-600 dark:text-gray-400">Your previous conversations are listed in the sidebar. Click on any chat to revisit it.</p>
-                </div>
-            </div>
-            <!-- Step 4 -->
-            <div class="flex items-start space-x-4">
-                <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">4</span>
-                <div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white">Image Generation</h3>
-                    <p class="text-gray-600 dark:text-gray-400">To generate an image, type <code>/image</code> followed by your prompt (e.g., <code>/image a cat wearing a hat</code>).</p>
-                </div>
-            </div>
-        </div>
-
-        <button id="tutorial-done-btn" class="mt-8 px-6 py-2 bg-blue-600 text-white font-semibold rounded-xl shadow-md hover:bg-blue-700 transition-all duration-200 active:scale-95">Got It!</button>
-    </div>
-</div>
     <!-- 100% privacy-first analytics -->
     <script data-collect-dnt="true" async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
     <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif?collect-dnt=true" alt="" referrerpolicy="no-referrer-when-downgrade"/></noscript>
