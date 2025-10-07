@@ -87,6 +87,38 @@
         .chat-history-item.text-blue-400 {
             /* These are handled by Tailwind classes added via JS */
         }
+        /* Tutorial Overlay styles */
+#tutorial-overlay {
+    display: flex; /* Use flex for centering */
+    opacity: 0; /* Start hidden */
+    visibility: hidden; /* Start hidden */
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#tutorial-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+#tutorial-overlay .bg-opacity-70 {
+    /* Tailwind already provides this */
+}
+
+#tutorial-overlay .backdrop-blur-sm {
+    /* Tailwind already provides this */
+}
+
+#tutorial-overlay .rounded-3xl {
+    /* Tailwind already provides this */
+}
+
+#tutorial-overlay .shadow-2xl {
+    /* Tailwind already provides this */
+}
+
+#tutorial-overlay .max-w-xl {
+    /* Tailwind already provides this */
+}
     </style>
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
