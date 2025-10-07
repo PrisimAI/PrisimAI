@@ -719,6 +719,42 @@ const imageApiUrl = 'https://image.pollinations.ai/prompt/';
             }
         });
 
+        // --- Tutorial Overlay Logic ---
+const tutorialOverlay = document.getElementById('tutorial-overlay');
+const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
+const tutorialDoneBtn = document.getElementById('tutorial-done-btn');
+const TUTORIAL_SEEN_KEY = 'prisimaiTutorialSeen';
+
+function showTutorial() {
+    if (!localStorage.getItem(TUTORIAL_SEEN_KEY)) {
+        tutorialOverlay.classList.add('visible');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling while tutorial is shown
+    }
+}
+
+function hideTutorial() {
+    tutorialOverlay.classList.remove('visible');
+    document.body.style.overflow = ''; // Restore scrolling
+    localStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
+}
+
+if (tutorialCloseBtn) {
+    tutorialCloseBtn.addEventListener('click', hideTutorial);
+}
+
+if (tutorialDoneBtn) {
+    tutorialDoneBtn.addEventListener('click', hideTutorial);
+}
+
+// Call showTutorial when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    loadAllChats();
+    fetchModels();
+    showTutorial(); // Show tutorial on initial load if not seen
+});
+
+// --- End of Tutorial Overlay Logic ---
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             loadAllChats(); // Load saved chats first
