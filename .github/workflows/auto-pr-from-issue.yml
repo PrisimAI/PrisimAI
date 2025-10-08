@@ -9,45 +9,59 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout the repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Generate code changes using AI
       - name: Generate code changes using AI
         id: ai
         run: |
           ISSUE_BODY="${{ github.event.issue.body }}"
           ISSUE_TITLE="${{ github.event.issue.title }}"
+
+          # Send issue text to Gemini model
           AI_RESPONSE=$(curl -s -X POST "https://text.pollinations.ai/openai" \
             -H "Content-Type: application/json" \
             -d '{
-              "model": "gpt-3.5-turbo",
-              "messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "'"${ISSUE_BODY}"'"}],
+              "model": "gemini",
+              "messages": [
+                {"role": "system", "content": "You are a helpful coding assistant. Make code changes based on the issue description."},
+                {"role": "user", "content": "'"${ISSUE_BODY}"'"}
+              ],
               "temperature": 0.7
             }')
+
           echo "AI_RESPONSE=$AI_RESPONSE" >> $GITHUB_ENV
 
+      # 3️⃣ Create a new branch and apply changes
       - name: Create a new branch and apply changes
-  run: |
-    BRANCH_NAME="fix/$(date +%Y%m%d%H%M%S)"
-    git checkout -b $BRANCH_NAME
+        run: |
+          BRANCH_NAME="fix/$(date +%Y%m%d%H%M%S)"
+          git checkout -b $BRANCH_NAME
 
-    # Set Git author so commits don't fail
-    git config user.name "github-actions[bot]"
-    git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Set Git author identity to prevent commit errors
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-    echo "${{ env.AI_RESPONSE }}" > fix.txt
-    git add fix.txt
-    git commit -m "Fix for issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}"
-    git push origin $BRANCH_NAME
+          # Apply AI changes (currently to fix.txt)
+          echo "${{ env.AI_RESPONSE }}" > fix.txt
+          git add fix.txt
+          git commit -m "Fix for issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}"
+          git push origin $BRANCH_NAME
 
+      # 4️⃣ Install GitHub CLI
       - name: Install GitHub CLI
         run: |
           curl -fsSL https://cli.github.com/packages/githubcli-archive.key | sudo tee /usr/share/keyrings/githubcli.asc
           sudo apt update
           sudo apt install gh -y
 
+      # 5️⃣ Create a pull request
       - name: Create a pull request
         run: |
-          gh pr create --base main --head $BRANCH_NAME --title "Fix for issue #${{ github.event.issue.number }}" --body "Automatically generated pull request for issue #${{ github.event.issue.number }}."
+          gh pr create --base main --head $BRANCH_NAME \
+            --title "Fix for issue #${{ github.event.issue.number }}" \
+            --body "Automatically generated pull request for issue #${{ github.event.issue.number }}."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
