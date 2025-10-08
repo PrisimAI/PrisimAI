@@ -1,0 +1,48 @@
+name: Auto PR from Issue
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Generate code changes using AI
+        id: ai
+        run: |
+          ISSUE_BODY="${{ github.event.issue.body }}"
+          ISSUE_TITLE="${{ github.event.issue.title }}"
+          AI_RESPONSE=$(curl -s -X POST "https://text.pollinations.ai/openai" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "model": "gpt-3.5-turbo",
+              "messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "'"${ISSUE_BODY}"'"}],
+              "temperature": 0.7
+            }')
+          echo "AI_RESPONSE=$AI_RESPONSE" >> $GITHUB_ENV
+
+      - name: Create a new branch and apply changes
+        run: |
+          BRANCH_NAME="fix/$(date +%Y%m%d%H%M%S)"
+          git checkout -b $BRANCH_NAME
+          echo "${{ env.AI_RESPONSE }}" > fix.txt
+          git add fix.txt
+          git commit -m "Fix for issue #${{ github.event.issue.number }}: ${ISSUE_TITLE}"
+          git push origin $BRANCH_NAME
+
+      - name: Install GitHub CLI
+        run: |
+          curl -fsSL https://cli.github.com/packages/githubcli-archive.key | sudo tee /usr/share/keyrings/githubcli.asc
+          sudo apt update
+          sudo apt install gh -y
+
+      - name: Create a pull request
+        run: |
+          gh pr create --base main --head $BRANCH_NAME --title "Fix for issue #${{ github.event.issue.number }}" --body "Automatically generated pull request for issue #${{ github.event.issue.number }}."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
