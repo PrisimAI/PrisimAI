@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>PrisimAI</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,7 +22,8 @@
             background: linear-gradient(135deg, #f0f4ff 0%, #e6f0ff 100%);
         }
 
-        body.dark {
+        /* NOTE: Tailwind toggles the `dark` class on <html>. Target that here. */
+        .dark body {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         }
 
@@ -44,7 +45,7 @@
         #chat-history::-webkit-scrollbar-track,
         #chat-history-list-container::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.05);
-            border-radius: 4px; /* Added for track */
+            border-radius: 4px;
         }
 
         #chat-history::-webkit-scrollbar-thumb,
@@ -93,32 +94,13 @@
             opacity: 1;
             visibility: visible;
         }
-
-        #tutorial-overlay .bg-opacity-70 {
-            /* Tailwind already provides this */
-        }
-
-        #tutorial-overlay .backdrop-blur-sm {
-            /* Tailwind already provides this */
-        }
-
-        #tutorial-overlay .rounded-3xl {
-            /* Tailwind already provides this */
-        }
-
-        #tutorial-overlay .shadow-2xl {
-            /* Tailwind already provides this */
-        }
-
-        #tutorial-overlay .max-w-xl {
-            /* Tailwind already provides this */
-        }
     </style>
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
+
     <script type="text/javascript">
         (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -225,8 +207,8 @@
         </div>
     </main>
 
-    <!-- Tutorial Overlay -->
-    <div id="tutorial-overlay" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 hidden items-center justify-center transition-opacity duration-500">
+    <!-- Tutorial Overlay (removed conflicting `hidden` class so JS visibility toggle works) -->
+    <div id="tutorial-overlay" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 items-center justify-center transition-opacity duration-500">
         <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl max-w-xl w-full text-center relative">
             <button id="tutorial-close-btn" class="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -237,7 +219,7 @@
             <p class="text-lg mb-6 text-gray-700 dark:text-gray-300">Let's get you started with a quick tour:</p>
 
             <div id="tutorial-steps" class="space-y-4 text-left">
-                <!-- Step 1 -->
+                <!-- Steps -->
                 <div class="flex items-start space-x-4">
                     <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">1</span>
                     <div>
@@ -245,7 +227,6 @@
                         <p class="text-gray-600 dark:text-gray-400">Click the <strong class="font-medium">+ New Chat</strong> button in the sidebar to begin a fresh conversation. Each chat is saved automatically.</p>
                     </div>
                 </div>
-                <!-- Step 2 -->
                 <div class="flex items-start space-x-4">
                     <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">2</span>
                     <div>
@@ -253,7 +234,6 @@
                         <p class="text-gray-600 dark:text-gray-400">Type your message in the input box at the bottom and press Enter or click the send button. The AI's response will appear on the right.</p>
                     </div>
                 </div>
-                <!-- Step 3 -->
                 <div class="flex items-start space-x-4">
                     <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">3</span>
                     <div>
@@ -261,7 +241,6 @@
                         <p class="text-gray-600 dark:text-gray-400">Your previous conversations are listed in the sidebar. Click on any chat to revisit it.</p>
                     </div>
                 </div>
-                <!-- Step 4 -->
                 <div class="flex items-start space-x-4">
                     <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">4</span>
                     <div>
@@ -269,7 +248,6 @@
                         <p class="text-gray-600 dark:text-gray-400">To generate an image, type <code>/image</code> followed by your prompt (e.g., <code>/image a cat wearing a hat</code>).</p>
                     </div>
                 </div>
-                <!-- NEW Step 5 -->
                 <div class="flex items-start space-x-4">
                     <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">5</span>
                     <div>
@@ -288,12 +266,16 @@
         const darkModeToggle = document.getElementById('dark-mode-toggle');
         if (darkModeToggle) {
             darkModeToggle.addEventListener('click', () => {
+                // Tailwind expects the 'dark' class on <html> (documentElement).
                 document.documentElement.classList.toggle('dark');
+                // also keep body-level for any non-tailwind logic (defensive)
+                document.body.classList.toggle('dark');
                 localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
             });
             // Load saved theme
-            if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
+                document.body.classList.add('dark');
             }
         }
 
@@ -309,19 +291,21 @@
         let currentChatId = null;
         let allChats = {}; // Stores all chat data, keyed by chatId
 
-        // API Configuration
-        const apiKey = 'TOEAP3DuMvvVHUsy'; // Replace with your actual API key if different
+        // API Configuration (placeholder values)
+        const apiKey = 'TOEAP3DuMvvVHUsy'; // Replace with real key if needed
         const referrer = 'https://prisimai.github.io/PrisimAI/index.html'; // Your website URL
         const textApiUrl = 'https://text.pollinations.ai/openai';
         const imageApiUrl = 'https://image.pollinations.ai/prompt/';
 
         // Function to generate a unique ID for a new chat
         function generateChatId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+            // Use Date + random (short)
+            return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
         }
 
         // Function to escape HTML to prevent XSS
         function escapeHTML(str) {
+            if (typeof str !== 'string') return '';
             const div = document.createElement('div');
             div.appendChild(document.createTextNode(str));
             return div.innerHTML;
@@ -340,7 +324,8 @@
                 </svg>
                 <span class="truncate" title="${safeTitle}">${safeTitle}</span>
             `;
-            chatHistoryList.prepend(chatButton); // Add to the top
+            // Add to top of list
+            chatHistoryList.prepend(chatButton);
             return chatButton;
         }
 
@@ -357,11 +342,11 @@
 
         // Function to update the title of a chat button
         function updateChatButtonTitle(chatId, newTitle) {
-            const button = chatHistoryList.querySelector(`.chat-history-item[data-chat-id="${chatId}"] span`);
-            if (button) {
+            const buttonSpan = chatHistoryList.querySelector(`.chat-history-item[data-chat-id="${chatId}"] span`);
+            if (buttonSpan) {
                 const safeTitle = escapeHTML(newTitle);
-                button.textContent = safeTitle;
-                button.title = safeTitle;
+                buttonSpan.textContent = safeTitle;
+                buttonSpan.title = safeTitle;
             }
         }
 
@@ -398,14 +383,13 @@
             welcomeMessage.classList.add('hidden');
             chatHistory.classList.remove('hidden');
 
-            if (messages.length === 0) {
+            if (!messages || messages.length === 0) {
                 welcomeMessage.classList.remove('hidden');
                 chatHistory.classList.add('hidden');
                 return;
             }
 
             messages.forEach(msg => {
-                // Determine type for images
                 const messageType = msg.type || 'text';
                 addMessage(msg.content, msg.role, messageType);
             });
@@ -414,8 +398,11 @@
 
         // Function to save all chats to localStorage
         function saveAllChats() {
-            // Store only the chats, not other UI states
-            localStorage.setItem('allPrisimAIChats', JSON.stringify(allChats));
+            try {
+                localStorage.setItem('allPrisimAIChats', JSON.stringify(allChats));
+            } catch (e) {
+                console.warn('Could not save chats to localStorage:', e);
+            }
         }
 
         // Function to load all chats from localStorage
@@ -425,36 +412,32 @@
                 try {
                     allChats = JSON.parse(savedChats);
                     // Populate the chat history sidebar
-                    // Sort chats by timestamp (assuming generated IDs are timestamps)
                     const sortedChatIds = Object.keys(allChats).sort((a, b) => {
-                        // Attempt to parse as numbers, fall back to string comparison if needed
                         const numA = parseInt(a, 36);
                         const numB = parseInt(b, 36);
                         if (!isNaN(numA) && !isNaN(numB)) {
                             return numB - numA; // Descending order (newest first)
                         }
-                        return b.localeCompare(a); // Fallback
+                        return b.localeCompare(a);
                     });
 
                     sortedChatIds.forEach(chatId => {
                         addChatButton(chatId, allChats[chatId].title);
                     });
 
-                    // Select the first chat if available, otherwise start a new one
                     const firstChatId = sortedChatIds[0];
                     if (firstChatId) {
                         selectChat(firstChatId);
                     } else {
-                        selectChat(null); // Start a new chat if no saved chats
+                        selectChat(null);
                     }
                 } catch (e) {
                     console.error("Error parsing saved chats:", e);
-                    // If parsing fails, clear saved data and start fresh
                     localStorage.removeItem('allPrisimAIChats');
-                    selectChat(null); // Start a new chat
+                    selectChat(null);
                 }
             } else {
-                selectChat(null); // Start a new chat if no saved data
+                selectChat(null);
             }
         }
 
@@ -467,16 +450,17 @@
                     buttonToRemove.remove();
                 }
             }
-            currentChatId = null; // Reset current chat
+            currentChatId = null;
             chatHistory.innerHTML = '';
             welcomeMessage.classList.remove('hidden');
             chatHistory.classList.add('hidden');
-            chatInput.placeholder = 'Message PrisimAI ✨...'; // Reset placeholder
-            saveAllChats(); // Save the deletion
-            selectChat(null); // Ensure a new chat is selected
+            chatInput.placeholder = 'Message PrisimAI ✨...';
+            saveAllChats();
+            selectChat(null);
         }
 
-        // Add message to chat (modified to store messages in allChats and handle types)
+        // Add message to chat.
+        // Note: If message is an empty string, we create a placeholder DOM element but DO NOT store to allChats.
         function addMessage(message, role, type = 'text') {
             welcomeMessage.classList.add('hidden');
             chatHistory.classList.remove('hidden');
@@ -486,16 +470,21 @@
 
             let contentHTML = '';
             if (type === 'image') {
-                contentHTML = `<img src="${message}" alt="Generated image" class="rounded-xl w-full max-w-sm shadow-lg cursor-pointer" onclick="window.open('${message}', '_blank')">`;
+                const safeUrl = escapeHTML(message);
+                contentHTML = `<img src="${safeUrl}" alt="Generated image" class="rounded-xl w-full max-w-sm shadow-lg cursor-pointer" onclick="window.open('${safeUrl}', '_blank')">`;
             } else {
-                contentHTML = `<div class="p-4 rounded-xl shadow-md ${isUser ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100'}" style="white-space: pre-wrap; max-width: 80%;"> <p>${message}</p> </div>`;
+                // Escape message content to prevent XSS
+                const safeText = escapeHTML(message);
+                // We'll style user and assistant differently
+                const bubbleClasses = isUser ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100';
+                contentHTML = `<div class="p-4 rounded-xl shadow-md ${bubbleClasses}" style="white-space: pre-wrap; max-width: 80%;"> <p>${safeText}</p> </div>`;
             }
+
             messageWrapper.innerHTML = contentHTML;
             chatHistory.appendChild(messageWrapper);
 
-            // Store message in the current chat
-            if (currentChatId) {
-                // Ensure the chat exists before pushing
+            // Store message in the current chat only if non-empty (to avoid placeholder duplicates)
+            if (currentChatId && message !== '') {
                 if (!allChats[currentChatId]) {
                     allChats[currentChatId] = { title: 'New Chat', messages: [] };
                     addChatButton(currentChatId, 'New Chat');
@@ -503,17 +492,15 @@
                 }
                 allChats[currentChatId].messages.push({ role, content: message, type: type });
 
-                // Attempt to update title if it's the first user message and the chat title is still default
+                // Update title if first user message and still default title
                 if (isUser && allChats[currentChatId].messages.length === 1 && allChats[currentChatId].title === 'New Chat') {
                     const newTitle = message.substring(0, 50) + (message.length > 50 ? '...' : '');
                     allChats[currentChatId].title = newTitle;
                     updateChatButtonTitle(currentChatId, newTitle);
                 }
-                saveAllChats(); // Save after adding a message
-            } else {
-                // This case should ideally not happen if selectChat is called correctly
-                console.error("Error: currentChatId is null when trying to add a message.");
-                // Fallback: create a temporary chat if absolutely necessary
+                saveAllChats();
+            } else if (!currentChatId && message !== '') {
+                // Fallback: create a new chat if somehow no currentChatId
                 const tempId = generateChatId();
                 allChats[tempId] = { title: 'Temporary Chat', messages: [{ role, content: message, type }] };
                 currentChatId = tempId;
@@ -554,10 +541,9 @@
                     models.forEach(model => {
                         const option = document.createElement('option');
                         option.value = model.id || model.name || model.model || model;
-                        option.textContent = model.description || model.name || model.id || model;
+                        option.textContent = model.description || model.name || model.id || String(model);
                         modelSelector.appendChild(option);
                     });
-                    // Set default to the first model if available
                     if (models.length > 0) {
                         modelSelector.value = models[0].id || models[0].name || models[0].model;
                     }
@@ -570,11 +556,11 @@
             }
         }
 
-        // Stream text response (modified to store in allChats)
+        // Stream text response (handles streaming and storing)
         async function streamTextResponse() {
             const loadingIndicator = showLoadingIndicator();
-            const selectedModel = modelSelector.value;
-            const currentMessages = allChats[currentChatId]?.messages || []; // Use messages from current chat
+            const selectedModel = modelSelector.value || '';
+            const currentMessages = allChats[currentChatId]?.messages || [];
 
             const requestBody = {
                 model: selectedModel,
@@ -600,47 +586,44 @@
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
                 let accumulatedContent = '';
-                let assistantMessageElement = null;
-                let assistantMessageWrapper = null;
 
-                // Add a placeholder for the assistant message immediately
+                // Create assistant placeholder DOM but DO NOT store (addMessage with empty string won't store)
+                const assistantMessageWrapper = addMessage('', 'assistant'); // placeholder visual
+                const assistantMessageElement = assistantMessageWrapper.querySelector('div p');
+                // Remove loading indicator
+                if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
+
+                // Store assistant placeholder once in allChats so we can update it later
                 if (currentChatId) {
-                    assistantMessageWrapper = addMessage('', 'assistant');
-                    assistantMessageElement = assistantMessageWrapper.querySelector('div p');
-                    // Ensure loading indicator is removed if we immediately add the message element
-                    loadingIndicator.remove();
-                    // Store a placeholder in chat messages so we can update it
+                    if (!allChats[currentChatId]) allChats[currentChatId] = { title: 'New Chat', messages: [] };
                     allChats[currentChatId].messages.push({ role: 'assistant', content: '', type: 'text' });
                     saveAllChats();
                 } else {
-                     console.error("Critical error: currentChatId is missing during stream start.");
-                     loadingIndicator.remove();
-                     return; // Stop if no chat context
+                    console.error("Critical error: currentChatId is missing during stream start.");
                 }
-
 
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
 
                     const chunk = decoder.decode(value, { stream: true });
-                    const jsonStrings = chunk.split('data:').filter(s => s.trim() !== '' && s.trim() !== '[DONE]');
-
-                    for (const jsonStr of jsonStrings) {
+                    // The stream might use "data: <json>\n\n" framing.
+                    const parts = chunk.split(/(?:\r\n|\n){1,}/).filter(s => s.trim() !== '');
+                    for (const part of parts) {
+                        const trimmed = part.replace(/^data:\s*/, '').trim();
+                        if (!trimmed || trimmed === '[DONE]') continue;
                         try {
-                            const data = JSON.parse(jsonStr);
+                            const data = JSON.parse(trimmed);
                             const deltaContent = data.choices?.[0]?.delta?.content;
-                            const fullContent = data.choices?.[0]?.message?.content; // Sometimes full message is sent
-
+                            const fullContent = data.choices?.[0]?.message?.content;
                             if (deltaContent !== undefined) {
                                 accumulatedContent += deltaContent;
                             } else if (fullContent !== undefined) {
-                                // This might happen if the stream is short or ends with the full message
                                 accumulatedContent = fullContent;
-                                break; // Exit inner loop
+                                // if full message is present, we can break processing early
                             }
                         } catch (e) {
-                            console.error("Failed to parse JSON chunk:", e, "Chunk:", jsonStr);
+                            // ignore JSON parse errors for partial chunks
                         }
                     }
 
@@ -653,11 +636,9 @@
                 // Update the actual message in allChats after streaming is complete
                 if (currentChatId && allChats[currentChatId].messages.length > 0) {
                     const lastMessageIndex = allChats[currentChatId].messages.length - 1;
-                    // Check if the last message added was the assistant placeholder
                     if (allChats[currentChatId].messages[lastMessageIndex].role === 'assistant') {
                         allChats[currentChatId].messages[lastMessageIndex].content = accumulatedContent;
                     } else {
-                        // If not, add it as a new message (shouldn't happen often with placeholder logic)
                         allChats[currentChatId].messages.push({ role: 'assistant', content: accumulatedContent, type: 'text' });
                     }
                     saveAllChats();
@@ -665,15 +646,14 @@
 
             } catch (error) {
                 console.error('API Error:', error);
-                loadingIndicator.remove(); // Remove indicator if error occurs
+                if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
                 const errorMessage = `Sorry, I encountered an error: ${error.message || 'Please try again.'}`;
-                // Add error message as a new message
                 if (currentChatId) {
                     addMessage(errorMessage, 'assistant');
                     allChats[currentChatId].messages.push({ role: 'assistant', content: errorMessage });
                     saveAllChats();
                 } else {
-                    alert(errorMessage); // Fallback if no chat context
+                    alert(errorMessage);
                 }
             }
         }
@@ -683,9 +663,9 @@
             const imageUrl = `${imageApiUrl}${encodeURIComponent(prompt)}?key=${apiKey}&referrer=${referrer}`;
             const loadingIndicator = showLoadingIndicator();
             try {
-                const response = await fetch(imageUrl, { method: 'GET' }); // Explicitly GET
+                const response = await fetch(imageUrl, { method: 'GET' });
                 if (response.ok) {
-                    loadingIndicator.remove();
+                    if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
                     addMessage(imageUrl, 'assistant', 'image');
                     if (currentChatId) {
                         allChats[currentChatId].messages.push({ role: 'assistant', content: imageUrl, type: 'image' });
@@ -696,7 +676,7 @@
                 }
             } catch (error) {
                 console.error('API Error:', error);
-                loadingIndicator.remove();
+                if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
                 const errorMessage = `Sorry, I couldn't generate an image. ${error.message || ''}`;
                 addMessage(errorMessage, 'assistant');
                 if (currentChatId) {
@@ -706,7 +686,7 @@
             }
         }
 
-        // Handle chat submission
+        // Handle chat submission (fixed order: ensure chat exists BEFORE calling addMessage)
         async function handleChat() {
             const userMessage = chatInput.value.trim();
             if (userMessage === '') return;
@@ -714,21 +694,18 @@
             chatInput.value = ''; // Clear input immediately
             resizeTextarea(); // Reset textarea height
 
-            // Add user message to UI and current chat messages
-            addMessage(userMessage, 'user');
-
-            if (currentChatId === null) { // If it's a brand new, unsaved chat
-                // This condition should ideally be handled by selectChat(null) before the first message
-                // But as a safeguard:
+            // Ensure current chat exists before adding message
+            if (currentChatId === null) {
                 currentChatId = generateChatId();
-                allChats[currentChatId] = { title: userMessage.substring(0, 50) + (userMessage.length > 50 ? '...' : ''), messages: [{ role: 'user', content: userMessage }] };
+                allChats[currentChatId] = { title: 'New Chat', messages: [] };
                 addChatButton(currentChatId, allChats[currentChatId].title);
                 setActiveChatButton(currentChatId);
                 chatInput.placeholder = `Message ${escapeHTML(allChats[currentChatId].title)}...`;
                 saveAllChats();
-            } else {
-                // Add user message to existing chat, saveAllChats will be called within addMessage
             }
+
+            // Add user message to UI and to current chat
+            addMessage(userMessage, 'user');
 
             const lowerMessage = userMessage.toLowerCase();
             if (lowerMessage.startsWith('/image')) {
@@ -745,6 +722,7 @@
 
         // Resize textarea
         function resizeTextarea() {
+            if (!chatInput) return;
             chatInput.style.height = 'auto';
             chatInput.style.height = `${chatInput.scrollHeight}px`;
         }
@@ -756,15 +734,16 @@
         const TUTORIAL_SEEN_KEY = 'prisimaiTutorialSeen';
 
         function showTutorial() {
-            if (!localStorage.getItem(TUTORIAL_SEEN_KEY)) {
+            if (!localStorage.getItem(TUTORIAL_SEEN_KEY) && tutorialOverlay) {
                 tutorialOverlay.classList.add('visible');
-                document.body.style.overflow = 'hidden'; // Prevent scrolling while tutorial is shown
+                document.body.style.overflow = 'hidden';
             }
         }
 
         function hideTutorial() {
+            if (!tutorialOverlay) return;
             tutorialOverlay.classList.remove('visible');
-            document.body.style.overflow = ''; // Restore scrolling
+            document.body.style.overflow = '';
             localStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
         }
 
@@ -802,10 +781,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadAllChats();
             fetchModels();
-            showTutorial(); // Show tutorial on initial load if not seen
+            showTutorial();
         });
 
-        // Service Worker
+        // Service Worker registration (optional)
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
                 navigator.serviceWorker.register("sw.js")
