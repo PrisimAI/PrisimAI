@@ -27,13 +27,18 @@ jobs:
           echo "AI_RESPONSE=$AI_RESPONSE" >> $GITHUB_ENV
 
       - name: Create a new branch and apply changes
-        run: |
-          BRANCH_NAME="fix/$(date +%Y%m%d%H%M%S)"
-          git checkout -b $BRANCH_NAME
-          echo "${{ env.AI_RESPONSE }}" > fix.txt
-          git add fix.txt
-          git commit -m "Fix for issue #${{ github.event.issue.number }}: ${ISSUE_TITLE}"
-          git push origin $BRANCH_NAME
+  run: |
+    BRANCH_NAME="fix/$(date +%Y%m%d%H%M%S)"
+    git checkout -b $BRANCH_NAME
+
+    # Set Git author so commits don't fail
+    git config user.name "github-actions[bot]"
+    git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    echo "${{ env.AI_RESPONSE }}" > fix.txt
+    git add fix.txt
+    git commit -m "Fix for issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}"
+    git push origin $BRANCH_NAME
 
       - name: Install GitHub CLI
         run: |
