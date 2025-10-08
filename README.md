@@ -1,3 +1,5 @@
+[![pages-build-deployment](https://github.com/PrisimAI/PrisimAI/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/PrisimAI/PrisimAI/actions/workflows/pages/pages-build-deployment)
+
 # PrisimAI
 
 PrisimAI is a progressive web app (PWA) that lets you chat with models powered by Pollinations.ai
