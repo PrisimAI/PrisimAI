@@ -556,107 +556,96 @@
             }
         }
 
-        // Stream text response (handles streaming and storing)
         async function streamTextResponse() {
-            const loadingIndicator = showLoadingIndicator();
-            const selectedModel = modelSelector.value || '';
-            const currentMessages = allChats[currentChatId]?.messages || [];
+    const loadingIndicator = showLoadingIndicator();
+    const selectedModel = modelSelector.value || '';
+    const currentMessages = allChats[currentChatId]?.messages || [];
 
-            const requestBody = {
+    try {
+        const response = await fetch(textApiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`,       // ✅ Header added here
+                'x-referrer': referrer                     // ✅ Referrer header
+            },
+            body: JSON.stringify({
                 model: selectedModel,
                 messages: currentMessages,
                 stream: true,
-                private: false,
-                referrer: referrer,
-                api_key: apiKey
-            };
+                private: false
+            })
+        });
 
-            try {
-                const response = await fetch(textApiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestBody)
-                });
+        if (!response.ok) throw new Error(`API Error: ${response.status} - ${await response.text()}`);
+        if (!response.body) throw new Error('ReadableStream not supported');
 
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status} - ${await response.text()}`);
-                }
-                if (!response.body) throw new Error('ReadableStream not supported');
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedContent = '';
 
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let accumulatedContent = '';
+        // Create assistant placeholder DOM but DO NOT store yet
+        const assistantMessageWrapper = addMessage('', 'assistant');
+        const assistantMessageElement = assistantMessageWrapper.querySelector('div p');
 
-                // Create assistant placeholder DOM but DO NOT store (addMessage with empty string won't store)
-                const assistantMessageWrapper = addMessage('', 'assistant'); // placeholder visual
-                const assistantMessageElement = assistantMessageWrapper.querySelector('div p');
-                // Remove loading indicator
-                if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
+        if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
 
-                // Store assistant placeholder once in allChats so we can update it later
-                if (currentChatId) {
-                    if (!allChats[currentChatId]) allChats[currentChatId] = { title: 'New Chat', messages: [] };
-                    allChats[currentChatId].messages.push({ role: 'assistant', content: '', type: 'text' });
-                    saveAllChats();
-                } else {
-                    console.error("Critical error: currentChatId is missing during stream start.");
-                }
+        // Store assistant placeholder in allChats
+        if (currentChatId) {
+            if (!allChats[currentChatId]) allChats[currentChatId] = { title: 'New Chat', messages: [] };
+            allChats[currentChatId].messages.push({ role: 'assistant', content: '', type: 'text' });
+            saveAllChats();
+        } else {
+            console.error("Critical error: currentChatId is missing during stream start.");
+        }
 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-
-                    const chunk = decoder.decode(value, { stream: true });
-                    // The stream might use "data: <json>\n\n" framing.
-                    const parts = chunk.split(/(?:\r\n|\n){1,}/).filter(s => s.trim() !== '');
-                    for (const part of parts) {
-                        const trimmed = part.replace(/^data:\s*/, '').trim();
-                        if (!trimmed || trimmed === '[DONE]') continue;
-                        try {
-                            const data = JSON.parse(trimmed);
-                            const deltaContent = data.choices?.[0]?.delta?.content;
-                            const fullContent = data.choices?.[0]?.message?.content;
-                            if (deltaContent !== undefined) {
-                                accumulatedContent += deltaContent;
-                            } else if (fullContent !== undefined) {
-                                accumulatedContent = fullContent;
-                                // if full message is present, we can break processing early
-                            }
-                        } catch (e) {
-                            // ignore JSON parse errors for partial chunks
-                        }
-                    }
-
-                    if (assistantMessageElement) {
-                        assistantMessageElement.textContent = accumulatedContent;
-                    }
-                    chatHistory.scrollTop = chatHistory.scrollHeight;
-                }
-
-                // Update the actual message in allChats after streaming is complete
-                if (currentChatId && allChats[currentChatId].messages.length > 0) {
-                    const lastMessageIndex = allChats[currentChatId].messages.length - 1;
-                    if (allChats[currentChatId].messages[lastMessageIndex].role === 'assistant') {
-                        allChats[currentChatId].messages[lastMessageIndex].content = accumulatedContent;
-                    } else {
-                        allChats[currentChatId].messages.push({ role: 'assistant', content: accumulatedContent, type: 'text' });
-                    }
-                    saveAllChats();
-                }
-
-            } catch (error) {
-                console.error('API Error:', error);
-                if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
-                const errorMessage = `Sorry, I encountered an error: ${error.message || 'Please try again.'}`;
-                if (currentChatId) {
-                    addMessage(errorMessage, 'assistant');
-                    allChats[currentChatId].messages.push({ role: 'assistant', content: errorMessage });
-                    saveAllChats();
-                } else {
-                    alert(errorMessage);
+        // Read the streaming chunks
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            const parts = chunk.split(/(?:\r\n|\n){1,}/).filter(s => s.trim() !== '');
+            for (const part of parts) {
+                const trimmed = part.replace(/^data:\s*/, '').trim();
+                if (!trimmed || trimmed === '[DONE]') continue;
+                try {
+                    const data = JSON.parse(trimmed);
+                    const deltaContent = data.choices?.[0]?.delta?.content;
+                    const fullContent = data.choices?.[0]?.message?.content;
+                    if (deltaContent !== undefined) accumulatedContent += deltaContent;
+                    else if (fullContent !== undefined) accumulatedContent = fullContent;
+                } catch (e) {
+                    // ignore partial JSON parse errors
                 }
             }
+            if (assistantMessageElement) assistantMessageElement.textContent = accumulatedContent;
+            chatHistory.scrollTop = chatHistory.scrollHeight;
         }
+
+        // Update the message in allChats after streaming
+        if (currentChatId && allChats[currentChatId].messages.length > 0) {
+            const lastIndex = allChats[currentChatId].messages.length - 1;
+            if (allChats[currentChatId].messages[lastIndex].role === 'assistant') {
+                allChats[currentChatId].messages[lastIndex].content = accumulatedContent;
+            } else {
+                allChats[currentChatId].messages.push({ role: 'assistant', content: accumulatedContent, type: 'text' });
+            }
+            saveAllChats();
+        }
+
+    } catch (error) {
+        console.error('API Error:', error);
+        if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
+        const errorMessage = `Sorry, I encountered an error: ${error.message || 'Please try again.'}`;
+        if (currentChatId) {
+            addMessage(errorMessage, 'assistant');
+            allChats[currentChatId].messages.push({ role: 'assistant', content: errorMessage });
+            saveAllChats();
+        } else {
+            alert(errorMessage);
+        }
+    }
+}
 
         // Handle image response
         async function handleImageResponse(prompt) {
