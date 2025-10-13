@@ -26,7 +26,7 @@
 <link rel="canonical" href="https://PrisimAI.github.io/PrismAI">
 
 <!-- Favicon -->
-<link rel="icon" href="https://PrisimAI.github.io/PrismAI/favicon.ico" type="image/x-icon">
+<link rel="icon" href="https://PrisimAI.github.io/PrisimAI/favicon.ico" type="image/x-icon">
 
 
     <!-- Tailwind CSS CDN -->
@@ -37,9 +37,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.15);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-inner: rgba(255,255,255,0.06);
+            --glass-shadow: 0 1px 0 rgba(255,255,255,0.03) inset;
+            --accent: #2563eb;
         }
 
         body {
@@ -47,78 +49,144 @@
             background: linear-gradient(135deg, #f0f4ff 0%, #e6f0ff 100%);
         }
 
-        /* NOTE: Tailwind toggles the `dark` class on <html>. Target that here. */
         .dark body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: linear-gradient(135deg, #071024 0%, #0b1b2e 100%);
         }
 
-        /* Glassmorphism effect */
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
+        /* ---------- GLASS STYLES ---------- */
+        /* Primary full-bleed glass (used for the chat area) - subtle, liquid look (no outer shadow) */
+        .glass-primary {
+            background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+            border: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(14px) saturate(1.1);
+            -webkit-backdrop-filter: blur(14px) saturate(1.1);
             box-shadow: var(--glass-shadow);
         }
 
-        /* Custom scrollbar */
-        #chat-history::-webkit-scrollbar,
-        #chat-history-list-container::-webkit-scrollbar {
-            width: 8px;
+        /* Elevated glass (for sidebar/profile) - still glass but slightly raised */
+        .glass-elevated {
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+            border: 1px solid rgba(255,255,255,0.10);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 8px 30px rgba(2,6,23,0.12);
         }
 
-        #chat-history::-webkit-scrollbar-track,
-        #chat-history-list-container::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 4px;
+        /* Liquid sheen animation for bubbles */
+        @keyframes sheen {
+            0% { transform: translateX(-120%) skewX(-10deg); opacity: 0; }
+            50% { opacity: 0.18; }
+            100% { transform: translateX(120%) skewX(-10deg); opacity: 0; }
         }
 
-        #chat-history::-webkit-scrollbar-thumb,
-        #chat-history-list-container::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 4px;
+        /* Message bubble basics */
+        .msg {
+            max-width: 78%;
+            line-height: 1.45;
+            word-break: break-word;
+            position: relative;
         }
 
-        /* Bouncing dots animation */
-        @keyframes bounce-dot {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-8px);
-            }
+        /* Assistant bubble: glassy, rounded, subtle border + sheen */
+        .msg-assistant {
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.0));
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 14px 16px;
+            border-radius: 16px;
+            color: #0b1220;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
         }
-        .bounce-dot {
-            animation: bounce-dot 1.4s infinite ease-in-out;
+        .dark .msg-assistant { color: #e6eefc; border-color: rgba(255,255,255,0.06); }
+
+        /* Assistant glass tail (left) */
+        .msg-assistant:after {
+            content: "";
+            position: absolute;
+            left: -8px;
+            top: 14px;
+            width: 18px; height: 18px;
+            background: inherit;
+            border-left: none;
+            transform: rotate(45deg);
+            border-radius: 3px;
+            filter: blur(0.2px);
+            z-index: -1;
         }
 
-        /* Fade-in animation for messages */
+        /* Add sheen */
+        .msg-assistant .sheen {
+            position: absolute;
+            top: -10px;
+            left: -40%;
+            width: 120%;
+            height: 40%;
+            transform: rotate(-12deg);
+            background: linear-gradient(90deg, rgba(255,255,255,0.0), rgba(255,255,255,0.18), rgba(255,255,255,0.0));
+            pointer-events: none;
+            animation: sheen 3.4s linear infinite;
+            opacity: 0;
+        }
+
+        /* User bubble: solid gradient, pill-ish and bold text */
+        .msg-user {
+            background: linear-gradient(180deg, rgba(37,99,235,1), rgba(59,130,246,0.95));
+            color: white;
+            padding: 12px 16px;
+            border-radius: 18px;
+            box-shadow: 0 4px 18px rgba(37,99,235,0.12);
+            font-weight: 500;
+        }
+
+        /* User tail (right) */
+        .msg-user:after {
+            content: "";
+            position: absolute;
+            right: -8px;
+            top: 12px;
+            width: 18px; height: 18px;
+            background: inherit;
+            transform: rotate(45deg);
+            border-radius: 3px;
+            z-index: -1;
+            filter: blur(0.2px);
+        }
+
+        /* Scrollbar theming */
+        #chat-history::-webkit-scrollbar {
+            width: 10px;
+        }
+        #chat-history::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #chat-history::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.12);
+            border-radius: 8px;
+        }
+        .dark #chat-history::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.07);
+        }
+
+        /* small fade-in */
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
+        .fade-in { animation: fadeIn .22s ease-out both; }
+
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            aside { width: 64px; } /* collapse sidebar visually on small screens */
+            aside .space-y-6 > *:not(:first-child){ display:none; } /* hide sidebar content for compactness */
         }
 
-        /* Tutorial Overlay styles */
-        #tutorial-overlay {
-            display: flex; /* Use flex for centering */
-            opacity: 0; /* Start hidden */
-            visibility: hidden; /* Start hidden */
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
+        /* small helper to ensure input doesn't overlap messages when absolute positioning used */
+        .chat-input-wrapper { z-index: 10; }
 
-        #tutorial-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
+        /* tutorial overlay tweaks */
+        #tutorial-overlay { display: none; }
+        #tutorial-overlay.visible { display: flex; }
+
     </style>
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -137,8 +205,8 @@
 <body class="text-gray-800 antialiased flex h-screen overflow-hidden dark:text-gray-100 transition-colors duration-300">
 
     <!-- Sidebar -->
-    <aside class="w-64 flex-shrink-0 flex flex-col justify-between p-6 sm:flex shadow-xl rounded-r-3xl glass m-4">
-        <div class="space-y-6">
+    <aside class="w-64 flex-shrink-0 flex flex-col justify-between p-6 sm:flex glass-elevated m-4 rounded-r-3xl">
+        <div class="space-y-6 relative">
             <!-- Dark mode toggle -->
             <button id="dark-mode-toggle" class="absolute top-4 right-4 p-2 rounded-full bg-white/20 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 shadow hover:bg-white/30 dark:hover:bg-gray-600/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400">
                 <svg id="dark-mode-icon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -156,7 +224,7 @@
             </div>
 
             <!-- New Chat Button -->
-            <button id="new-chat-btn" class="w-full p-2 rounded-xl bg-blue-500/20 text-blue-600 dark:text-blue-300 font-semibold shadow hover:bg-blue-500/30 active:scale-95 transition-all duration-200">
+            <button id="new-chat-btn" class="w-full p-2 rounded-xl bg-blue-500/20 text-blue-600 dark:text-blue-300 font-semibold hover:bg-blue-500/30 active:scale-95 transition-all duration-200">
                 + New Chat
             </button>
 
@@ -164,22 +232,20 @@
             <div id="chat-history-list-container" class="mb-6 flex-grow overflow-y-auto max-h-[calc(100%-150px)]">
                 <h3 class="text-lg font-bold text-gray-700 dark:text-gray-300 mb-3">Chat History</h3>
                 <div id="chat-history-list" class="space-y-2">
-                    <!-- Chat history items will be added here dynamically by JS -->
-                    <!-- Example of a "New Chat" button that's always there -->
+                    <!-- Placeholder New Chat button -->
                     <button class="w-full p-2 rounded-xl text-left text-gray-700 dark:text-gray-300 font-medium hover:bg-white/20 transition-all duration-200 active:scale-95 flex items-center space-x-2 chat-history-item" data-chat-id="new-chat-placeholder">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
                         <span class="truncate">New Chat</span>
                     </button>
-                    <!-- Saved chats will be appended here -->
                 </div>
             </div>
 
             <!-- Model Selector -->
             <div class="space-y-2 mt-8">
                 <label for="model-selector" class="text-sm font-medium text-gray-700 dark:text-gray-300">Select Model</label>
-                <select id="model-selector" class="w-full p-2 rounded-xl border border-gray-300/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow hover:border-blue-400 transition-all duration-200">
+                <select id="model-selector" class="w-full p-2 rounded-xl border border-gray-300/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
                     <option value="" disabled selected>Loading models...</option>
                 </select>
             </div>
@@ -198,41 +264,45 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col relative bg-gradient-to-br from-blue-50/30 via-white/30 to-indigo-100/30 dark:from-gray-900/30 dark:via-gray-800/30 dark:to-gray-900/30 p-4">
-        <div class="flex-1 flex flex-col justify-between items-center">
-            <!-- Chat Container -->
-            <div id="chat-container" class="flex-1 relative w-full max-w-2xl mx-auto my-8 rounded-3xl glass overflow-hidden">
-                <!-- Welcome Message -->
-                <div id="welcome-message" class="absolute inset-0 flex flex-col justify-center items-center text-center p-8 space-y-4 text-gray-500 dark:text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-20 h-20 text-blue-400">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5a6 6 0 1 0-12 0v1.5a6 6 0 0 0 6 6Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
-                    </svg>
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Hello there, Stranger!</h2>
-                    <p class="text-lg">What can I help you with today? Try typing something in the box below.</p>
+    <main class="flex-1 flex flex-col relative p-0">
+        <div class="flex-1 flex flex-col">
+            <!-- Chat Container: spans the available width (from sidebar to page edge) -->
+            <div id="chat-container" class="flex-1 relative w-full m-4 glass-primary overflow-hidden rounded-2xl">
+                <!-- Layout: column, chat history grows, input fixed to bottom -->
+                <div class="flex flex-col h-full">
+                    <!-- Welcome Message (shows when no messages) -->
+                    <div id="welcome-message" class="flex flex-col items-center justify-center text-center p-8 space-y-4 text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-20 h-20 text-blue-400">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5a6 6 0 1 0-12 0v1.5a6 6 0 0 0 6 6Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+                        </svg>
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Hello there, Stranger!</h2>
+                        <p class="text-lg">What can I help you with today? Try typing something in the box below.</p>
+                    </div>
+
+                    <!-- Chat History (flexible, scrollable) -->
+                    <div id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-4 hidden">
+                        <!-- Messages get appended here -->
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="chat-input-wrapper p-4 bg-transparent border-t border-white/6 dark:border-black/6">
+                        <form id="chat-form" class="flex items-end space-x-4">
+                            <textarea id="chat-input" placeholder="Message PrisimAI ✨..." rows="1" class="flex-1 p-3 rounded-2xl border border-gray-300/30 dark:border-gray-600/30 bg-white/10 dark:bg-gray-700/20 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                            <button type="submit" class="p-3 rounded-2xl bg-blue-500 text-white shadow-lg hover:bg-blue-600 active:bg-blue-700 active:scale-95 transition-all duration-200" aria-label="Send message">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.769 59.769 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
-                <!-- Chat History -->
-                <div id="chat-history" class="absolute inset-0 overflow-y-auto p-8 space-y-4 hidden">
-                    <!-- Messages will be loaded here -->
-                </div>
-
-                <!-- Chat Input -->
-                <div class="absolute bottom-0 inset-x-0 p-4 bg-white/30 dark:bg-gray-800/30 glass border-t border-gray-200/30 dark:border-gray-700/30">
-                    <form id="chat-form" class="flex items-end space-x-4">
-                        <textarea id="chat-input" placeholder="Message PrisimAI ✨..." rows="1" class="flex-1 p-3 rounded-2xl border border-gray-300/30 dark:border-gray-600/30 bg-white/30 dark:bg-gray-700/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none shadow"></textarea>
-                        <button type="submit" class="p-3 rounded-2xl bg-blue-500 text-white shadow-lg hover:bg-blue-600 active:bg-blue-700 active:scale-95 transition-all duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.769 59.769 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                            </svg>
-                        </button>
-                    </form>
-                </div>
             </div>
         </div>
     </main>
 
-    <!-- Tutorial Overlay (removed conflicting `hidden` class so JS visibility toggle works) -->
+    <!-- Tutorial Overlay -->
     <div id="tutorial-overlay" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 items-center justify-center transition-opacity duration-500">
         <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl max-w-xl w-full text-center relative">
             <button id="tutorial-close-btn" class="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors">
@@ -244,7 +314,6 @@
             <p class="text-lg mb-6 text-gray-700 dark:text-gray-300">Let's get you started with a quick tour:</p>
 
             <div id="tutorial-steps" class="space-y-4 text-left">
-                <!-- Steps -->
                 <div class="flex items-start space-x-4">
                     <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">1</span>
                     <div>
@@ -287,301 +356,253 @@
     </div>
 
     <script>
-        // Dark mode toggle
-        const darkModeToggle = document.getElementById('dark-mode-toggle');
-        if (darkModeToggle) {
-            darkModeToggle.addEventListener('click', () => {
-                // Tailwind expects the 'dark' class on <html> (documentElement).
-                document.documentElement.classList.toggle('dark');
-                // also keep body-level for any non-tailwind logic (defensive)
-                document.body.classList.toggle('dark');
-                localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        // ---------- Utilities & DOM Refs ----------
+const darkModeToggle = document.getElementById('dark-mode-toggle');
+const chatHistory = document.getElementById('chat-history');
+const chatInput = document.getElementById('chat-input');
+const chatForm = document.getElementById('chat-form');
+const welcomeMessage = document.getElementById('welcome-message');
+const newChatBtn = document.getElementById('new-chat-btn');
+const modelSelector = document.getElementById('model-selector');
+const chatHistoryList = document.getElementById('chat-history-list');
+
+let currentChatId = null;
+let allChats = {}; // { chatId: { title, messages: [...], createdAt } }
+
+// API placeholders (replace with real values in production)
+const apiKey = 'TOEAP3DuMvvVHUsy';
+const referrer = 'https://prisimai.github.io/PrismAI/index.html';
+const textApiUrl = 'https://text.pollinations.ai/openai';
+const imageApiUrl = 'https://image.pollinations.ai/prompt/';
+
+// ---------- ID / Storage helpers ----------
+function generateChatId() {
+    return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+}
+
+function escapeHTML(str) {
+    if (typeof str !== 'string') return '';
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+}
+
+// ---------- Sidebar chat button management ----------
+function addChatButton(chatId, title = 'New Chat') {
+    const existing = chatHistoryList.querySelector(`[data-chat-id="${chatId}"]`);
+    if (existing) return existing;
+
+    const chatButton = document.createElement('button');
+    chatButton.classList.add('w-full','p-2','rounded-xl','text-left','text-gray-700','dark:text-gray-300','font-medium','hover:bg-white/20','transition-all','duration-200','active:scale-95','flex','items-center','space-x-2','chat-history-item');
+    chatButton.dataset.chatId = chatId;
+    const safeTitle = escapeHTML(title);
+    chatButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0 0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z" />
+        </svg>
+        <span class="truncate" title="${safeTitle}">${safeTitle}</span>
+    `;
+    chatHistoryList.prepend(chatButton);
+    return chatButton;
+}
+
+function setActiveChatButton(chatId) {
+    document.querySelectorAll('.chat-history-item').forEach(btn => {
+        if (btn.dataset.chatId === chatId) {
+            btn.classList.add('bg-blue-500/20','text-blue-400','font-semibold');
+        } else {
+            btn.classList.remove('bg-blue-500/20','text-blue-400','font-semibold');
+        }
+    });
+}
+
+function updateChatButtonTitle(chatId, newTitle) {
+    const btn = chatHistoryList.querySelector(`.chat-history-item[data-chat-id="${chatId}"]`);
+    if (!btn) return;
+    const span = btn.querySelector('span');
+    if (span) {
+        const safeTitle = escapeHTML(newTitle);
+        span.textContent = safeTitle;
+        span.title = safeTitle;
+    }
+}
+
+// ---------- Chat selection & load ----------
+function selectChat(chatId) {
+    if (chatId === null || chatId === 'new-chat-placeholder') {
+        currentChatId = generateChatId();
+        allChats[currentChatId] = { title: 'New Chat', messages: [], createdAt: Date.now() };
+        addChatButton(currentChatId, allChats[currentChatId].title);
+        setActiveChatButton(currentChatId);
+        loadChatMessages([]);
+        chatInput.placeholder = 'Message PrisimAI ✨...';
+        saveAllChats();
+        return;
+    }
+
+    if (!allChats[chatId]) {
+        console.warn(`Chat ${chatId} missing, creating new`);
+        selectChat(null);
+        return;
+    }
+
+    currentChatId = chatId;
+    const chatData = allChats[chatId];
+    loadChatMessages(chatData.messages || []);
+    setActiveChatButton(chatId);
+    chatInput.placeholder = `Message ${escapeHTML(chatData.title)}...`;
+    saveAllChats();
+}
+
+function loadChatMessages(messages) {
+    chatHistory.innerHTML = '';
+    if (!messages || messages.length === 0) {
+        welcomeMessage.classList.remove('hidden');
+        chatHistory.classList.add('hidden');
+        return;
+    }
+    welcomeMessage.classList.add('hidden');
+    chatHistory.classList.remove('hidden');
+
+    messages.forEach(msg => {
+        addMessage(msg.content, msg.role, msg.type || 'text', false);
+    });
+    requestAnimationFrame(() => { chatHistory.scrollTop = chatHistory.scrollHeight; });
+}
+
+// ---------- Persisting ----------
+function saveAllChats() {
+    try {
+        localStorage.setItem('allPrisimAIChats', JSON.stringify(allChats));
+    } catch (e) {
+        console.warn('Could not save chats to localStorage:', e);
+    }
+}
+
+function loadAllChats() {
+    const saved = localStorage.getItem('allPrisimAIChats');
+    if (!saved) {
+        selectChat(null);
+        return;
+    }
+    try {
+        allChats = JSON.parse(saved) || {};
+        const sorted = Object.entries(allChats).sort((a,b) => (b[1]?.createdAt||0) - (a[1]?.createdAt||0));
+        sorted.forEach(([id, data]) => addChatButton(id, data.title || 'Chat'));
+        const first = sorted[0]?.[0];
+        if (first) selectChat(first);
+        else selectChat(null);
+    } catch (e) {
+        console.error('Error loading chats:', e);
+        localStorage.removeItem('allPrisimAIChats');
+        selectChat(null);
+    }
+}
+
+function clearCurrentChat() {
+    if (!currentChatId) return;
+    delete allChats[currentChatId];
+    const btn = chatHistoryList.querySelector(`[data-chat-id="${currentChatId}"]`);
+    if (btn) btn.remove();
+    currentChatId = null;
+    chatHistory.innerHTML = '';
+    welcomeMessage.classList.remove('hidden');
+    chatHistory.classList.add('hidden');
+    chatInput.placeholder = 'Message PrisimAI ✨...';
+    saveAllChats();
+    selectChat(null);
+}
+
+// ---------- Messages rendering ----------
+function addMessage(message, role='assistant', type='text', store=true) {
+    welcomeMessage.classList.add('hidden');
+    chatHistory.classList.remove('hidden');
+    const isUser = role === 'user';
+
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('fade-in','mb-4','flex');
+    wrapper.style.alignItems = 'flex-start';
+    wrapper.style.justifyContent = isUser ? 'flex-end' : 'flex-start';
+
+    const bubble = document.createElement('div');
+    bubble.classList.add('msg');
+
+    if (type === 'image') {
+        bubble.innerHTML = `<img src="${escapeHTML(message)}" alt="Generated" class="rounded-xl max-w-sm cursor-pointer shadow-lg" onclick="window.open('${escapeHTML(message)}','_blank')">`;
+    } else {
+        if (isUser) {
+            bubble.classList.add('msg-user');
+            bubble.innerHTML = `<div style="position:relative;"><div>${escapeHTML(message)}</div></div>`;
+        } else {
+            bubble.classList.add('msg-assistant');
+            bubble.innerHTML = `<div style="position:relative;"><p style="margin:0;">${escapeHTML(message)}</p><div class="sheen"></div></div>`;
+        }
+    }
+
+    wrapper.appendChild(bubble);
+    chatHistory.appendChild(wrapper);
+
+    if (store && message !== '') {
+        if (!currentChatId) {
+            currentChatId = generateChatId();
+            allChats[currentChatId] = { title: 'New Chat', messages: [], createdAt: Date.now() };
+            addChatButton(currentChatId, allChats[currentChatId].title);
+            setActiveChatButton(currentChatId);
+        }
+        allChats[currentChatId].messages.push({ role, content: message, type });
+        if (role === 'user' && allChats[currentChatId].title === 'New Chat') {
+            const short = message.slice(0, 50) + (message.length > 50 ? '...' : '');
+            allChats[currentChatId].title = short;
+            updateChatButtonTitle(currentChatId, short);
+        }
+        saveAllChats();
+    }
+
+    requestAnimationFrame(() => { chatHistory.scrollTop = chatHistory.scrollHeight; });
+    return wrapper;
+}
+
+function showLoadingIndicator() {
+    const loading = document.createElement('div');
+    loading.classList.add('fade-in','mb-4','flex','justify-start');
+    loading.innerHTML = `<div class="p-3 rounded-xl bg-gray-200/60 dark:bg-gray-700/60 text-gray-800 dark:text-gray-100 flex items-center space-x-2 msg-assistant" style="max-width: 140px;">
+        <div class="w-3 h-3 rounded-full bounce-dot" style="background: rgba(0,0,0,0.35); animation-delay:-0.32s;"></div>
+        <div class="w-3 h-3 rounded-full bounce-dot" style="background: rgba(0,0,0,0.35); animation-delay:-0.16s;"></div>
+        <div class="w-3 h-3 rounded-full bounce-dot" style="background: rgba(0,0,0,0.35);"></div>
+    </div>`;
+    chatHistory.appendChild(loading);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+    return loading;
+}
+
+// ---------- Fetch models ----------
+async function fetchModels() {
+    try {
+        modelSelector.innerHTML = `<option disabled selected>Loading models...</option>`;
+        const res = await fetch('https://text.pollinations.ai/models');
+        if (!res.ok) throw new Error('Failed to fetch models');
+        const models = await res.json();
+        console.log('Fetched models:', models);
+        modelSelector.innerHTML = '';
+        if (Array.isArray(models) && models.length) {
+            models.forEach(m => {
+                const option = document.createElement('option');
+                option.value = m.id || m.name || m.model || JSON.stringify(m);
+                option.textContent = m.description || m.name || m.id || String(m);
+                modelSelector.appendChild(option);
             });
-            // Load saved theme
-            if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-                document.body.classList.add('dark');
-            }
+            modelSelector.value = models[0].id || models[0].name || models[0].model || modelSelector.value;
+        } else {
+            modelSelector.innerHTML = `<option disabled>No models available</option>`;
         }
+    } catch (e) {
+        console.error('Error fetching models:', e);
+        modelSelector.innerHTML = `<option disabled>Error loading models</option>`;
+    }
+}
 
-        // --- Chat History Management ---
-        const chatHistory = document.getElementById('chat-history');
-        const chatInput = document.getElementById('chat-input');
-        const chatForm = document.getElementById('chat-form');
-        const welcomeMessage = document.getElementById('welcome-message');
-        const newChatBtn = document.getElementById('new-chat-btn');
-        const modelSelector = document.getElementById('model-selector');
-        const chatHistoryList = document.getElementById('chat-history-list'); // To hold list of chat buttons
-
-        let currentChatId = null;
-        let allChats = {}; // Stores all chat data, keyed by chatId
-
-        // API Configuration (placeholder values)
-        const apiKey = 'TOEAP3DuMvvVHUsy'; // Replace with real key if needed
-        const referrer = 'https://prisimai.github.io/PrisimAI/index.html'; // Your website URL
-        const textApiUrl = 'https://text.pollinations.ai/openai';
-        const imageApiUrl = 'https://image.pollinations.ai/prompt/';
-
-        // Function to generate a unique ID for a new chat
-        function generateChatId() {
-            // Use Date + random (short)
-            return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-        }
-
-        // Function to escape HTML to prevent XSS
-        function escapeHTML(str) {
-            if (typeof str !== 'string') return '';
-            const div = document.createElement('div');
-            div.appendChild(document.createTextNode(str));
-            return div.innerHTML;
-        }
-
-        // Function to add a chat button to the sidebar
-        function addChatButton(chatId, title = 'New Chat') {
-            const chatButton = document.createElement('button');
-            chatButton.classList.add('w-full', 'p-2', 'rounded-xl', 'text-left', 'text-gray-700', 'dark:text-gray-300', 'font-medium', 'hover:bg-white/20', 'transition-all', 'duration-200', 'active:scale-95', 'flex', 'items-center', 'space-x-2', 'chat-history-item');
-            chatButton.dataset.chatId = chatId;
-            // Ensure title is escaped for safety
-            const safeTitle = escapeHTML(title);
-            chatButton.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.374a2.25 2.25 0 00-2.25-2.25l-3.283-.774a2.25 2.25 0 00-2.049 2.155l-.753 3.646a2.25 2.25 0 01-2.169 2.228l-.775.251a1.058 1.058 0 00-.776.997c0 3.408.158 5.106.783 6.462.625 1.356 1.888 2.758 4.705 4.555a2.752 2.752 0 002.686.25 2.752 2.752 0 001.052-.548c.245-.297.49-.647.71-1.028l.567-1.094a2.25 2.25 0 011.777-1.351l3.154.788a2.25 2.25 0 012.157 2.175v.663c0 8.284-6.716 15-15 15h-2.25a2.25 2.25 0 01-2.25-2.25V24z" />
-                </svg>
-                <span class="truncate" title="${safeTitle}">${safeTitle}</span>
-            `;
-            // Add to top of list
-            chatHistoryList.prepend(chatButton);
-            return chatButton;
-        }
-
-        // Function to update the currently active chat button
-        function setActiveChatButton(chatId) {
-            document.querySelectorAll('.chat-history-item').forEach(btn => {
-                if (btn.dataset.chatId === chatId) {
-                    btn.classList.add('bg-blue-500/20', 'text-blue-400', 'font-semibold');
-                } else {
-                    btn.classList.remove('bg-blue-500/20', 'text-blue-400', 'font-semibold');
-                }
-            });
-        }
-
-        // Function to update the title of a chat button
-        function updateChatButtonTitle(chatId, newTitle) {
-            const buttonSpan = chatHistoryList.querySelector(`.chat-history-item[data-chat-id="${chatId}"] span`);
-            if (buttonSpan) {
-                const safeTitle = escapeHTML(newTitle);
-                buttonSpan.textContent = safeTitle;
-                buttonSpan.title = safeTitle;
-            }
-        }
-
-        // Function to select and load a chat
-        function selectChat(chatId) {
-            if (chatId === null || chatId === 'new-chat-placeholder') { // Starting a new chat
-                currentChatId = generateChatId();
-                // Ensure a default title, will be updated later if user sends message
-                allChats[currentChatId] = { title: 'New Chat', messages: [] };
-                loadChatMessages([]);
-                addChatButton(currentChatId, 'New Chat');
-                setActiveChatButton(currentChatId);
-                chatInput.placeholder = 'Message PrisimAI ✨...'; // Reset placeholder
-            } else {
-                currentChatId = chatId;
-                const chatData = allChats[currentChatId];
-                if (chatData) {
-                    loadChatMessages(chatData.messages);
-                    setActiveChatButton(currentChatId);
-                    // Update the input placeholder to reflect the current chat
-                    chatInput.placeholder = `Message ${escapeHTML(chatData.title)}...`;
-                } else {
-                    // If for some reason the chat ID doesn't exist in allChats, start a new one
-                    console.warn(`Chat ID ${chatId} not found, starting new chat.`);
-                    selectChat(null); // Start a new chat
-                }
-            }
-            saveAllChats(); // Save the current state after selection
-        }
-
-        // Function to load messages for the current chat
-        function loadChatMessages(messages) {
-            chatHistory.innerHTML = ''; // Clear current messages
-            welcomeMessage.classList.add('hidden');
-            chatHistory.classList.remove('hidden');
-
-            if (!messages || messages.length === 0) {
-                welcomeMessage.classList.remove('hidden');
-                chatHistory.classList.add('hidden');
-                return;
-            }
-
-            messages.forEach(msg => {
-                const messageType = msg.type || 'text';
-                addMessage(msg.content, msg.role, messageType);
-            });
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }
-
-        // Function to save all chats to localStorage
-        function saveAllChats() {
-            try {
-                localStorage.setItem('allPrisimAIChats', JSON.stringify(allChats));
-            } catch (e) {
-                console.warn('Could not save chats to localStorage:', e);
-            }
-        }
-
-        // Function to load all chats from localStorage
-        function loadAllChats() {
-            const savedChats = localStorage.getItem('allPrisimAIChats');
-            if (savedChats) {
-                try {
-                    allChats = JSON.parse(savedChats);
-                    // Populate the chat history sidebar
-                    const sortedChatIds = Object.keys(allChats).sort((a, b) => {
-                        const numA = parseInt(a, 36);
-                        const numB = parseInt(b, 36);
-                        if (!isNaN(numA) && !isNaN(numB)) {
-                            return numB - numA; // Descending order (newest first)
-                        }
-                        return b.localeCompare(a);
-                    });
-
-                    sortedChatIds.forEach(chatId => {
-                        addChatButton(chatId, allChats[chatId].title);
-                    });
-
-                    const firstChatId = sortedChatIds[0];
-                    if (firstChatId) {
-                        selectChat(firstChatId);
-                    } else {
-                        selectChat(null);
-                    }
-                } catch (e) {
-                    console.error("Error parsing saved chats:", e);
-                    localStorage.removeItem('allPrisimAIChats');
-                    selectChat(null);
-                }
-            } else {
-                selectChat(null);
-            }
-        }
-
-        // Function to clear current chat history and start fresh
-        function clearCurrentChat() {
-            if (currentChatId && allChats[currentChatId]) {
-                delete allChats[currentChatId];
-                const buttonToRemove = chatHistoryList.querySelector(`.chat-history-item[data-chat-id="${currentChatId}"]`);
-                if (buttonToRemove) {
-                    buttonToRemove.remove();
-                }
-            }
-            currentChatId = null;
-            chatHistory.innerHTML = '';
-            welcomeMessage.classList.remove('hidden');
-            chatHistory.classList.add('hidden');
-            chatInput.placeholder = 'Message PrisimAI ✨...';
-            saveAllChats();
-            selectChat(null);
-        }
-
-        // Add message to chat.
-        // Note: If message is an empty string, we create a placeholder DOM element but DO NOT store to allChats.
-        function addMessage(message, role, type = 'text') {
-            welcomeMessage.classList.add('hidden');
-            chatHistory.classList.remove('hidden');
-            const isUser = role === 'user';
-            const messageWrapper = document.createElement('div');
-            messageWrapper.classList.add('flex', 'space-x-4', 'mb-4', 'fade-in', isUser ? 'justify-end' : 'justify-start');
-
-            let contentHTML = '';
-            if (type === 'image') {
-                const safeUrl = escapeHTML(message);
-                contentHTML = `<img src="${safeUrl}" alt="Generated image" class="rounded-xl w-full max-w-sm shadow-lg cursor-pointer" onclick="window.open('${safeUrl}', '_blank')">`;
-            } else {
-                // Escape message content to prevent XSS
-                const safeText = escapeHTML(message);
-                // We'll style user and assistant differently
-                const bubbleClasses = isUser ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100';
-                contentHTML = `<div class="p-4 rounded-xl shadow-md ${bubbleClasses}" style="white-space: pre-wrap; max-width: 80%;"> <p>${safeText}</p> </div>`;
-            }
-
-            messageWrapper.innerHTML = contentHTML;
-            chatHistory.appendChild(messageWrapper);
-
-            // Store message in the current chat only if non-empty (to avoid placeholder duplicates)
-            if (currentChatId && message !== '') {
-                if (!allChats[currentChatId]) {
-                    allChats[currentChatId] = { title: 'New Chat', messages: [] };
-                    addChatButton(currentChatId, 'New Chat');
-                    setActiveChatButton(currentChatId);
-                }
-                allChats[currentChatId].messages.push({ role, content: message, type: type });
-
-                // Update title if first user message and still default title
-                if (isUser && allChats[currentChatId].messages.length === 1 && allChats[currentChatId].title === 'New Chat') {
-                    const newTitle = message.substring(0, 50) + (message.length > 50 ? '...' : '');
-                    allChats[currentChatId].title = newTitle;
-                    updateChatButtonTitle(currentChatId, newTitle);
-                }
-                saveAllChats();
-            } else if (!currentChatId && message !== '') {
-                // Fallback: create a new chat if somehow no currentChatId
-                const tempId = generateChatId();
-                allChats[tempId] = { title: 'Temporary Chat', messages: [{ role, content: message, type }] };
-                currentChatId = tempId;
-                addChatButton(currentChatId, 'Temporary Chat');
-                setActiveChatButton(currentChatId);
-                saveAllChats();
-            }
-
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-            return messageWrapper;
-        }
-
-        // Loading indicator
-        function showLoadingIndicator() {
-            welcomeMessage.classList.add('hidden');
-            chatHistory.classList.remove('hidden');
-            const loadingWrapper = document.createElement('div');
-            loadingWrapper.classList.add('flex', 'space-x-4', 'mb-4', 'justify-start', 'fade-in');
-            loadingWrapper.innerHTML = `<div class="p-4 rounded-xl shadow-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 flex items-center space-x-2">
-                <div class="w-3 h-3 bg-gray-500 rounded-full bounce-dot" style="animation-delay: -0.32s;"></div>
-                <div class="w-3 h-3 bg-gray-500 rounded-full bounce-dot" style="animation-delay: -0.16s;"></div>
-                <div class="w-3 h-3 bg-gray-500 rounded-full bounce-dot"></div>
-            </div>`;
-            chatHistory.appendChild(loadingWrapper);
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-            return loadingWrapper;
-        }
-
-        // Fetch models from Pollinations API
-        async function fetchModels() {
-            try {
-                modelSelector.innerHTML = `<option disabled selected>Loading models...</option>`;
-                const response = await fetch('https://text.pollinations.ai/models');
-                if (!response.ok) throw new Error(`Failed to fetch models: ${response.status}`);
-                const models = await response.json();
-                modelSelector.innerHTML = ''; // Clear placeholder
-                if (Array.isArray(models) && models.length > 0) {
-                    models.forEach(model => {
-                        const option = document.createElement('option');
-                        option.value = model.id || model.name || model.model || model;
-                        option.textContent = model.description || model.name || model.id || String(model);
-                        modelSelector.appendChild(option);
-                    });
-                    if (models.length > 0) {
-                        modelSelector.value = models[0].id || models[0].name || models[0].model;
-                    }
-                } else {
-                    modelSelector.innerHTML = `<option disabled>No models available</option>`;
-                }
-            } catch (error) {
-                console.error('Error fetching models:', error);
-                modelSelector.innerHTML = `<option disabled>Error loading models</option>`;
-            }
-        }
-
-        async function streamTextResponse() {
+// ---------- STREAMING / TEXT RESPONSE ----------
+async function streamTextResponse() {
     const loadingIndicator = showLoadingIndicator();
     const selectedModel = modelSelector.value || '';
     const currentMessages = allChats[currentChatId]?.messages || [];
@@ -591,8 +612,8 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`,       // ✅ Header added here
-                'x-referrer': referrer                     // ✅ Referrer header
+                'Authorization': `Bearer ${apiKey}`,
+                'x-referrer': referrer
             },
             body: JSON.stringify({
                 model: selectedModel,
@@ -609,22 +630,17 @@
         const decoder = new TextDecoder();
         let accumulatedContent = '';
 
-        // Create assistant placeholder DOM but DO NOT store yet
-        const assistantMessageWrapper = addMessage('', 'assistant');
-        const assistantMessageElement = assistantMessageWrapper.querySelector('div p');
+        const assistantWrapper = addMessage('', 'assistant', 'text', false);
+        const contentP = assistantWrapper.querySelector('p') || assistantWrapper.querySelector('div');
 
         if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
 
-        // Store assistant placeholder in allChats
         if (currentChatId) {
-            if (!allChats[currentChatId]) allChats[currentChatId] = { title: 'New Chat', messages: [] };
+            if (!allChats[currentChatId]) allChats[currentChatId] = { title: 'New Chat', messages: [], createdAt: Date.now() };
             allChats[currentChatId].messages.push({ role: 'assistant', content: '', type: 'text' });
             saveAllChats();
-        } else {
-            console.error("Critical error: currentChatId is missing during stream start.");
         }
 
-        // Read the streaming chunks
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
@@ -639,173 +655,176 @@
                     const fullContent = data.choices?.[0]?.message?.content;
                     if (deltaContent !== undefined) accumulatedContent += deltaContent;
                     else if (fullContent !== undefined) accumulatedContent = fullContent;
-                } catch (e) {
-                    // ignore partial JSON parse errors
-                }
+                } catch (e) {}
             }
-            if (assistantMessageElement) assistantMessageElement.textContent = accumulatedContent;
+            if (contentP) contentP.textContent = accumulatedContent;
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
-        // Update the message in allChats after streaming
-        if (currentChatId && allChats[currentChatId].messages.length > 0) {
-            const lastIndex = allChats[currentChatId].messages.length - 1;
-            if (allChats[currentChatId].messages[lastIndex].role === 'assistant') {
-                allChats[currentChatId].messages[lastIndex].content = accumulatedContent;
-            } else {
-                allChats[currentChatId].messages.push({ role: 'assistant', content: accumulatedContent, type: 'text' });
+        if (currentChatId) {
+            const msgs = allChats[currentChatId].messages;
+            if (msgs && msgs.length > 0 && msgs[msgs.length-1].role === 'assistant') {
+                msgs[msgs.length-1].content = accumulatedContent;
+                saveAllChats();
             }
-            saveAllChats();
         }
-
     } catch (error) {
         console.error('API Error:', error);
         if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
-        const errorMessage = `Sorry, I encountered an error: ${error.message || 'Please try again.'}`;
-        if (currentChatId) {
+
+        // Fallback: try JSON response if streaming fails
+        try {
+            const fallbackRes = await fetch(textApiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`,
+                    'x-referrer': referrer
+                },
+                body: JSON.stringify({
+                    model: selectedModel,
+                    messages: currentMessages,
+                    stream: false,
+                    private: false
+                })
+            });
+            const data = await fallbackRes.json();
+            const fallbackMessage = data.choices?.[0]?.message?.content || "No content from API";
+            addMessage(fallbackMessage, 'assistant');
+            if (currentChatId) {
+                allChats[currentChatId].messages.push({ role: 'assistant', content: fallbackMessage });
+                saveAllChats();
+            }
+        } catch (fallbackError) {
+            const errorMessage = `Sorry, I encountered an error: ${error.message || 'Please try again.'}`;
             addMessage(errorMessage, 'assistant');
-            allChats[currentChatId].messages.push({ role: 'assistant', content: errorMessage });
-            saveAllChats();
-        } else {
-            alert(errorMessage);
+            if (currentChatId) {
+                allChats[currentChatId].messages.push({ role: 'assistant', content: errorMessage });
+                saveAllChats();
+            } else {
+                alert(errorMessage);
+            }
         }
     }
 }
 
-        // Handle image response
-        async function handleImageResponse(prompt) {
-            const imageUrl = `${imageApiUrl}${encodeURIComponent(prompt)}?key=${apiKey}&referrer=${referrer}`;
-            const loadingIndicator = showLoadingIndicator();
-            try {
-                const response = await fetch(imageUrl, { method: 'GET' });
-                if (response.ok) {
-                    if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
-                    addMessage(imageUrl, 'assistant', 'image');
-                    if (currentChatId) {
-                        allChats[currentChatId].messages.push({ role: 'assistant', content: imageUrl, type: 'image' });
-                        saveAllChats();
-                    }
-                } else {
-                    throw new Error(`Failed to generate image. Status: ${response.status}`);
-                }
-            } catch (error) {
-                console.error('API Error:', error);
-                if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
-                const errorMessage = `Sorry, I couldn't generate an image. ${error.message || ''}`;
-                addMessage(errorMessage, 'assistant');
-                if (currentChatId) {
-                    allChats[currentChatId].messages.push({ role: 'assistant', content: errorMessage });
-                    saveAllChats();
-                }
-            }
+// ---------- IMAGE RESPONSE ----------
+async function handleImageResponse(prompt) {
+    const imageUrl = `${imageApiUrl}${encodeURIComponent(prompt)}?key=${apiKey}&referrer=${referrer}`;
+    const loading = showLoadingIndicator();
+    try {
+        const res = await fetch(imageUrl, { method: 'GET' });
+        if (loading && loading.parentNode) loading.remove();
+        if (res.ok) {
+            addMessage(imageUrl, 'assistant', 'image');
+        } else {
+            throw new Error(`Failed to generate image. Status: ${res.status}`);
         }
+    } catch (e) {
+        console.error('Image API error', e);
+        if (loading && loading.parentNode) loading.remove();
+        const err = `Sorry, I couldn't generate an image. ${e.message || ''}`;
+        addMessage(err, 'assistant');
+    }
+}
 
-        // Handle chat submission (fixed order: ensure chat exists BEFORE calling addMessage)
-        async function handleChat() {
-            const userMessage = chatInput.value.trim();
-            if (userMessage === '') return;
+// ---------- Chat submission ----------
+async function handleChatSubmission() {
+    const userMessage = chatInput.value.trim();
+    if (!userMessage) return;
 
-            chatInput.value = ''; // Clear input immediately
-            resizeTextarea(); // Reset textarea height
+    chatInput.value = '';
+    resizeTextarea();
 
-            // Ensure current chat exists before adding message
-            if (currentChatId === null) {
-                currentChatId = generateChatId();
-                allChats[currentChatId] = { title: 'New Chat', messages: [] };
-                addChatButton(currentChatId, allChats[currentChatId].title);
-                setActiveChatButton(currentChatId);
-                chatInput.placeholder = `Message ${escapeHTML(allChats[currentChatId].title)}...`;
-                saveAllChats();
-            }
+    if (!currentChatId) {
+        currentChatId = generateChatId();
+        allChats[currentChatId] = { title: 'New Chat', messages: [], createdAt: Date.now() };
+        addChatButton(currentChatId, allChats[currentChatId].title);
+        setActiveChatButton(currentChatId);
+        saveAllChats();
+    }
 
-            // Add user message to UI and to current chat
-            addMessage(userMessage, 'user');
+    addMessage(userMessage, 'user', 'text', true);
 
-            const lowerMessage = userMessage.toLowerCase();
-            if (lowerMessage.startsWith('/image')) {
-                const prompt = userMessage.substring(6).trim();
-                if (prompt) {
-                    await handleImageResponse(prompt);
-                } else {
-                    addMessage("Please provide a prompt after /image command.", 'assistant');
-                }
-            } else {
-                await streamTextResponse();
-            }
-        }
+    const lower = userMessage.toLowerCase();
+    if (lower.startsWith('/image')) {
+        const prompt = userMessage.substring(6).trim();
+        if (prompt) await handleImageResponse(prompt);
+        else addMessage("Please provide a prompt after /image command.", 'assistant', 'text', true);
+    } else {
+        await streamTextResponse();
+    }
+}
 
-        // Resize textarea
-        function resizeTextarea() {
-            if (!chatInput) return;
-            chatInput.style.height = 'auto';
-            chatInput.style.height = `${chatInput.scrollHeight}px`;
-        }
+// ---------- Textarea autosize ----------
+function resizeTextarea() {
+    if (!chatInput) return;
+    chatInput.style.height = 'auto';
+    chatInput.style.height = `${Math.min(chatInput.scrollHeight, 400)}px`;
+}
 
-        // --- Tutorial Overlay Logic ---
-        const tutorialOverlay = document.getElementById('tutorial-overlay');
-        const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
-        const tutorialDoneBtn = document.getElementById('tutorial-done-btn');
-        const TUTORIAL_SEEN_KEY = 'prisimaiTutorialSeen';
+// ---------- Tutorial overlay ----------
+const tutorialOverlay = document.getElementById('tutorial-overlay');
+const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
+const tutorialDoneBtn = document.getElementById('tutorial-done-btn');
+const TUTORIAL_SEEN_KEY = 'prisimaiTutorialSeen';
 
-        function showTutorial() {
-            if (!localStorage.getItem(TUTORIAL_SEEN_KEY) && tutorialOverlay) {
-                tutorialOverlay.classList.add('visible');
-                document.body.style.overflow = 'hidden';
-            }
-        }
+function showTutorial() {
+    if (!localStorage.getItem(TUTORIAL_SEEN_KEY) && tutorialOverlay) {
+        tutorialOverlay.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+    }
+}
+function hideTutorial() {
+    if (!tutorialOverlay) return;
+    tutorialOverlay.classList.remove('visible');
+    document.body.style.overflow = '';
+    localStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
+}
+if (tutorialCloseBtn) tutorialCloseBtn.addEventListener('click', hideTutorial);
+if (tutorialDoneBtn) tutorialDoneBtn.addEventListener('click', hideTutorial);
 
-        function hideTutorial() {
-            if (!tutorialOverlay) return;
-            tutorialOverlay.classList.remove('visible');
-            document.body.style.overflow = '';
-            localStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
-        }
+// ---------- Event bindings ----------
+if (darkModeToggle) {
+    darkModeToggle.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+    }
+}
 
-        if (tutorialCloseBtn) {
-            tutorialCloseBtn.addEventListener('click', hideTutorial);
-        }
+chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleChatSubmission();
+});
+chatInput.addEventListener('input', resizeTextarea);
+newChatBtn.addEventListener('click', () => selectChat(null));
+chatHistoryList.addEventListener('click', (ev) => {
+    const btn = ev.target.closest('.chat-history-item');
+    if (!btn || !btn.dataset.chatId) return;
+    selectChat(btn.dataset.chatId);
+});
 
-        if (tutorialDoneBtn) {
-            tutorialDoneBtn.addEventListener('click', hideTutorial);
-        }
+// ---------- Init ----------
+document.addEventListener('DOMContentLoaded', () => {
+    loadAllChats();
+    fetchModels();
+    showTutorial();
+});
 
-        // Event listeners
-        chatForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleChat();
-        });
+// service worker (optional)
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js")
+            .then(reg => console.log("SW registered:", reg))
+            .catch(err => console.error("SW failed:", err));
+    });
+}
 
-        chatInput.addEventListener('input', resizeTextarea);
-
-        // New Chat Button: Clears current chat and starts a new one
-        newChatBtn.addEventListener('click', () => {
-            selectChat(null); // Pass null to indicate a new chat
-        });
-
-        // Event delegation for chat history buttons
-        chatHistoryList.addEventListener('click', (event) => {
-            const targetButton = event.target.closest('.chat-history-item');
-            if (targetButton && targetButton.dataset.chatId) {
-                const chatId = targetButton.dataset.chatId;
-                selectChat(chatId);
-            }
-        });
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAllChats();
-            fetchModels();
-            showTutorial();
-        });
-
-        // Service Worker registration (optional)
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker.register("sw.js")
-                    .then(registration => console.log("Service Worker registered:", registration))
-                    .catch(error => console.error("Service Worker registration failed:", error));
-            });
-        }
     </script>
 
     <!-- 100% privacy-first analytics -->
