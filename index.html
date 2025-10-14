@@ -357,22 +357,16 @@
 
     <script>
         // ---------- Utilities & DOM Refs ----------
-const darkModeToggle = document.getElementById('dark-mode-toggle');
-const chatHistory = document.getElementById('chat-history');
-const chatInput = document.getElementById('chat-input');
-const chatForm = document.getElementById('chat-form');
-const welcomeMessage = document.getElementById('welcome-message');
-const newChatBtn = document.getElementById('new-chat-btn');
-const modelSelector = document.getElementById('model-selector');
-const chatHistoryList = document.getElementById('chat-history-list');
+let darkModeToggle, chatHistory, chatInput, chatForm, welcomeMessage, newChatBtn, modelSelector, chatHistoryList;
 
+// ---------- Globals ----------
 let currentChatId = null;
 let allChats = {}; // { chatId: { title, messages: [...], createdAt } }
 
-// API placeholders (replace with real values in production)
+// API placeholders (kept intentionally)
 const apiKey = 'TOEAP3DuMvvVHUsy';
 const referrer = 'https://prisimai.github.io/PrismAI/index.html';
-const textApiUrl = 'https://text.pollinations.ai/openai';
+const textApiUrl = 'https://text.pollinations.ai/';
 const imageApiUrl = 'https://image.pollinations.ai/prompt/';
 
 // ---------- ID / Storage helpers ----------
@@ -383,7 +377,7 @@ function generateChatId() {
 function escapeHTML(str) {
     if (typeof str !== 'string') return '';
     const div = document.createElement('div');
-    div.appendChild(document.createTextNode(str));
+    div.textContent = str;
     return div.innerHTML;
 }
 
@@ -393,12 +387,19 @@ function addChatButton(chatId, title = 'New Chat') {
     if (existing) return existing;
 
     const chatButton = document.createElement('button');
-    chatButton.classList.add('w-full','p-2','rounded-xl','text-left','text-gray-700','dark:text-gray-300','font-medium','hover:bg-white/20','transition-all','duration-200','active:scale-95','flex','items-center','space-x-2','chat-history-item');
+    chatButton.classList.add(
+        'w-full','p-2','rounded-xl','text-left','text-gray-700','dark:text-gray-300',
+        'font-medium','hover:bg-white/20','transition-all','duration-200','active:scale-95',
+        'flex','items-center','space-x-2','chat-history-item'
+    );
     chatButton.dataset.chatId = chatId;
     const safeTitle = escapeHTML(title);
     chatButton.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0 0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0
+                0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z"/>
         </svg>
         <span class="truncate" title="${safeTitle}">${safeTitle}</span>
     `;
@@ -580,9 +581,9 @@ async function fetchModels() {
     try {
         modelSelector.innerHTML = `<option disabled selected>Loading models...</option>`;
         const res = await fetch('https://text.pollinations.ai/models');
-        if (!res.ok) throw new Error('Failed to fetch models');
-        const models = await res.json();
-        console.log('Fetched models:', models);
+        const text = await res.text();
+        let models = [];
+        try { models = JSON.parse(text); } catch {}
         modelSelector.innerHTML = '';
         if (Array.isArray(models) && models.length) {
             models.forEach(m => {
@@ -629,6 +630,7 @@ async function streamTextResponse() {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let accumulatedContent = '';
+        let buffer = '';
 
         const assistantWrapper = addMessage('', 'assistant', 'text', false);
         const contentP = assistantWrapper.querySelector('p') || assistantWrapper.querySelector('div');
@@ -644,10 +646,11 @@ async function streamTextResponse() {
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            const chunk = decoder.decode(value, { stream: true });
-            const parts = chunk.split(/(?:\r\n|\n){1,}/).filter(s => s.trim() !== '');
-            for (const part of parts) {
-                const trimmed = part.replace(/^data:\s*/, '').trim();
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop();
+            for (const line of lines) {
+                const trimmed = line.replace(/^data:\s*/, '').trim();
                 if (!trimmed || trimmed === '[DONE]') continue;
                 try {
                     const data = JSON.parse(trimmed);
@@ -655,7 +658,7 @@ async function streamTextResponse() {
                     const fullContent = data.choices?.[0]?.message?.content;
                     if (deltaContent !== undefined) accumulatedContent += deltaContent;
                     else if (fullContent !== undefined) accumulatedContent = fullContent;
-                } catch (e) {}
+                } catch {}
             }
             if (contentP) contentP.textContent = accumulatedContent;
             chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -672,7 +675,6 @@ async function streamTextResponse() {
         console.error('API Error:', error);
         if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
 
-        // Fallback: try JSON response if streaming fails
         try {
             const fallbackRes = await fetch(textApiUrl, {
                 method: 'POST',
@@ -691,19 +693,9 @@ async function streamTextResponse() {
             const data = await fallbackRes.json();
             const fallbackMessage = data.choices?.[0]?.message?.content || "No content from API";
             addMessage(fallbackMessage, 'assistant');
-            if (currentChatId) {
-                allChats[currentChatId].messages.push({ role: 'assistant', content: fallbackMessage });
-                saveAllChats();
-            }
         } catch (fallbackError) {
             const errorMessage = `Sorry, I encountered an error: ${error.message || 'Please try again.'}`;
             addMessage(errorMessage, 'assistant');
-            if (currentChatId) {
-                allChats[currentChatId].messages.push({ role: 'assistant', content: errorMessage });
-                saveAllChats();
-            } else {
-                alert(errorMessage);
-            }
         }
     }
 }
@@ -764,10 +756,8 @@ function resizeTextarea() {
 }
 
 // ---------- Tutorial overlay ----------
-const tutorialOverlay = document.getElementById('tutorial-overlay');
-const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
-const tutorialDoneBtn = document.getElementById('tutorial-done-btn');
 const TUTORIAL_SEEN_KEY = 'prisimaiTutorialSeen';
+let tutorialOverlay, tutorialCloseBtn, tutorialDoneBtn;
 
 function showTutorial() {
     if (!localStorage.getItem(TUTORIAL_SEEN_KEY) && tutorialOverlay) {
@@ -781,49 +771,65 @@ function hideTutorial() {
     document.body.style.overflow = '';
     localStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
 }
-if (tutorialCloseBtn) tutorialCloseBtn.addEventListener('click', hideTutorial);
-if (tutorialDoneBtn) tutorialDoneBtn.addEventListener('click', hideTutorial);
 
-// ---------- Event bindings ----------
-if (darkModeToggle) {
-    darkModeToggle.addEventListener('click', () => {
-        document.documentElement.classList.toggle('dark');
-        document.body.classList.toggle('dark');
-        localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-    });
-    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        document.body.classList.add('dark');
-    }
-}
-
-chatForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    handleChatSubmission();
-});
-chatInput.addEventListener('input', resizeTextarea);
-newChatBtn.addEventListener('click', () => selectChat(null));
-chatHistoryList.addEventListener('click', (ev) => {
-    const btn = ev.target.closest('.chat-history-item');
-    if (!btn || !btn.dataset.chatId) return;
-    selectChat(btn.dataset.chatId);
-});
-
-// ---------- Init ----------
+// ---------- Init after DOM Ready ----------
 document.addEventListener('DOMContentLoaded', () => {
-    loadAllChats();
+    // Re-fetch elements safely
+    darkModeToggle = document.getElementById('dark-mode-toggle');
+    chatHistory = document.getElementById('chat-history');
+    chatInput = document.getElementById('chat-input');
+    chatForm = document.getElementById('chat-form');
+    welcomeMessage = document.getElementById('welcome-message');
+    newChatBtn = document.getElementById('new-chat-btn');
+    modelSelector = document.getElementById('model-selector');
+    chatHistoryList = document.getElementById('chat-history-list');
+    tutorialOverlay = document.getElementById('tutorial-overlay');
+    tutorialCloseBtn = document.getElementById('tutorial-close-btn');
+    tutorialDoneBtn = document.getElementById('tutorial-done-btn');
+
+    // Dark mode
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.body.classList.add('dark');
+        }
+    }
+
+    // Chat form
+    if (chatForm) {
+        chatForm.addEventListener('submit', e => {
+            e.preventDefault();
+            handleChatSubmission();
+        });
+    }
+    if (chatInput) {
+        chatInput.addEventListener('input', resizeTextarea);
+        chatInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleChatSubmission();
+            }
+        });
+    }
+
+    if (newChatBtn) newChatBtn.addEventListener('click', clearCurrentChat);
+    if (tutorialCloseBtn) tutorialCloseBtn.addEventListener('click', hideTutorial);
+    if (tutorialDoneBtn) tutorialDoneBtn.addEventListener('click', hideTutorial);
+    if (chatHistoryList) chatHistoryList.addEventListener('click', e => {
+        const btn = e.target.closest('.chat-history-item');
+        if (btn) selectChat(btn.dataset.chatId);
+    });
+
     fetchModels();
+    loadAllChats();
     showTutorial();
 });
-
-// service worker (optional)
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js")
-            .then(reg => console.log("SW registered:", reg))
-            .catch(err => console.error("SW failed:", err));
-    });
-}
 
     </script>
 
