@@ -1,840 +1,132 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <!-- Basic Meta Tags -->
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PrismAI – Your AI Assistant for Everything</title>
-<meta name="description" content="PrismAI is your ultimate AI assistant, offering tools for creativity, productivity, and smart solutions. Experience next-level AI right in your browser.">
-<meta name="keywords" content="AI, artificial intelligence, PrismAI, AI tools, AI assistant, productivity, creative AI, smart AI">
-<meta name="author" content="PrismAI Team">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PrisimAI</title>
+  <style>
+    /* Reset page to let iframe be full-bleed */
+    html,body {
+      height:100%;
+      margin:0;
+      background:#fff;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+    }
 
-<!-- Open Graph / Social Sharing -->
-<meta property="og:title" content="PrismAI – Your AI Assistant for Everything">
-<meta property="og:description" content="PrismAI is your ultimate AI assistant, offering tools for creativity, productivity, and smart solutions.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://PrisimAI.github.io/PrismAI">
-<meta property="og:image" content="https://PrisimAI.github.io/PrismAI/preview-image.png">
+    /* container keeps spinner + iframe */
+    .embed-wrap {
+      position:fixed;
+      inset:0; /* top:0; right:0; bottom:0; left:0; */
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+    }
 
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PrismAI – Your AI Assistant for Everything">
-<meta name="twitter:description" content="PrismAI is your ultimate AI assistant, offering tools for creativity, productivity, and smart solutions.">
-<meta name="twitter:image" content="https://PrisimAI.github.io/PrismAI/preview-image.png">
+    /* full-viewport iframe */
+    iframe.embed-frame {
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+    }
 
-<!-- SEO Hints -->
-<link rel="canonical" href="https://PrisimAI.github.io/PrismAI">
+    /* Simple centered spinner while iframe loads */
+    .spinner {
+      position:absolute;
+      z-index:20;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:.5rem;
+      background: rgba(255,255,255,0.9);
+      padding:1rem 1.25rem;
+      border-radius:10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    }
 
-<!-- Favicon -->
-<link rel="icon" href="https://PrisimAI.github.io/PrisimAI/favicon.ico" type="image/x-icon">
+    .dot {
+      width:12px;height:12px;border-radius:50%;
+      animation: spin 0.9s linear infinite;
+      background: #444;
+    }
+    @keyframes spin { 0%{ transform: scale(.6) } 50%{ transform: scale(1.2) } 100%{ transform: scale(.6) } }
 
+    /* fallback notice if iframe cannot be shown */
+    .fallback {
+      position:absolute;
+      z-index:30;
+      left:12px;
+      bottom:12px;
+      background:#fff;
+      padding:8px 10px;
+      border-radius:8px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.12);
+      font-size:13px;
+      display:none;
+    }
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --glass-inner: rgba(255,255,255,0.06);
-            --glass-shadow: 0 1px 0 rgba(255,255,255,0.03) inset;
-            --accent: #2563eb;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f0f4ff 0%, #e6f0ff 100%);
-        }
-
-        .dark body {
-            background: linear-gradient(135deg, #071024 0%, #0b1b2e 100%);
-        }
-
-        /* ---------- GLASS STYLES ---------- */
-        /* Primary full-bleed glass (used for the chat area) - subtle, liquid look (no outer shadow) */
-        .glass-primary {
-            background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-            border: 1px solid rgba(255,255,255,0.06);
-            backdrop-filter: blur(14px) saturate(1.1);
-            -webkit-backdrop-filter: blur(14px) saturate(1.1);
-            box-shadow: var(--glass-shadow);
-        }
-
-        /* Elevated glass (for sidebar/profile) - still glass but slightly raised */
-        .glass-elevated {
-            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-            border: 1px solid rgba(255,255,255,0.10);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            box-shadow: 0 8px 30px rgba(2,6,23,0.12);
-        }
-
-        /* Liquid sheen animation for bubbles */
-        @keyframes sheen {
-            0% { transform: translateX(-120%) skewX(-10deg); opacity: 0; }
-            50% { opacity: 0.18; }
-            100% { transform: translateX(120%) skewX(-10deg); opacity: 0; }
-        }
-
-        /* Message bubble basics */
-        .msg {
-            max-width: 78%;
-            line-height: 1.45;
-            word-break: break-word;
-            position: relative;
-        }
-
-        /* Assistant bubble: glassy, rounded, subtle border + sheen */
-        .msg-assistant {
-            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.0));
-            border: 1px solid rgba(255,255,255,0.06);
-            padding: 14px 16px;
-            border-radius: 16px;
-            color: #0b1220;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-        }
-        .dark .msg-assistant { color: #e6eefc; border-color: rgba(255,255,255,0.06); }
-
-        /* Assistant glass tail (left) */
-        .msg-assistant:after {
-            content: "";
-            position: absolute;
-            left: -8px;
-            top: 14px;
-            width: 18px; height: 18px;
-            background: inherit;
-            border-left: none;
-            transform: rotate(45deg);
-            border-radius: 3px;
-            filter: blur(0.2px);
-            z-index: -1;
-        }
-
-        /* Add sheen */
-        .msg-assistant .sheen {
-            position: absolute;
-            top: -10px;
-            left: -40%;
-            width: 120%;
-            height: 40%;
-            transform: rotate(-12deg);
-            background: linear-gradient(90deg, rgba(255,255,255,0.0), rgba(255,255,255,0.18), rgba(255,255,255,0.0));
-            pointer-events: none;
-            animation: sheen 3.4s linear infinite;
-            opacity: 0;
-        }
-
-        /* User bubble: solid gradient, pill-ish and bold text */
-        .msg-user {
-            background: linear-gradient(180deg, rgba(37,99,235,1), rgba(59,130,246,0.95));
-            color: white;
-            padding: 12px 16px;
-            border-radius: 18px;
-            box-shadow: 0 4px 18px rgba(37,99,235,0.12);
-            font-weight: 500;
-        }
-
-        /* User tail (right) */
-        .msg-user:after {
-            content: "";
-            position: absolute;
-            right: -8px;
-            top: 12px;
-            width: 18px; height: 18px;
-            background: inherit;
-            transform: rotate(45deg);
-            border-radius: 3px;
-            z-index: -1;
-            filter: blur(0.2px);
-        }
-
-        /* Scrollbar theming */
-        #chat-history::-webkit-scrollbar {
-            width: 10px;
-        }
-        #chat-history::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        #chat-history::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.12);
-            border-radius: 8px;
-        }
-        .dark #chat-history::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.07);
-        }
-
-        /* small fade-in */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in { animation: fadeIn .22s ease-out both; }
-
-        /* Responsive adjustments */
-        @media (max-width: 900px) {
-            aside { width: 64px; } /* collapse sidebar visually on small screens */
-            aside .space-y-6 > *:not(:first-child){ display:none; } /* hide sidebar content for compactness */
-        }
-
-        /* small helper to ensure input doesn't overlap messages when absolute positioning used */
-        .chat-input-wrapper { z-index: 10; }
-
-        /* tutorial overlay tweaks */
-        #tutorial-overlay { display: none; }
-        #tutorial-overlay.visible { display: flex; }
-
-    </style>
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2563eb">
-
-    <script type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "tm2922ucwi");
-    </script>
+    /* small safe button to open in new tab */
+    .open-btn {
+      margin-top:6px;
+      display:inline-block;
+      padding:.35rem .6rem;
+      border-radius:6px;
+      text-decoration:none;
+      border:1px solid #ddd;
+      background:#f7f7f7;
+      color:#111;
+      font-size:.9rem;
+    }
+  </style>
 </head>
-<body class="text-gray-800 antialiased flex h-screen overflow-hidden dark:text-gray-100 transition-colors duration-300">
-
-    <!-- Sidebar -->
-    <aside class="w-64 flex-shrink-0 flex flex-col justify-between p-6 sm:flex glass-elevated m-4 rounded-r-3xl">
-        <div class="space-y-6 relative">
-            <!-- Dark mode toggle -->
-            <button id="dark-mode-toggle" class="absolute top-4 right-4 p-2 rounded-full bg-white/20 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 shadow hover:bg-white/30 dark:hover:bg-gray-600/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                <svg id="dark-mode-icon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path id="sun-icon" class="block dark:hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.93l-.71-.71M12 7a5 5 0 100 10 5 5 0 000-10z" />
-                    <path id="moon-icon" class="hidden dark:block" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
-                </svg>
-            </button>
-
-            <!-- Header -->
-            <div class="flex items-center space-x-3 mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-blue-500">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9.206 13.91a4.992 4.992 0 0 0-1.745-1.924c-.394-.287-.803-.524-1.229-.715L5 10.985a2.25 2.25 0 0 1-.585-2.023c.31-.617.915-1.054 1.558-1.127l.799-.089a5.002 5.002 0 0 1 4.71-2.903c.369.043.737.087 1.106.131L15 8.169a2.25 2.25 0 0 1 2.023.585c.617.31 1.054.915 1.127 1.558l.089.799a5.002 5.002 0 0 1-2.903 4.71c-.043.369-.087.737-.131 1.106l-1.996 4.99a2.25 2.25 0 0 1-2.023.585c-.617-.31-1.054-.915-1.127-1.558l-.089-.799a5.002 5.002 0 0 1-4.71-2.903c-.043-.369-.087-.737-.131-1.106l-1.996-4.99a2.25 2.25 0 0 1-2.023-.585c-.617-.31-1.054-.915-1.127-1.558l-.089-.799a5.002 5.002 0 0 1-2.903-4.71z" />
-                </svg>
-                <h1 class="text-xl font-bold text-gray-900 dark:text-white">PrisimAI</h1>
-            </div>
-
-            <!-- New Chat Button -->
-            <button id="new-chat-btn" class="w-full p-2 rounded-xl bg-blue-500/20 text-blue-600 dark:text-blue-300 font-semibold hover:bg-blue-500/30 active:scale-95 transition-all duration-200">
-                + New Chat
-            </button>
-
-            <!-- Chat History Sidebar -->
-            <div id="chat-history-list-container" class="mb-6 flex-grow overflow-y-auto max-h-[calc(100%-150px)]">
-                <h3 class="text-lg font-bold text-gray-700 dark:text-gray-300 mb-3">Chat History</h3>
-                <div id="chat-history-list" class="space-y-2">
-                    <!-- Placeholder New Chat button -->
-                    <button class="w-full p-2 rounded-xl text-left text-gray-700 dark:text-gray-300 font-medium hover:bg-white/20 transition-all duration-200 active:scale-95 flex items-center space-x-2 chat-history-item" data-chat-id="new-chat-placeholder">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
-                        <span class="truncate">New Chat</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Model Selector -->
-            <div class="space-y-2 mt-8">
-                <label for="model-selector" class="text-sm font-medium text-gray-700 dark:text-gray-300">Select Model</label>
-                <select id="model-selector" class="w-full p-2 rounded-xl border border-gray-300/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
-                    <option value="" disabled selected>Loading models...</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Profile Section -->
-        <div class="mt-8">
-            <div class="flex items-center space-x-3 p-3 hover:bg-blue-500/10 rounded-xl transition-all duration-200 cursor-pointer active:scale-95">
-                <img src="https://placehold.co/40x40" alt="Profile" class="w-10 h-10 rounded-full border-2 border-blue-400/30 shadow">
-                <div>
-                    <div class="font-semibold text-gray-900 dark:text-white">Stranger</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Free</div>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col relative p-0">
-        <div class="flex-1 flex flex-col">
-            <!-- Chat Container: spans the available width (from sidebar to page edge) -->
-            <div id="chat-container" class="flex-1 relative w-full m-4 glass-primary overflow-hidden rounded-2xl">
-                <!-- Layout: column, chat history grows, input fixed to bottom -->
-                <div class="flex flex-col h-full">
-                    <!-- Welcome Message (shows when no messages) -->
-                    <div id="welcome-message" class="flex flex-col items-center justify-center text-center p-8 space-y-4 text-gray-500 dark:text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-20 h-20 text-blue-400">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5a6 6 0 1 0-12 0v1.5a6 6 0 0 0 6 6Z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
-                        </svg>
-                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Hello there, Stranger!</h2>
-                        <p class="text-lg">What can I help you with today? Try typing something in the box below.</p>
-                    </div>
-
-                    <!-- Chat History (flexible, scrollable) -->
-                    <div id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-4 hidden">
-                        <!-- Messages get appended here -->
-                    </div>
-
-                    <!-- Chat Input -->
-                    <div class="chat-input-wrapper p-4 bg-transparent border-t border-white/6 dark:border-black/6">
-                        <form id="chat-form" class="flex items-end space-x-4">
-                            <textarea id="chat-input" placeholder="Message PrisimAI ✨..." rows="1" class="flex-1 p-3 rounded-2xl border border-gray-300/30 dark:border-gray-600/30 bg-white/10 dark:bg-gray-700/20 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
-                            <button type="submit" class="p-3 rounded-2xl bg-blue-500 text-white shadow-lg hover:bg-blue-600 active:bg-blue-700 active:scale-95 transition-all duration-200" aria-label="Send message">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.769 59.769 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                                </svg>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </main>
-
-    <!-- Tutorial Overlay -->
-    <div id="tutorial-overlay" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 items-center justify-center transition-opacity duration-500">
-        <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl max-w-xl w-full text-center relative">
-            <button id="tutorial-close-btn" class="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-            <h2 class="text-2xl font-bold mb-4 text-blue-600 dark:text-blue-400">Welcome to PrisimAI!</h2>
-            <p class="text-lg mb-6 text-gray-700 dark:text-gray-300">Let's get you started with a quick tour:</p>
-
-            <div id="tutorial-steps" class="space-y-4 text-left">
-                <div class="flex items-start space-x-4">
-                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">1</span>
-                    <div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Start a New Chat</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Click the <strong class="font-medium">+ New Chat</strong> button in the sidebar to begin a fresh conversation. Each chat is saved automatically.</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-4">
-                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">2</span>
-                    <div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Chat with the AI</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Type your message in the input box at the bottom and press Enter or click the send button. The AI's response will appear on the right.</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-4">
-                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">3</span>
-                    <div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Explore Chat History</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Your previous conversations are listed in the sidebar. Click on any chat to revisit it.</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-4">
-                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">4</span>
-                    <div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Image Generation</h3>
-                        <p class="text-gray-600 dark:text-gray-400">To generate an image, type <code>/image</code> followed by your prompt (e.g., <code>/image a cat wearing a hat</code>).</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-4">
-                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">5</span>
-                    <div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Model Selection</h3>
-                        <p class="text-gray-600 dark:text-gray-400">In the sidebar, you can select different AI models to experiment with their unique responses.</p>
-                    </div>
-                </div>
-            </div>
-
-            <button id="tutorial-done-btn" class="mt-8 px-6 py-2 bg-blue-600 text-white font-semibold rounded-xl shadow-md hover:bg-blue-700 transition-all duration-200 active:scale-95">Got It!</button>
-        </div>
+<body>
+  <div class="embed-wrap" role="region" aria-label="Embedded chat">
+    <div class="spinner" id="spinner" aria-hidden="false">
+      <div class="dot" aria-hidden="true"></div>
+      <div style="font-size:13px;color:#222;">Loading chat…</div>
     </div>
 
-    <script>
-        // ---------- Utilities & DOM Refs ----------
-let darkModeToggle, chatHistory, chatInput, chatForm, welcomeMessage, newChatBtn, modelSelector, chatHistoryList;
+    <iframe
+      id="embedFrame"
+      class="embed-frame"
+      src="https://prisimai.base44.app/Chat"
+      title="PrisimAI Chat"
+      allow="clipboard-read; clipboard-write; microphone; camera; autoplay; encrypted-media"
+      >
+      <!-- fallback: shown only when iframe not supported -->
+      Your browser doesn't support iframes. Open the chat directly:
+      <a href="https://prisimai.base44.app/Chat" target="_blank" rel="noopener">Open chat</a>
+    </iframe>
 
-// ---------- Globals ----------
-let currentChatId = null;
-let allChats = {}; // { chatId: { title, messages: [...], createdAt } }
+    <div class="fallback" id="fallback">
+      Couldn't load the embedded site. <a class="open-btn" href="https://prisimai.base44.app/Chat" target="_blank" rel="noopener">Open in new tab</a>
+    </div>
+  </div>
 
-// API placeholders (kept intentionally)
-const apiKey = 'TOEAP3DuMvvVHUsy';
-const referrer = 'https://prisimai.github.io/PrismAI/index.html';
-const textApiUrl = 'https://text.pollinations.ai/';
-const imageApiUrl = 'https://image.pollinations.ai/prompt/';
+  <script>
+    const frame = document.getElementById('embedFrame');
+    const spinner = document.getElementById('spinner');
+    const fallback = document.getElementById('fallback');
 
-// ---------- ID / Storage helpers ----------
-function generateChatId() {
-    return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
-}
-
-function escapeHTML(str) {
-    if (typeof str !== 'string') return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-// ---------- Sidebar chat button management ----------
-function addChatButton(chatId, title = 'New Chat') {
-    const existing = chatHistoryList.querySelector(`[data-chat-id="${chatId}"]`);
-    if (existing) return existing;
-
-    const chatButton = document.createElement('button');
-    chatButton.classList.add(
-        'w-full','p-2','rounded-xl','text-left','text-gray-700','dark:text-gray-300',
-        'font-medium','hover:bg-white/20','transition-all','duration-200','active:scale-95',
-        'flex','items-center','space-x-2','chat-history-item'
-    );
-    chatButton.dataset.chatId = chatId;
-    const safeTitle = escapeHTML(title);
-    chatButton.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-            stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                d="M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0
-                0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z"/>
-        </svg>
-        <span class="truncate" title="${safeTitle}">${safeTitle}</span>
-    `;
-    chatHistoryList.prepend(chatButton);
-    return chatButton;
-}
-
-function setActiveChatButton(chatId) {
-    document.querySelectorAll('.chat-history-item').forEach(btn => {
-        if (btn.dataset.chatId === chatId) {
-            btn.classList.add('bg-blue-500/20','text-blue-400','font-semibold');
-        } else {
-            btn.classList.remove('bg-blue-500/20','text-blue-400','font-semibold');
-        }
-    });
-}
-
-function updateChatButtonTitle(chatId, newTitle) {
-    const btn = chatHistoryList.querySelector(`.chat-history-item[data-chat-id="${chatId}"]`);
-    if (!btn) return;
-    const span = btn.querySelector('span');
-    if (span) {
-        const safeTitle = escapeHTML(newTitle);
-        span.textContent = safeTitle;
-        span.title = safeTitle;
-    }
-}
-
-// ---------- Chat selection & load ----------
-function selectChat(chatId) {
-    if (chatId === null || chatId === 'new-chat-placeholder') {
-        currentChatId = generateChatId();
-        allChats[currentChatId] = { title: 'New Chat', messages: [], createdAt: Date.now() };
-        addChatButton(currentChatId, allChats[currentChatId].title);
-        setActiveChatButton(currentChatId);
-        loadChatMessages([]);
-        chatInput.placeholder = 'Message PrisimAI ✨...';
-        saveAllChats();
-        return;
-    }
-
-    if (!allChats[chatId]) {
-        console.warn(`Chat ${chatId} missing, creating new`);
-        selectChat(null);
-        return;
-    }
-
-    currentChatId = chatId;
-    const chatData = allChats[chatId];
-    loadChatMessages(chatData.messages || []);
-    setActiveChatButton(chatId);
-    chatInput.placeholder = `Message ${escapeHTML(chatData.title)}...`;
-    saveAllChats();
-}
-
-function loadChatMessages(messages) {
-    chatHistory.innerHTML = '';
-    if (!messages || messages.length === 0) {
-        welcomeMessage.classList.remove('hidden');
-        chatHistory.classList.add('hidden');
-        return;
-    }
-    welcomeMessage.classList.add('hidden');
-    chatHistory.classList.remove('hidden');
-
-    messages.forEach(msg => {
-        addMessage(msg.content, msg.role, msg.type || 'text', false);
-    });
-    requestAnimationFrame(() => { chatHistory.scrollTop = chatHistory.scrollHeight; });
-}
-
-// ---------- Persisting ----------
-function saveAllChats() {
-    try {
-        localStorage.setItem('allPrisimAIChats', JSON.stringify(allChats));
-    } catch (e) {
-        console.warn('Could not save chats to localStorage:', e);
-    }
-}
-
-function loadAllChats() {
-    const saved = localStorage.getItem('allPrisimAIChats');
-    if (!saved) {
-        selectChat(null);
-        return;
-    }
-    try {
-        allChats = JSON.parse(saved) || {};
-        const sorted = Object.entries(allChats).sort((a,b) => (b[1]?.createdAt||0) - (a[1]?.createdAt||0));
-        sorted.forEach(([id, data]) => addChatButton(id, data.title || 'Chat'));
-        const first = sorted[0]?.[0];
-        if (first) selectChat(first);
-        else selectChat(null);
-    } catch (e) {
-        console.error('Error loading chats:', e);
-        localStorage.removeItem('allPrisimAIChats');
-        selectChat(null);
-    }
-}
-
-function clearCurrentChat() {
-    if (!currentChatId) return;
-    delete allChats[currentChatId];
-    const btn = chatHistoryList.querySelector(`[data-chat-id="${currentChatId}"]`);
-    if (btn) btn.remove();
-    currentChatId = null;
-    chatHistory.innerHTML = '';
-    welcomeMessage.classList.remove('hidden');
-    chatHistory.classList.add('hidden');
-    chatInput.placeholder = 'Message PrisimAI ✨...';
-    saveAllChats();
-    selectChat(null);
-}
-
-// ---------- Messages rendering ----------
-function addMessage(message, role='assistant', type='text', store=true) {
-    welcomeMessage.classList.add('hidden');
-    chatHistory.classList.remove('hidden');
-    const isUser = role === 'user';
-
-    const wrapper = document.createElement('div');
-    wrapper.classList.add('fade-in','mb-4','flex');
-    wrapper.style.alignItems = 'flex-start';
-    wrapper.style.justifyContent = isUser ? 'flex-end' : 'flex-start';
-
-    const bubble = document.createElement('div');
-    bubble.classList.add('msg');
-
-    if (type === 'image') {
-        bubble.innerHTML = `<img src="${escapeHTML(message)}" alt="Generated" class="rounded-xl max-w-sm cursor-pointer shadow-lg" onclick="window.open('${escapeHTML(message)}','_blank')">`;
-    } else {
-        if (isUser) {
-            bubble.classList.add('msg-user');
-            bubble.innerHTML = `<div style="position:relative;"><div>${escapeHTML(message)}</div></div>`;
-        } else {
-            bubble.classList.add('msg-assistant');
-            bubble.innerHTML = `<div style="position:relative;"><p style="margin:0;">${escapeHTML(message)}</p><div class="sheen"></div></div>`;
-        }
-    }
-
-    wrapper.appendChild(bubble);
-    chatHistory.appendChild(wrapper);
-
-    if (store && message !== '') {
-        if (!currentChatId) {
-            currentChatId = generateChatId();
-            allChats[currentChatId] = { title: 'New Chat', messages: [], createdAt: Date.now() };
-            addChatButton(currentChatId, allChats[currentChatId].title);
-            setActiveChatButton(currentChatId);
-        }
-        allChats[currentChatId].messages.push({ role, content: message, type });
-        if (role === 'user' && allChats[currentChatId].title === 'New Chat') {
-            const short = message.slice(0, 50) + (message.length > 50 ? '...' : '');
-            allChats[currentChatId].title = short;
-            updateChatButtonTitle(currentChatId, short);
-        }
-        saveAllChats();
-    }
-
-    requestAnimationFrame(() => { chatHistory.scrollTop = chatHistory.scrollHeight; });
-    return wrapper;
-}
-
-function showLoadingIndicator() {
-    const loading = document.createElement('div');
-    loading.classList.add('fade-in','mb-4','flex','justify-start');
-    loading.innerHTML = `<div class="p-3 rounded-xl bg-gray-200/60 dark:bg-gray-700/60 text-gray-800 dark:text-gray-100 flex items-center space-x-2 msg-assistant" style="max-width: 140px;">
-        <div class="w-3 h-3 rounded-full bounce-dot" style="background: rgba(0,0,0,0.35); animation-delay:-0.32s;"></div>
-        <div class="w-3 h-3 rounded-full bounce-dot" style="background: rgba(0,0,0,0.35); animation-delay:-0.16s;"></div>
-        <div class="w-3 h-3 rounded-full bounce-dot" style="background: rgba(0,0,0,0.35);"></div>
-    </div>`;
-    chatHistory.appendChild(loading);
-    chatHistory.scrollTop = chatHistory.scrollHeight;
-    return loading;
-}
-
-// ---------- Fetch models ----------
-async function fetchModels() {
-    try {
-        modelSelector.innerHTML = `<option disabled selected>Loading models...</option>`;
-        const res = await fetch('https://text.pollinations.ai/models');
-        const text = await res.text();
-        let models = [];
-        try { models = JSON.parse(text); } catch {}
-        modelSelector.innerHTML = '';
-        if (Array.isArray(models) && models.length) {
-            models.forEach(m => {
-                const option = document.createElement('option');
-                option.value = m.id || m.name || m.model || JSON.stringify(m);
-                option.textContent = m.description || m.name || m.id || String(m);
-                modelSelector.appendChild(option);
-            });
-            modelSelector.value = models[0].id || models[0].name || models[0].model || modelSelector.value;
-        } else {
-            modelSelector.innerHTML = `<option disabled>No models available</option>`;
-        }
-    } catch (e) {
-        console.error('Error fetching models:', e);
-        modelSelector.innerHTML = `<option disabled>Error loading models</option>`;
-    }
-}
-
-// ---------- STREAMING / TEXT RESPONSE ----------
-async function streamTextResponse() {
-    const loadingIndicator = showLoadingIndicator();
-    const selectedModel = modelSelector.value || '';
-    const currentMessages = allChats[currentChatId]?.messages || [];
-
-    try {
-        const response = await fetch(textApiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`,
-                'x-referrer': referrer
-            },
-            body: JSON.stringify({
-                model: selectedModel,
-                messages: currentMessages,
-                stream: true,
-                private: false
-            })
-        });
-
-        if (!response.ok) throw new Error(`API Error: ${response.status} - ${await response.text()}`);
-        if (!response.body) throw new Error('ReadableStream not supported');
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let accumulatedContent = '';
-        let buffer = '';
-
-        const assistantWrapper = addMessage('', 'assistant', 'text', false);
-        const contentP = assistantWrapper.querySelector('p') || assistantWrapper.querySelector('div');
-
-        if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
-
-        if (currentChatId) {
-            if (!allChats[currentChatId]) allChats[currentChatId] = { title: 'New Chat', messages: [], createdAt: Date.now() };
-            allChats[currentChatId].messages.push({ role: 'assistant', content: '', type: 'text' });
-            saveAllChats();
-        }
-
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split("\n");
-            buffer = lines.pop();
-            for (const line of lines) {
-                const trimmed = line.replace(/^data:\s*/, '').trim();
-                if (!trimmed || trimmed === '[DONE]') continue;
-                try {
-                    const data = JSON.parse(trimmed);
-                    const deltaContent = data.choices?.[0]?.delta?.content;
-                    const fullContent = data.choices?.[0]?.message?.content;
-                    if (deltaContent !== undefined) accumulatedContent += deltaContent;
-                    else if (fullContent !== undefined) accumulatedContent = fullContent;
-                } catch {}
-            }
-            if (contentP) contentP.textContent = accumulatedContent;
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }
-
-        if (currentChatId) {
-            const msgs = allChats[currentChatId].messages;
-            if (msgs && msgs.length > 0 && msgs[msgs.length-1].role === 'assistant') {
-                msgs[msgs.length-1].content = accumulatedContent;
-                saveAllChats();
-            }
-        }
-    } catch (error) {
-        console.error('API Error:', error);
-        if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
-
-        try {
-            const fallbackRes = await fetch(textApiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`,
-                    'x-referrer': referrer
-                },
-                body: JSON.stringify({
-                    model: selectedModel,
-                    messages: currentMessages,
-                    stream: false,
-                    private: false
-                })
-            });
-            const data = await fallbackRes.json();
-            const fallbackMessage = data.choices?.[0]?.message?.content || "No content from API";
-            addMessage(fallbackMessage, 'assistant');
-        } catch (fallbackError) {
-            const errorMessage = `Sorry, I encountered an error: ${error.message || 'Please try again.'}`;
-            addMessage(errorMessage, 'assistant');
-        }
-    }
-}
-
-// ---------- IMAGE RESPONSE ----------
-async function handleImageResponse(prompt) {
-    const imageUrl = `${imageApiUrl}${encodeURIComponent(prompt)}?key=${apiKey}&referrer=${referrer}`;
-    const loading = showLoadingIndicator();
-    try {
-        const res = await fetch(imageUrl, { method: 'GET' });
-        if (loading && loading.parentNode) loading.remove();
-        if (res.ok) {
-            addMessage(imageUrl, 'assistant', 'image');
-        } else {
-            throw new Error(`Failed to generate image. Status: ${res.status}`);
-        }
-    } catch (e) {
-        console.error('Image API error', e);
-        if (loading && loading.parentNode) loading.remove();
-        const err = `Sorry, I couldn't generate an image. ${e.message || ''}`;
-        addMessage(err, 'assistant');
-    }
-}
-
-// ---------- Chat submission ----------
-async function handleChatSubmission() {
-    const userMessage = chatInput.value.trim();
-    if (!userMessage) return;
-
-    chatInput.value = '';
-    resizeTextarea();
-
-    if (!currentChatId) {
-        currentChatId = generateChatId();
-        allChats[currentChatId] = { title: 'New Chat', messages: [], createdAt: Date.now() };
-        addChatButton(currentChatId, allChats[currentChatId].title);
-        setActiveChatButton(currentChatId);
-        saveAllChats();
-    }
-
-    addMessage(userMessage, 'user', 'text', true);
-
-    const lower = userMessage.toLowerCase();
-    if (lower.startsWith('/image')) {
-        const prompt = userMessage.substring(6).trim();
-        if (prompt) await handleImageResponse(prompt);
-        else addMessage("Please provide a prompt after /image command.", 'assistant', 'text', true);
-    } else {
-        await streamTextResponse();
-    }
-}
-
-// ---------- Textarea autosize ----------
-function resizeTextarea() {
-    if (!chatInput) return;
-    chatInput.style.height = 'auto';
-    chatInput.style.height = `${Math.min(chatInput.scrollHeight, 400)}px`;
-}
-
-// ---------- Tutorial overlay ----------
-const TUTORIAL_SEEN_KEY = 'prisimaiTutorialSeen';
-let tutorialOverlay, tutorialCloseBtn, tutorialDoneBtn;
-
-function showTutorial() {
-    if (!localStorage.getItem(TUTORIAL_SEEN_KEY) && tutorialOverlay) {
-        tutorialOverlay.classList.add('visible');
-        document.body.style.overflow = 'hidden';
-    }
-}
-function hideTutorial() {
-    if (!tutorialOverlay) return;
-    tutorialOverlay.classList.remove('visible');
-    document.body.style.overflow = '';
-    localStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
-}
-
-// ---------- Init after DOM Ready ----------
-document.addEventListener('DOMContentLoaded', () => {
-    // Re-fetch elements safely
-    darkModeToggle = document.getElementById('dark-mode-toggle');
-    chatHistory = document.getElementById('chat-history');
-    chatInput = document.getElementById('chat-input');
-    chatForm = document.getElementById('chat-form');
-    welcomeMessage = document.getElementById('welcome-message');
-    newChatBtn = document.getElementById('new-chat-btn');
-    modelSelector = document.getElementById('model-selector');
-    chatHistoryList = document.getElementById('chat-history-list');
-    tutorialOverlay = document.getElementById('tutorial-overlay');
-    tutorialCloseBtn = document.getElementById('tutorial-close-btn');
-    tutorialDoneBtn = document.getElementById('tutorial-done-btn');
-
-    // Dark mode
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            document.body.classList.toggle('dark');
-            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-        });
-        if (localStorage.getItem('theme') === 'dark' ||
-            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            document.body.classList.add('dark');
-        }
-    }
-
-    // Chat form
-    if (chatForm) {
-        chatForm.addEventListener('submit', e => {
-            e.preventDefault();
-            handleChatSubmission();
-        });
-    }
-    if (chatInput) {
-        chatInput.addEventListener('input', resizeTextarea);
-        chatInput.addEventListener('keydown', e => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleChatSubmission();
-            }
-        });
-    }
-
-    if (newChatBtn) newChatBtn.addEventListener('click', clearCurrentChat);
-    if (tutorialCloseBtn) tutorialCloseBtn.addEventListener('click', hideTutorial);
-    if (tutorialDoneBtn) tutorialDoneBtn.addEventListener('click', hideTutorial);
-    if (chatHistoryList) chatHistoryList.addEventListener('click', e => {
-        const btn = e.target.closest('.chat-history-item');
-        if (btn) selectChat(btn.dataset.chatId);
+    // Hide spinner when iframe loads successfully
+    frame.addEventListener('load', () => {
+      // some sites load but then block content via headers; the load event still fires—
+      // we keep spinner short and then hide it (user can open in new tab if blocked).
+      setTimeout(() => {
+        spinner.style.display = 'none';
+      }, 200); // tiny delay for smoothness
     });
 
-    fetchModels();
-    loadAllChats();
-    showTutorial();
-});
-
-    </script>
-
-    <!-- 100% privacy-first analytics -->
-    <script data-collect-dnt="true" async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-    <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif?collect-dnt=true" alt="" referrerpolicy="no-referrer-when-downgrade"/></noscript>
+    // If iframe fails to load due to frame-ancestors / X-Frame-Options, there's no reliable cross-origin error.
+    // Use a timeout heuristic: if after N seconds spinner still visible, show fallback affordance.
+    setTimeout(() => {
+      if (spinner && spinner.style.display !== 'none') {
+        fallback.style.display = 'block';
+        // keep spinner but slightly transparent so user sees both
+        spinner.style.opacity = '0.95';
+      }
+    }, 3500);
+  </script>
 </body>
 </html>
