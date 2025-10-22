@@ -8,7 +8,7 @@ jobs:
   auto-ai-response:
     runs-on: ubuntu-latest
     steps:
-      # Step 0: Checkout repo so we can read files
+      # Step 0: Checkout the repo so we can read files
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -19,23 +19,23 @@ jobs:
           TITLE="${{ github.event.issue.title }}"
           BODY="${{ github.event.issue.body }}"
 
-          # Include entire index.html content
+          # Safely read entire index.html
           if [ -f index.html ]; then
             CODE_SNIPPET=$(cat index.html)
           else
             CODE_SNIPPET="No index.html found in the repo."
           fi
 
-          # Build prompt including repo snippet
+          # Build prompt including index.html content
           PROMPT="You are a helpful GitHub assistant. Someone opened an issue titled '$TITLE' with description: '$BODY'. Here is the content of index.html from the repo:\n$CODE_SNIPPET\nSuggest possible causes and fixes in a friendly tone."
 
-          # URL-encode the prompt for Pollinations
+          # URL-encode the prompt
           ENCODED_PROMPT=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$PROMPT")
 
-          # Call Pollinations AI
+          # Call Pollinations API
           RESPONSE=$(curl -s "https://text.pollinations.ai/$ENCODED_PROMPT?model=openai")
 
-          # Save AI response for next step
+          # Save AI response for the next step
           echo "response<<EOF" >> $GITHUB_OUTPUT
           echo "$RESPONSE" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
