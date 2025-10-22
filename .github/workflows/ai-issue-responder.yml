@@ -15,13 +15,14 @@ jobs:
           TITLE="${{ github.event.issue.title }}"
           BODY="${{ github.event.issue.body }}"
 
-          # Create valid flat JSON payload for Pollinations
-          PAYLOAD="{\"model\":\"openai\",\"prompt\":\"You are a helpful GitHub assistant. Someone opened an issue titled '$TITLE' with description: '$BODY'. Suggest possible causes and fixes in a friendly tone.\"}"
+          # Build prompt
+          PROMPT="You are a helpful GitHub assistant. Someone opened an issue titled '$TITLE' with description: '$BODY'. Suggest possible causes and fixes in a friendly tone."
 
-          # Call Pollinations API
-          RESPONSE=$(curl -s "https://text.pollinations.ai/" \
-            -H "Content-Type: application/json" \
-            -d "$PAYLOAD")
+          # URL-encode the prompt
+          ENCODED_PROMPT=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$PROMPT")
+
+          # Call Pollinations API via GET request
+          RESPONSE=$(curl -s "https://text.pollinations.ai/$ENCODED_PROMPT?model=openai?referrer=prisimai.github.io")
 
           # Save AI response for next step
           echo "response<<EOF" >> $GITHUB_OUTPUT
