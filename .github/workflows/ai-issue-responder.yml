@@ -1,0 +1,39 @@
+name: AI Issue Responder
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  auto-ai-response:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate AI response using Pollinations
+        id: ai
+        run: |
+          BODY=$(echo "${{ github.event.issue.body }}" | jq -Rs .)
+          TITLE=$(echo "${{ github.event.issue.title }}" | jq -Rs .)
+
+          PROMPT="You are a helpful open-source assistant. Someone opened an issue titled $TITLE with this description: $BODY. 
+          Suggest possible causes and fixes in a friendly tone. Keep it concise but helpful."
+
+          echo "Prompt: $PROMPT"
+
+          RESPONSE=$(curl -s "https://text.pollinations.ai/" \
+            -H "Content-Type: application/json" \
+            -d "{\"model\":\"openai\",\"prompt\":$PROMPT}")
+
+          echo "response<<EOF" >> $GITHUB_OUTPUT
+          echo "$RESPONSE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Comment on issue
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            🤖 **AI Assistant Response:**
+            ${{ steps.ai.outputs.response }}
+
+            _Generated automatically by Pollinations AI 🌸_
