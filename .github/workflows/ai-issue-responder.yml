@@ -8,25 +8,29 @@ jobs:
   auto-ai-response:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate AI response using Pollinations
+      # Step 1: Generate AI response using Pollinations
+      - name: Generate AI response
         id: ai
         run: |
-          BODY=$(echo "${{ github.event.issue.body }}" | jq -Rs .)
-          TITLE=$(echo "${{ github.event.issue.title }}" | jq -Rs .)
+          # Safely escape issue title and body into JSON strings
+          ISSUE_TITLE=$(echo "${{ github.event.issue.title }}" | jq -R .)
+          ISSUE_BODY=$(echo "${{ github.event.issue.body }}" | jq -R .)
 
-          PROMPT="You are a helpful open-source assistant. Someone opened an issue titled $TITLE with this description: $BODY. 
-          Suggest possible causes and fixes in a friendly tone. Keep it concise but helpful."
+          # Build valid JSON payload for Pollinations AI
+          PAYLOAD=$(jq -n --arg title "$ISSUE_TITLE" --arg body "$ISSUE_BODY" \
+            '{"model":"openai","prompt":"You are a helpful GitHub assistant. Someone opened an issue titled \($title) with the description: \($body). Suggest possible causes and fixes in a friendly tone."}')
 
-          echo "Prompt: $PROMPT"
-
+          # Call the Pollinations AI API
           RESPONSE=$(curl -s "https://text.pollinations.ai/" \
             -H "Content-Type: application/json" \
-            -d "{\"model\":\"openai\",\"prompt\":$PROMPT}")
+            -d "$PAYLOAD")
 
+          # Save the AI response for next step
           echo "response<<EOF" >> $GITHUB_OUTPUT
           echo "$RESPONSE" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      # Step 2: Comment on the issue with AI response
       - name: Comment on issue
         uses: peter-evans/create-or-update-comment@v3
         with:
