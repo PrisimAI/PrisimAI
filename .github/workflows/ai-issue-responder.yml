@@ -22,7 +22,7 @@ jobs:
           ENCODED_PROMPT=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$PROMPT")
 
           # Call Pollinations API via GET request
-          RESPONSE=$(curl -s "https://text.pollinations.ai/$ENCODED_PROMPT?model=openai?referrer=prisimai.github.io")
+          RESPONSE=$(curl -s "https://text.pollinations.ai/$ENCODED_PROMPT?model=openai")
 
           # Save AI response for next step
           echo "response<<EOF" >> $GITHUB_OUTPUT
