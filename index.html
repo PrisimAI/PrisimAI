@@ -33,138 +33,159 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --glass-inner: rgba(255,255,255,0.06);
-            --glass-shadow: 0 1px 0 rgba(255,255,255,0.03) inset;
-            --accent: #2563eb;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) inset, 0 4px 20px rgba(0, 0, 0, 0.1);
+            --accent: #3b82f6;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f0f4ff 0%, #e6f0ff 100%);
+            font-family: 'Poppins', sans-serif;
+            background: #f8fafc;
         }
 
         .dark body {
-            background: linear-gradient(135deg, #071024 0%, #0b1b2e 100%);
+            background: linear-gradient(135deg, #0a1125 0%, #1e2a44 100%);
         }
 
-        /* ---------- GLASS STYLES ---------- */
+        /* Glass Styles */
         .glass-primary {
-            background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-            border: 1px solid rgba(255,255,255,0.06);
-            backdrop-filter: blur(14px) saturate(1.1);
-            -webkit-backdrop-filter: blur(14px) saturate(1.1);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(16px) saturate(1.2);
+            -webkit-backdrop-filter: blur(16px) saturate(1.2);
             box-shadow: var(--glass-shadow);
+            border-radius: 1.5rem;
         }
 
         .glass-elevated {
-            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-            border: 1px solid rgba(255,255,255,0.10);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            box-shadow: 0 8px 30px rgba(2,6,23,0.12);
+            background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.08));
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border-radius: 1.5rem;
         }
 
+        /* Sheen Animation */
         @keyframes sheen {
-            0% { transform: translateX(-120%) skewX(-10deg); opacity: 0; }
-            50% { opacity: 0.18; }
-            100% { transform: translateX(120%) skewX(-10deg); opacity: 0; }
+            0% { transform: translateX(-150%) skewX(-15deg); opacity: 0; }
+            50% { opacity: 0.15; }
+            100% { transform: translateX(150%) skewX(-15deg); opacity: 0; }
         }
 
         .msg {
-            max-width: 78%;
-            line-height: 1.45;
+            max-width: 80%;
+            line-height: 1.5;
             word-break: break-word;
             position: relative;
+            padding: 16px 20px;
         }
 
         .msg-assistant {
-            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.0));
-            border: 1px solid rgba(255,255,255,0.06);
-            padding: 14px 16px;
-            border-radius: 16px;
-            color: #0b1220;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem 1rem 1rem 0;
+            color: #111827;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
-        .dark .msg-assistant { color: #e6eefc; border-color: rgba(255,255,255,0.06); }
+        .dark .msg-assistant {
+            color: #e5e7eb;
+            border-color: rgba(255,255,255,0.1);
+        }
 
         .msg-assistant:after {
             content: "";
             position: absolute;
-            left: -8px;
-            top: 14px;
-            width: 18px; height: 18px;
+            left: -10px;
+            top: 16px;
+            width: 20px;
+            height: 20px;
             background: inherit;
             border-left: none;
             transform: rotate(45deg);
-            border-radius: 3px;
-            filter: blur(0.2px);
+            border-radius: 4px;
+            filter: blur(0.3px);
             z-index: -1;
         }
 
         .msg-assistant .sheen {
             position: absolute;
             top: -10px;
-            left: -40%;
-            width: 120%;
-            height: 40%;
-            transform: rotate(-12deg);
-            background: linear-gradient(90deg, rgba(255,255,255,0.0), rgba(255,255,255,0.18), rgba(255,255,255,0.0));
+            left: -50%;
+            width: 140%;
+            height: 50%;
+            transform: rotate(-10deg);
+            background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.15), rgba(255,255,255,0));
             pointer-events: none;
-            animation: sheen 3.4s linear infinite;
+            animation: sheen 4s linear infinite;
             opacity: 0;
         }
 
         .msg-user {
-            background: linear-gradient(180deg, rgba(37,99,235,1), rgba(59,130,246,0.95));
+            background: linear-gradient(180deg, #3b82f6, #60a5fa);
             color: white;
-            padding: 12px 16px;
-            border-radius: 18px;
-            box-shadow: 0 4px 18px rgba(37,99,235,0.12);
+            border-radius: 1rem 1rem 0 1rem;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
             font-weight: 500;
         }
 
         .msg-user:after {
             content: "";
             position: absolute;
-            right: -8px;
-            top: 12px;
-            width: 18px; height: 18px;
+            right: -10px;
+            top: 16px;
+            width: 20px;
+            height: 20px;
             background: inherit;
             transform: rotate(45deg);
-            border-radius: 3px;
+            border-radius: 4px;
             z-index: -1;
-            filter: blur(0.2px);
+            filter: blur(0.3px);
+        }
+
+        .timestamp {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .timestamp:hover {
+            opacity: 1;
         }
 
         #chat-history::-webkit-scrollbar {
-            width: 10px;
+            width: 8px;
         }
         #chat-history::-webkit-scrollbar-track {
             background: transparent;
         }
         #chat-history::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.12);
-            border-radius: 8px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 4px;
         }
         .dark #chat-history::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.1);
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(8px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .fade-in { animation: fadeIn .22s ease-out both; }
+        .fade-in { animation: fadeIn 0.3s ease-out both; }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.9); }
+        }
 
         @media (max-width: 900px) {
-            aside { width: 64px; }
-            aside .space-y-6 > *:not(:first-child){ display:none; }
+            aside { width: 72px; }
+            aside .space-y-6 > *:not(:first-child) { display: none; }
+            .msg { max-width: 90%; }
         }
 
         .chat-input-wrapper { z-index: 10; }
@@ -174,6 +195,9 @@
 
         #error-notification {
             transition: opacity 0.3s ease;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         #error-notification.hidden {
             opacity: 0;
@@ -186,16 +210,36 @@
             cursor: pointer;
             opacity: 0.7;
             transition: opacity 0.2s;
+            color: #f3f4f6;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         .edit-message:hover {
             opacity: 1;
+        }
+
+        .send-button {
+            transition: all 0.2s ease;
+        }
+        .send-button:active {
+            animation: bounce 0.2s ease;
+        }
+
+        .sidebar-button {
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            transition: all 0.2s ease;
+        }
+        .sidebar-button:hover {
+            transform: scale(1.02);
         }
     </style>
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#3b82f6">
 
     <script type="text/javascript">
         (function(c,l,a,r,i,t,y){
@@ -208,10 +252,10 @@
 <body class="text-gray-800 antialiased flex h-screen overflow-hidden dark:text-gray-100 transition-colors duration-300">
 
     <!-- Sidebar -->
-    <aside class="w-64 flex-shrink-0 flex flex-col justify-between p-6 sm:flex glass-elevated m-4 rounded-r-3xl">
-        <div class="space-y-6 relative">
+    <aside class="w-72 flex-shrink-0 flex flex-col justify-between p-8 sm:flex glass-elevated m-6 rounded-2xl">
+        <div class="space-y-8 relative">
             <!-- Dark mode toggle -->
-            <button id="dark-mode-toggle" class="absolute top-4 right-4 p-2 rounded-full bg-white/20 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 shadow hover:bg-white/30 dark:hover:bg-gray-600/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle dark mode">
+            <button id="dark-mode-toggle" class="absolute top-4 right-4 p-3 rounded-full bg-white/20 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 shadow hover:bg-white/30 dark:hover:bg-gray-600/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle dark mode">
                 <svg id="dark-mode-icon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path id="sun-icon" class="block dark:hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.93l-.71-.71M12 7a5 5 0 100 10 5 5 0 000-10z" />
                     <path id="moon-icon" class="hidden dark:block" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
@@ -219,28 +263,28 @@
             </button>
 
             <!-- Header -->
-            <div class="flex items-center space-x-3 mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-blue-500">
+            <div class="flex items-center space-x-3 mb-8">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-blue-500">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9.206 13.91a4.992 4.992 0 0 0-1.745-1.924c-.394-.287-.803-.524-1.229-.715L5 10.985a2.25 2.25 0 0 1-.585-2.023c.31-.617.915-1.054 1.558-1.127l.799-.089a5.002 5.002 0 0 1 4.71-2.903c.369.043.737.087 1.106.131L15 8.169a2.25 2.25 0 0 1 2.023.585c.617.31 1.054.915 1.127 1.558l.089.799a5.002 5.002 0 0 1-2.903 4.71c-.043.369-.087.737-.131 1.106l-1.996 4.99a2.25 2.25 0 0 1-2.023.585c-.617-.31-1.054-.915-1.127-1.558l-.089-.799a5.002 5.002 0 0 1-4.71-2.903c-.043-.369-.087-.737-.131-1.106l-1.996-4.99a2.25 2.25 0 0 1-2.023-.585c-.617-.31-1.054-.915-1.127-1.558l-.089-.799a5.002 5.002 0 0 1-2.903-4.71z" />
                 </svg>
-                <h1 class="text-xl font-bold text-gray-900 dark:text-white">PrisimAI</h1>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">PrismAI</h1>
             </div>
 
             <!-- New Chat Button -->
-            <button id="new-chat-btn" class="w-full p-2 rounded-xl bg-blue-500/20 text-blue-600 dark:text-blue-300 font-semibold hover:bg-blue-500/30 active:scale-95 transition-all duration-200" aria-label="Start new chat">
+            <button id="new-chat-btn" class="w-full p-3 rounded-xl sidebar-button text-white font-semibold hover:shadow-lg active:scale-95 transition-all duration-200" aria-label="Start new chat">
                 + New Chat
             </button>
 
             <!-- Export Chat Button -->
-            <button id="export-chat-btn" class="w-full p-2 rounded-xl bg-blue-500/20 text-blue-600 dark:text-blue-300 font-semibold hover:bg-blue-500/30 active:scale-95 transition-all duration-200" aria-label="Export current chat">
+            <button id="export-chat-btn" class="w-full p-3 rounded-xl sidebar-button text-white font-semibold hover:shadow-lg active:scale-95 transition-all duration-200" aria-label="Export current chat">
                 Export Chat
             </button>
 
             <!-- Chat History Sidebar -->
-            <div id="chat-history-list-container" class="mb-6 flex-grow overflow-y-auto max-h-[calc(100%-150px)]">
-                <h3 class="text-lg font-bold text-gray-700 dark:text-gray-300 mb-3">Chat History</h3>
-                <div id="chat-history-list" class="space-y-2">
-                    <button class="w-full p-2 rounded-xl text-left text-gray-700 dark:text-gray-300 font-medium hover:bg-white/20 transition-all duration-200 active:scale-95 flex items-center space-x-2 chat-history-item" data-chat-id="new-chat-placeholder" aria-label="Select new chat">
+            <div id="chat-history-list-container" class="mb-8 flex-grow overflow-y-auto max-h-[calc(100%-200px)]">
+                <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Chat History</h3>
+                <div id="chat-history-list" class="space-y-3">
+                    <button class="w-full p-3 rounded-xl text-left text-gray-700 dark:text-gray-300 font-medium hover:bg-white/20 transition-all duration-200 active:scale-95 flex items-center space-x-2 chat-history-item" data-chat-id="new-chat-placeholder" aria-label="Select new chat">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
@@ -250,9 +294,9 @@
             </div>
 
             <!-- Model Selector -->
-            <div class="space-y-2 mt-8">
-                <label for="model-selector" class="text-sm font-medium text-gray-700 dark:text-gray-300">Select Model</label>
-                <select id="model-selector" class="w-full p-2 rounded-xl border border-gray-300/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" aria-label="Select AI model">
+            <div class="space-y-3">
+                <label for="model-selector" class="text-sm font-medium text-gray-700 dark:text-gray-200">Select Model</label>
+                <select id="model-selector" class="w-full p-3 rounded-xl border border-gray-300/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" aria-label="Select AI model">
                     <option value="" disabled selected>Loading models...</option>
                 </select>
             </div>
@@ -260,8 +304,8 @@
 
         <!-- Profile Section -->
         <div class="mt-8">
-            <div class="flex items-center space-x-3 p-3 hover:bg-blue-500/10 rounded-xl transition-all duration-200 cursor-pointer active:scale-95">
-                <img src="https://placehold.co/40x40" alt="Profile" class="w-10 h-10 rounded-full border-2 border-blue-400/30 shadow">
+            <div class="flex items-center space-x-3 p-4 hover:bg-blue-500/10 rounded-xl transition-all duration-200 cursor-pointer active:scale-95">
+                <img src="https://placehold.co/40x40" alt="Profile" class="w-12 h-12 rounded-full border-2 border-blue-400/30 shadow">
                 <div>
                     <div class="font-semibold text-gray-900 dark:text-white">Stranger</div>
                     <div class="text-sm text-gray-500 dark:text-gray-400">Free</div>
@@ -273,37 +317,37 @@
     <!-- Main Content -->
     <main class="flex-1 flex flex-col relative p-0">
         <div class="flex-1 flex flex-col">
-            <div id="chat-container" class="flex-1 relative w-full m-4 glass-primary overflow-hidden rounded-2xl">
+            <div id="chat-container" class="flex-1 relative w-full m-6 glass-primary overflow-hidden">
                 <div class="flex flex-col h-full">
                     <!-- Error Notification -->
                     <div id="error-notification" class="hidden p-4 bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl mx-4 mt-4 text-center relative flex items-center justify-between">
                         <span id="error-message"></span>
-                        <button id="close-error" class="ml-2 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200" aria-label="Close error message">
+                        <button id="close-error" class="ml-2 text-red-600 dark:text-red-400 hover:bg-red-500/20 p-1 rounded-full transition-all" aria-label="Close error message">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
                     <!-- Welcome Message -->
-                    <div id="welcome-message" class="flex flex-col items-center justify-center text-center p-8 space-y-4 text-gray-500 dark:text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-20 h-20 text-blue-400">
+                    <div id="welcome-message" class="flex flex-col items-center justify-center text-center p-10 space-y-6 text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-24 h-24 text-blue-400">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5a6 6 0 1 0-12 0v1.5a6 6 0 0 0 6 6Z" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
                         </svg>
-                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Hello there, Stranger!</h2>
+                        <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Hello there, Stranger!</h2>
                         <p class="text-lg">What can I help you with today? Try typing something in the box below.</p>
                     </div>
 
                     <!-- Chat History -->
-                    <div id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-4 hidden" role="log" aria-live="polite">
+                    <div id="chat-history" class="flex-1 overflow-y-auto p-8 space-y-6 hidden" role="log" aria-live="polite">
                         <!-- Messages get appended here -->
                     </div>
 
                     <!-- Chat Input -->
-                    <div class="chat-input-wrapper p-4 bg-transparent border-t border-white/6 dark:border-black/6">
+                    <div class="chat-input-wrapper p-6 bg-transparent border-t border-white/10 dark:border-black/10">
                         <form id="chat-form" class="flex items-end space-x-4" role="form" aria-label="Chat input form">
-                            <textarea id="chat-input" placeholder="Message PrisimAI ✨..." rows="1" class="flex-1 p-3 rounded-2xl border border-gray-300/30 dark:border-gray-600/30 bg-white/10 dark:bg-gray-700/20 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" aria-label="Enter your message"></textarea>
-                            <button type="submit" class="p-3 rounded-2xl bg-blue-500 text-white shadow-lg hover:bg-blue-600 active:bg-blue-700 active:scale-95 transition-all duration-200" aria-label="Send message">
+                            <textarea id="chat-input" placeholder="Message PrismAI ✨..." rows="1" class="flex-1 p-4 rounded-3xl border border-gray-300/30 dark:border-gray-600/30 bg-white/15 dark:bg-gray-700/25 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-lg transition-all duration-200 resize-none" aria-label="Enter your message"></textarea>
+                            <button type="submit" class="p-4 rounded-3xl bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-lg hover:from-blue-600 hover:to-blue-500 send-button transition-all duration-200" aria-label="Send message">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.769 59.769 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                                 </svg>
@@ -316,46 +360,46 @@
     </main>
 
     <!-- Tutorial Overlay -->
-    <div id="tutorial-overlay" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 items-center justify-center transition-opacity duration-500">
-        <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl max-w-xl w-full text-center relative">
+    <div id="tutorial-overlay" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 items-center justify-center transition-opacity duration-500">
+        <div class="bg-white dark:bg-gray-800 p-10 rounded-2xl shadow-2xl max-w-lg w-full text-center relative glass-elevated">
             <button id="tutorial-close-btn" class="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors" aria-label="Close tutorial">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            <h2 class="text-2xl font-bold mb-4 text-blue-600 dark:text-blue-400">Welcome to PrisimAI!</h2>
+            <h2 class="text-3xl font-bold mb-6 text-blue-600 dark:text-blue-400">Welcome to PrismAI!</h2>
             <p class="text-lg mb-6 text-gray-700 dark:text-gray-300">Let's get you started with a quick tour:</p>
 
-            <div id="tutorial-steps" class="space-y-4 text-left">
-                <div class="flex items-start space-x-4">
+            <div id="tutorial-steps" class="space-y-6 text-left">
+                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
                     <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">1</span>
                     <div>
                         <h3 class="font-semibold text-gray-900 dark:text-white">Start a New Chat</h3>
                         <p class="text-gray-600 dark:text-gray-400">Click the <strong class="font-medium">+ New Chat</strong> button in the sidebar to begin a fresh conversation. Each chat is saved automatically.</p>
                     </div>
                 </div>
-                <div class="flex items-start space-x-4">
+                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
                     <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">2</span>
                     <div>
                         <h3 class="font-semibold text-gray-900 dark:text-white">Chat with the AI</h3>
                         <p class="text-gray-600 dark:text-gray-400">Type your message in the input box at the bottom and press Enter or click the send button. The AI's response will appear on the right.</p>
                     </div>
                 </div>
-                <div class="flex items-start space-x-4">
+                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
                     <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">3</span>
                     <div>
                         <h3 class="font-semibold text-gray-900 dark:text-white">Explore Chat History</h3>
                         <p class="text-gray-600 dark:text-gray-400">Your previous conversations are listed in the sidebar. Click on any chat to revisit it.</p>
                     </div>
                 </div>
-                <div class="flex items-start space-x-4">
+                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
                     <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">4</span>
                     <div>
                         <h3 class="font-semibold text-gray-900 dark:text-white">Image Generation</h3>
                         <p class="text-gray-600 dark:text-gray-400">To generate an image, type <code>/image</code> followed by your prompt (e.g., <code>/image a cat wearing a hat</code>).</p>
                     </div>
                 </div>
-                <div class="flex items-start space-x-4">
+                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
                     <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">5</span>
                     <div>
                         <h3 class="font-semibold text-gray-900 dark:text-white">Model Selection</h3>
@@ -364,7 +408,7 @@
                 </div>
             </div>
 
-            <button id="tutorial-done-btn" class="mt-8 px-6 py-2 bg-blue-600 text-white font-semibold rounded-xl shadow-md hover:bg-blue-700 transition-all duration-200 active:scale-95" aria-label="Complete tutorial">Got It!</button>
+            <button id="tutorial-done-btn" class="mt-8 px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-400 text-white font-semibold rounded-xl shadow-lg hover:from-blue-600 hover:to-blue-500 transition-all duration-200 active:scale-95" aria-label="Complete tutorial">Got It!</button>
         </div>
     </div>
 
@@ -377,7 +421,7 @@
             imageApiUrl: 'https://image.pollinations.ai/prompt/',
             requestTimeout: 30000,
             maxMessageLength: 1000,
-            cacheExpiration: 24 * 60 * 60 * 1000, // 24 hours
+            cacheExpiration: 24 * 60 * 60 * 1000,
             messagesPerPage: 20,
         };
 
@@ -463,7 +507,7 @@
             if (existing) return existing;
 
             const chatButton = document.createElement('button');
-            chatButton.classList.add('w-full','p-2','rounded-xl','text-left','text-gray-700','dark:text-gray-300','font-medium','hover:bg-white/20','transition-all','duration-200','active:scale-95','flex','items-center','space-x-2','chat-history-item');
+            chatButton.classList.add('w-full','p-3','rounded-xl','text-left','text-gray-700','dark:text-gray-300','font-medium','hover:bg-white/20','transition-all','duration-200','active:scale-95','flex','items-center','space-x-2','chat-history-item');
             chatButton.dataset.chatId = chatId;
             chatButton.setAttribute('aria-label', `Select chat: ${title}`);
             const safeTitle = escapeHTML(title);
@@ -507,7 +551,7 @@
                 addChatButton(currentChatId, allChats[currentChatId].title);
                 setActiveChatButton(currentChatId);
                 loadChatMessages([]);
-                chatInput.placeholder = 'Message PrisimAI ✨...';
+                chatInput.placeholder = 'Message PrismAI ✨...';
                 saveAllChats();
                 return;
             }
@@ -597,7 +641,7 @@
             const displayTime = timestamp ? new Date(timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
 
             const wrapper = document.createElement('div');
-            wrapper.classList.add('fade-in','mb-4','flex');
+            wrapper.classList.add('fade-in','mb-6','flex');
             wrapper.style.alignItems = 'flex-start';
             wrapper.style.justifyContent = isUser ? 'flex-end' : 'flex-start';
 
@@ -605,14 +649,14 @@
             bubble.classList.add('msg');
 
             if (type === 'image') {
-                bubble.innerHTML = `<img src="${escapeHTML(message)}" alt="Generated image" class="rounded-xl max-w-sm cursor-pointer shadow-lg" onclick="window.open('${escapeHTML(message)}','_blank')"><div class="text-xs text-gray-500 dark:text-gray-400 mt-1">${displayTime}</div>`;
+                bubble.innerHTML = `<img src="${escapeHTML(message)}" alt="Generated image" class="rounded-xl max-w-md cursor-pointer shadow-lg" onclick="window.open('${escapeHTML(message)}','_blank')"><div class="timestamp text-gray-500 dark:text-gray-400 mt-2">${displayTime}</div>`;
             } else {
                 if (isUser) {
                     bubble.classList.add('msg-user');
-                    bubble.innerHTML = `<div style="position:relative;"><div>${escapeHTML(message)}</div><button class="edit-message text-xs text-gray-300 hover:text-gray-100" aria-label="Edit message">Edit</button><div class="text-xs text-gray-500 dark:text-gray-400 mt-1">${displayTime}</div></div>`;
+                    bubble.innerHTML = `<div style="position:relative;"><div>${escapeHTML(message)}</div><button class="edit-message" aria-label="Edit message"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg> Edit</button><div class="timestamp text-gray-300 mt-2">${displayTime}</div></div>`;
                 } else {
                     bubble.classList.add('msg-assistant');
-                    bubble.innerHTML = `<div style="position:relative;"><p style="margin:0;">${escapeHTML(message)}</p><div class="sheen"></div><div class="text-xs text-gray-500 dark:text-gray-400 mt-1">${displayTime}</div></div>`;
+                    bubble.innerHTML = `<div style="position:relative;"><p style="margin:0;">${escapeHTML(message)}</p><div class="sheen"></div><div class="timestamp text-gray-500 dark:text-gray-400 mt-2">${displayTime}</div></div>`;
                 }
             }
 
@@ -641,8 +685,8 @@
 
         function showLoadingIndicator() {
             const loading = document.createElement('div');
-            loading.classList.add('fade-in','mb-4','flex','justify-start');
-            loading.innerHTML = `<div class="p-3 rounded-xl bg-gray-200/60 dark:bg-gray-700/60 text-gray-800 dark:text-gray-100 msg-assistant" style="max-width: 200px;">
+            loading.classList.add('fade-in','mb-6','flex','justify-start');
+            loading.innerHTML = `<div class="p-4 rounded-xl bg-gray-200/60 dark:bg-gray-700/60 text-gray-800 dark:text-gray-100 msg-assistant" style="max-width: 240px;">
                 <span>PrismAI is typing...</span>
             </div>`;
             chatHistory.appendChild(loading);
@@ -956,8 +1000,8 @@
             selectChat(btn.dataset.chatId);
         });
         chatHistory.addEventListener('click', (e) => {
-            if (e.target.classList.contains('edit-message')) {
-                const bubble = e.target.parentElement;
+            if (e.target.classList.contains('edit-message') || e.target.closest('.edit-message')) {
+                const bubble = e.target.closest('.msg').querySelector('div');
                 const original = bubble.querySelector('div').textContent;
                 chatInput.value = original;
                 bubble.parentElement.remove();
@@ -986,7 +1030,7 @@
             showTutorial();
         });
 
-        // service worker (optional)
+        // Service worker (optional)
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
                 navigator.serviceWorker.register("sw.js")
