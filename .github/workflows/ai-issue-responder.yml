@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Generate AI response
-        uses: CloudCompile/AI-Issue-Pollinations@v1.0.3   # reference your action repo + tag
+        uses: CloudCompile/AI-Issue-Pollinations@v1.0.4  # reference your action repo + tag
         id: ai
         with:
           file-to-scan: 'index.html'  # file from the target repo
