@@ -12,20 +12,18 @@ jobs:
       - name: Generate AI response
         id: ai
         run: |
-          # Safely escape issue title and body into JSON strings
-          ISSUE_TITLE=$(echo "${{ github.event.issue.title }}" | jq -R .)
-          ISSUE_BODY=$(echo "${{ github.event.issue.body }}" | jq -R .)
+          TITLE="${{ github.event.issue.title }}"
+          BODY="${{ github.event.issue.body }}"
 
-          # Build valid JSON payload for Pollinations AI
-          PAYLOAD=$(jq -n --arg title "$ISSUE_TITLE" --arg body "$ISSUE_BODY" \
-            '{"model":"openai","prompt":"You are a helpful GitHub assistant. Someone opened an issue titled \($title) with the description: \($body). Suggest possible causes and fixes in a friendly tone."}')
+          # Create valid flat JSON payload for Pollinations
+          PAYLOAD="{\"model\":\"openai\",\"prompt\":\"You are a helpful GitHub assistant. Someone opened an issue titled '$TITLE' with description: '$BODY'. Suggest possible causes and fixes in a friendly tone.\"}"
 
-          # Call the Pollinations AI API
+          # Call Pollinations API
           RESPONSE=$(curl -s "https://text.pollinations.ai/" \
             -H "Content-Type: application/json" \
             -d "$PAYLOAD")
 
-          # Save the AI response for next step
+          # Save AI response for next step
           echo "response<<EOF" >> $GITHUB_OUTPUT
           echo "$RESPONSE" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
