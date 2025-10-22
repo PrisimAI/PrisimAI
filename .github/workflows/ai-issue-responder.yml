@@ -8,6 +8,10 @@ jobs:
   auto-ai-response:
     runs-on: ubuntu-latest
     steps:
+      # Step 0: Checkout repo so we can read files
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       # Step 1: Generate AI response using Pollinations
       - name: Generate AI response
         id: ai
@@ -15,13 +19,20 @@ jobs:
           TITLE="${{ github.event.issue.title }}"
           BODY="${{ github.event.issue.body }}"
 
-          # Build prompt
-          PROMPT="You are a helpful GitHub assistant. Someone opened an issue titled '$TITLE' with description: '$BODY'. Suggest possible causes and fixes in a friendly tone."
+          # Include entire index.html content
+          if [ -f index.html ]; then
+            CODE_SNIPPET=$(cat index.html)
+          else
+            CODE_SNIPPET="No index.html found in the repo."
+          fi
 
-          # URL-encode the prompt
+          # Build prompt including repo snippet
+          PROMPT="You are a helpful GitHub assistant. Someone opened an issue titled '$TITLE' with description: '$BODY'. Here is the content of index.html from the repo:\n$CODE_SNIPPET\nSuggest possible causes and fixes in a friendly tone."
+
+          # URL-encode the prompt for Pollinations
           ENCODED_PROMPT=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$PROMPT")
 
-          # Call Pollinations API via GET request
+          # Call Pollinations AI
           RESPONSE=$(curl -s "https://text.pollinations.ai/$ENCODED_PROMPT?model=openai")
 
           # Save AI response for next step
