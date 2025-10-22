@@ -53,7 +53,6 @@
         }
 
         /* ---------- GLASS STYLES ---------- */
-        /* Primary full-bleed glass (used for the chat area) - subtle, liquid look (no outer shadow) */
         .glass-primary {
             background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
             border: 1px solid rgba(255,255,255,0.06);
@@ -62,7 +61,6 @@
             box-shadow: var(--glass-shadow);
         }
 
-        /* Elevated glass (for sidebar/profile) - still glass but slightly raised */
         .glass-elevated {
             background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
             border: 1px solid rgba(255,255,255,0.10);
@@ -71,14 +69,12 @@
             box-shadow: 0 8px 30px rgba(2,6,23,0.12);
         }
 
-        /* Liquid sheen animation for bubbles */
         @keyframes sheen {
             0% { transform: translateX(-120%) skewX(-10deg); opacity: 0; }
             50% { opacity: 0.18; }
             100% { transform: translateX(120%) skewX(-10deg); opacity: 0; }
         }
 
-        /* Message bubble basics */
         .msg {
             max-width: 78%;
             line-height: 1.45;
@@ -86,7 +82,6 @@
             position: relative;
         }
 
-        /* Assistant bubble: glassy, rounded, subtle border + sheen */
         .msg-assistant {
             background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.0));
             border: 1px solid rgba(255,255,255,0.06);
@@ -98,7 +93,6 @@
         }
         .dark .msg-assistant { color: #e6eefc; border-color: rgba(255,255,255,0.06); }
 
-        /* Assistant glass tail (left) */
         .msg-assistant:after {
             content: "";
             position: absolute;
@@ -113,7 +107,6 @@
             z-index: -1;
         }
 
-        /* Add sheen */
         .msg-assistant .sheen {
             position: absolute;
             top: -10px;
@@ -127,7 +120,6 @@
             opacity: 0;
         }
 
-        /* User bubble: solid gradient, pill-ish and bold text */
         .msg-user {
             background: linear-gradient(180deg, rgba(37,99,235,1), rgba(59,130,246,0.95));
             color: white;
@@ -137,7 +129,6 @@
             font-weight: 500;
         }
 
-        /* User tail (right) */
         .msg-user:after {
             content: "";
             position: absolute;
@@ -151,7 +142,6 @@
             filter: blur(0.2px);
         }
 
-        /* Scrollbar theming */
         #chat-history::-webkit-scrollbar {
             width: 10px;
         }
@@ -166,33 +156,39 @@
             background: rgba(255,255,255,0.07);
         }
 
-        /* small fade-in */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .fade-in { animation: fadeIn .22s ease-out both; }
 
-        /* Responsive adjustments */
         @media (max-width: 900px) {
-            aside { width: 64px; } /* collapse sidebar visually on small screens */
-            aside .space-y-6 > *:not(:first-child){ display:none; } /* hide sidebar content for compactness */
+            aside { width: 64px; }
+            aside .space-y-6 > *:not(:first-child){ display:none; }
         }
 
-        /* small helper to ensure input doesn't overlap messages when absolute positioning used */
         .chat-input-wrapper { z-index: 10; }
 
-        /* tutorial overlay tweaks */
         #tutorial-overlay { display: none; }
         #tutorial-overlay.visible { display: flex; }
 
-        /* Error notification styling */
         #error-notification {
             transition: opacity 0.3s ease;
         }
         #error-notification.hidden {
             opacity: 0;
             pointer-events: none;
+        }
+
+        .edit-message {
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .edit-message:hover {
+            opacity: 1;
         }
     </style>
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -215,7 +211,7 @@
     <aside class="w-64 flex-shrink-0 flex flex-col justify-between p-6 sm:flex glass-elevated m-4 rounded-r-3xl">
         <div class="space-y-6 relative">
             <!-- Dark mode toggle -->
-            <button id="dark-mode-toggle" class="absolute top-4 right-4 p-2 rounded-full bg-white/20 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 shadow hover:bg-white/30 dark:hover:bg-gray-600/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <button id="dark-mode-toggle" class="absolute top-4 right-4 p-2 rounded-full bg-white/20 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 shadow hover:bg-white/30 dark:hover:bg-gray-600/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle dark mode">
                 <svg id="dark-mode-icon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path id="sun-icon" class="block dark:hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.93l-.71-.71M12 7a5 5 0 100 10 5 5 0 000-10z" />
                     <path id="moon-icon" class="hidden dark:block" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
@@ -231,17 +227,21 @@
             </div>
 
             <!-- New Chat Button -->
-            <button id="new-chat-btn" class="w-full p-2 rounded-xl bg-blue-500/20 text-blue-600 dark:text-blue-300 font-semibold hover:bg-blue-500/30 active:scale-95 transition-all duration-200">
+            <button id="new-chat-btn" class="w-full p-2 rounded-xl bg-blue-500/20 text-blue-600 dark:text-blue-300 font-semibold hover:bg-blue-500/30 active:scale-95 transition-all duration-200" aria-label="Start new chat">
                 + New Chat
+            </button>
+
+            <!-- Export Chat Button -->
+            <button id="export-chat-btn" class="w-full p-2 rounded-xl bg-blue-500/20 text-blue-600 dark:text-blue-300 font-semibold hover:bg-blue-500/30 active:scale-95 transition-all duration-200" aria-label="Export current chat">
+                Export Chat
             </button>
 
             <!-- Chat History Sidebar -->
             <div id="chat-history-list-container" class="mb-6 flex-grow overflow-y-auto max-h-[calc(100%-150px)]">
                 <h3 class="text-lg font-bold text-gray-700 dark:text-gray-300 mb-3">Chat History</h3>
                 <div id="chat-history-list" class="space-y-2">
-                    <!-- Placeholder New Chat button -->
-                    <button class="w-full p-2 rounded-xl text-left text-gray-700 dark:text-gray-300 font-medium hover:bg-white/20 transition-all duration-200 active:scale-95 flex items-center space-x-2 chat-history-item" data-chat-id="new-chat-placeholder">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <button class="w-full p-2 rounded-xl text-left text-gray-700 dark:text-gray-300 font-medium hover:bg-white/20 transition-all duration-200 active:scale-95 flex items-center space-x-2 chat-history-item" data-chat-id="new-chat-placeholder" aria-label="Select new chat">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
                         <span class="truncate">New Chat</span>
@@ -252,7 +252,7 @@
             <!-- Model Selector -->
             <div class="space-y-2 mt-8">
                 <label for="model-selector" class="text-sm font-medium text-gray-700 dark:text-gray-300">Select Model</label>
-                <select id="model-selector" class="w-full p-2 rounded-xl border border-gray-300/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                <select id="model-selector" class="w-full p-2 rounded-xl border border-gray-300/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" aria-label="Select AI model">
                     <option value="" disabled selected>Loading models...</option>
                 </select>
             </div>
@@ -273,13 +273,18 @@
     <!-- Main Content -->
     <main class="flex-1 flex flex-col relative p-0">
         <div class="flex-1 flex flex-col">
-            <!-- Chat Container: spans the available width (from sidebar to page edge) -->
             <div id="chat-container" class="flex-1 relative w-full m-4 glass-primary overflow-hidden rounded-2xl">
-                <!-- Layout: column, chat history grows, input fixed to bottom -->
                 <div class="flex flex-col h-full">
                     <!-- Error Notification -->
-                    <div id="error-notification" class="hidden p-4 bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl mx-4 mt-4 text-center"></div>
-                    <!-- Welcome Message (shows when no messages) -->
+                    <div id="error-notification" class="hidden p-4 bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl mx-4 mt-4 text-center relative flex items-center justify-between">
+                        <span id="error-message"></span>
+                        <button id="close-error" class="ml-2 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200" aria-label="Close error message">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- Welcome Message -->
                     <div id="welcome-message" class="flex flex-col items-center justify-center text-center p-8 space-y-4 text-gray-500 dark:text-gray-400">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-20 h-20 text-blue-400">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5a6 6 0 1 0-12 0v1.5a6 6 0 0 0 6 6Z" />
@@ -289,17 +294,17 @@
                         <p class="text-lg">What can I help you with today? Try typing something in the box below.</p>
                     </div>
 
-                    <!-- Chat History (flexible, scrollable) -->
-                    <div id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-4 hidden">
+                    <!-- Chat History -->
+                    <div id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-4 hidden" role="log" aria-live="polite">
                         <!-- Messages get appended here -->
                     </div>
 
                     <!-- Chat Input -->
                     <div class="chat-input-wrapper p-4 bg-transparent border-t border-white/6 dark:border-black/6">
-                        <form id="chat-form" class="flex items-end space-x-4">
-                            <textarea id="chat-input" placeholder="Message PrisimAI ✨..." rows="1" class="flex-1 p-3 rounded-2xl border border-gray-300/30 dark:border-gray-600/30 bg-white/10 dark:bg-gray-700/20 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                        <form id="chat-form" class="flex items-end space-x-4" role="form" aria-label="Chat input form">
+                            <textarea id="chat-input" placeholder="Message PrisimAI ✨..." rows="1" class="flex-1 p-3 rounded-2xl border border-gray-300/30 dark:border-gray-600/30 bg-white/10 dark:bg-gray-700/20 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" aria-label="Enter your message"></textarea>
                             <button type="submit" class="p-3 rounded-2xl bg-blue-500 text-white shadow-lg hover:bg-blue-600 active:bg-blue-700 active:scale-95 transition-all duration-200" aria-label="Send message">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.769 59.769 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                                 </svg>
                             </button>
@@ -313,8 +318,8 @@
     <!-- Tutorial Overlay -->
     <div id="tutorial-overlay" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm z-50 items-center justify-center transition-opacity duration-500">
         <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl max-w-xl w-full text-center relative">
-            <button id="tutorial-close-btn" class="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <button id="tutorial-close-btn" class="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors" aria-label="Close tutorial">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
@@ -359,11 +364,23 @@
                 </div>
             </div>
 
-            <button id="tutorial-done-btn" class="mt-8 px-6 py-2 bg-blue-600 text-white font-semibold rounded-xl shadow-md hover:bg-blue-700 transition-all duration-200 active:scale-95">Got It!</button>
+            <button id="tutorial-done-btn" class="mt-8 px-6 py-2 bg-blue-600 text-white font-semibold rounded-xl shadow-md hover:bg-blue-700 transition-all duration-200 active:scale-95" aria-label="Complete tutorial">Got It!</button>
         </div>
     </div>
 
     <script>
+        // ---------- Configuration ----------
+        const config = {
+            apiKey: 'TOEAP3DuMvvVHUsy',
+            referrer: 'https://prisimai.github.io/PrismAI/index.html',
+            textApiUrl: 'https://text.pollinations.ai/openai',
+            imageApiUrl: 'https://image.pollinations.ai/prompt/',
+            requestTimeout: 30000,
+            maxMessageLength: 1000,
+            cacheExpiration: 24 * 60 * 60 * 1000, // 24 hours
+            messagesPerPage: 20,
+        };
+
         // ---------- Utilities & DOM Refs ----------
         const darkModeToggle = document.getElementById('dark-mode-toggle');
         const chatHistory = document.getElementById('chat-history');
@@ -371,19 +388,14 @@
         const chatForm = document.getElementById('chat-form');
         const welcomeMessage = document.getElementById('welcome-message');
         const newChatBtn = document.getElementById('new-chat-btn');
+        const exportChatBtn = document.getElementById('export-chat-btn');
         const modelSelector = document.getElementById('model-selector');
         const chatHistoryList = document.getElementById('chat-history-list');
 
         let currentChatId = null;
-        let allChats = {}; // { chatId: { title, messages: [...], createdAt } }
+        let allChats = {};
 
-        // API placeholders (replace with real values in production)
-        const apiKey = 'TOEAP3DuMvvVHUsy';
-        const referrer = 'https://prisimai.github.io/PrismAI/index.html';
-        const textApiUrl = 'https://text.pollinations.ai/openai';
-        const imageApiUrl = 'https://image.pollinations.ai/prompt/';
-
-        // ---------- ID / Storage helpers ----------
+        // ---------- Helper Functions ----------
         function generateChatId() {
             return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
         }
@@ -395,13 +407,53 @@
             return div.innerHTML;
         }
 
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        function validateInput(message) {
+            if (message.length > config.maxMessageLength) {
+                showErrorNotification(`Message is too long (max ${config.maxMessageLength} characters).`);
+                return false;
+            }
+            if (/[<>{}]/g.test(message)) {
+                showErrorNotification('Message contains invalid characters.');
+                return false;
+            }
+            return true;
+        }
+
+        function getCachedResponse(prompt) {
+            const cache = JSON.parse(localStorage.getItem('apiCache') || '{}');
+            const entry = cache[prompt];
+            if (entry && Date.now() - entry.timestamp < config.cacheExpiration) {
+                return entry.response;
+            }
+            return null;
+        }
+
+        function cacheResponse(prompt, response) {
+            const cache = JSON.parse(localStorage.getItem('apiCache') || '{}');
+            cache[prompt] = { response, timestamp: Date.now() };
+            localStorage.setItem('apiCache', JSON.stringify(cache));
+        }
+
         // ---------- Error Notification ----------
         function showErrorNotification(message) {
             const errorNotification = document.getElementById('error-notification');
-            if (errorNotification) {
-                errorNotification.textContent = message;
+            const errorMessage = document.getElementById('error-message');
+            if (errorNotification && errorMessage) {
+                errorMessage.textContent = message;
                 errorNotification.classList.remove('hidden');
-                setTimeout(() => errorNotification.classList.add('hidden'), 5000);
+                errorNotification.style.opacity = '1';
+                setTimeout(() => {
+                    errorNotification.style.opacity = '0';
+                    setTimeout(() => errorNotification.classList.add('hidden'), 300);
+                }, 5000);
             }
         }
 
@@ -413,9 +465,10 @@
             const chatButton = document.createElement('button');
             chatButton.classList.add('w-full','p-2','rounded-xl','text-left','text-gray-700','dark:text-gray-300','font-medium','hover:bg-white/20','transition-all','duration-200','active:scale-95','flex','items-center','space-x-2','chat-history-item');
             chatButton.dataset.chatId = chatId;
+            chatButton.setAttribute('aria-label', `Select chat: ${title}`);
             const safeTitle = escapeHTML(title);
             chatButton.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0 0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z" />
                 </svg>
                 <span class="truncate" title="${safeTitle}">${safeTitle}</span>
@@ -442,6 +495,7 @@
                 const safeTitle = escapeHTML(newTitle);
                 span.textContent = safeTitle;
                 span.title = safeTitle;
+                btn.setAttribute('aria-label', `Select chat: ${safeTitle}`);
             }
         }
 
@@ -472,9 +526,10 @@
             saveAllChats();
         }
 
-        function loadChatMessages(messages) {
+        function loadChatMessages(messages, start = 0, limit = config.messagesPerPage) {
             chatHistory.innerHTML = '';
-            if (!messages || messages.length === 0) {
+            const slicedMessages = messages.slice(start, start + limit);
+            if (!slicedMessages.length && messages.length === 0) {
                 welcomeMessage.classList.remove('hidden');
                 chatHistory.classList.add('hidden');
                 return;
@@ -482,8 +537,8 @@
             welcomeMessage.classList.add('hidden');
             chatHistory.classList.remove('hidden');
 
-            messages.forEach(msg => {
-                addMessage(msg.content, msg.role, msg.type || 'text', false);
+            slicedMessages.forEach(msg => {
+                addMessage(msg.content, msg.role, msg.type || 'text', false, msg.timestamp);
             });
             requestAnimationFrame(() => { chatHistory.scrollTop = chatHistory.scrollHeight; });
         }
@@ -494,6 +549,7 @@
                 localStorage.setItem('allPrisimAIChats', JSON.stringify(allChats));
             } catch (e) {
                 console.warn('Could not save chats to localStorage:', e);
+                showErrorNotification('Failed to save chat history.');
             }
         }
 
@@ -514,28 +570,31 @@
                 console.error('Error loading chats:', e);
                 localStorage.removeItem('allPrisimAIChats');
                 selectChat(null);
+                showErrorNotification('Failed to load chat history.');
             }
         }
 
-        function clearCurrentChat() {
-            if (!currentChatId) return;
-            delete allChats[currentChatId];
-            const btn = chatHistoryList.querySelector(`[data-chat-id="${currentChatId}"]`);
-            if (btn) btn.remove();
-            currentChatId = null;
-            chatHistory.innerHTML = '';
-            welcomeMessage.classList.remove('hidden');
-            chatHistory.classList.add('hidden');
-            chatInput.placeholder = 'Message PrisimAI ✨...';
-            saveAllChats();
-            selectChat(null);
+        function exportChat() {
+            if (!currentChatId || !allChats[currentChatId]) {
+                showErrorNotification('No chat selected to export.');
+                return;
+            }
+            const chatData = allChats[currentChatId];
+            const blob = new Blob([JSON.stringify(chatData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `prismai-chat-${currentChatId}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
         }
 
         // ---------- Messages rendering ----------
-        function addMessage(message, role='assistant', type='text', store=true) {
+        function addMessage(message, role='assistant', type='text', store=true, timestamp=null) {
             welcomeMessage.classList.add('hidden');
             chatHistory.classList.remove('hidden');
             const isUser = role === 'user';
+            const displayTime = timestamp ? new Date(timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
 
             const wrapper = document.createElement('div');
             wrapper.classList.add('fade-in','mb-4','flex');
@@ -546,14 +605,14 @@
             bubble.classList.add('msg');
 
             if (type === 'image') {
-                bubble.innerHTML = `<img src="${escapeHTML(message)}" alt="Generated" class="rounded-xl max-w-sm cursor-pointer shadow-lg" onclick="window.open('${escapeHTML(message)}','_blank')">`;
+                bubble.innerHTML = `<img src="${escapeHTML(message)}" alt="Generated image" class="rounded-xl max-w-sm cursor-pointer shadow-lg" onclick="window.open('${escapeHTML(message)}','_blank')"><div class="text-xs text-gray-500 dark:text-gray-400 mt-1">${displayTime}</div>`;
             } else {
                 if (isUser) {
                     bubble.classList.add('msg-user');
-                    bubble.innerHTML = `<div style="position:relative;"><div>${escapeHTML(message)}</div></div>`;
+                    bubble.innerHTML = `<div style="position:relative;"><div>${escapeHTML(message)}</div><button class="edit-message text-xs text-gray-300 hover:text-gray-100" aria-label="Edit message">Edit</button><div class="text-xs text-gray-500 dark:text-gray-400 mt-1">${displayTime}</div></div>`;
                 } else {
                     bubble.classList.add('msg-assistant');
-                    bubble.innerHTML = `<div style="position:relative;"><p style="margin:0;">${escapeHTML(message)}</p><div class="sheen"></div></div>`;
+                    bubble.innerHTML = `<div style="position:relative;"><p style="margin:0;">${escapeHTML(message)}</p><div class="sheen"></div><div class="text-xs text-gray-500 dark:text-gray-400 mt-1">${displayTime}</div></div>`;
                 }
             }
 
@@ -567,7 +626,7 @@
                     addChatButton(currentChatId, allChats[currentChatId].title);
                     setActiveChatButton(currentChatId);
                 }
-                allChats[currentChatId].messages.push({ role, content: message, type });
+                allChats[currentChatId].messages.push({ role, content: message, type, timestamp: Date.now() });
                 if (role === 'user' && allChats[currentChatId].title === 'New Chat') {
                     const short = message.slice(0, 50) + (message.length > 50 ? '...' : '');
                     allChats[currentChatId].title = short;
@@ -583,10 +642,8 @@
         function showLoadingIndicator() {
             const loading = document.createElement('div');
             loading.classList.add('fade-in','mb-4','flex','justify-start');
-            loading.innerHTML = `<div class="p-3 rounded-xl bg-gray-200/60 dark:bg-gray-700/60 text-gray-800 dark:text-gray-100 flex items-center space-x-2 msg-assistant" style="max-width: 140px;">
-                <div class="w-3 h-3 rounded-full bounce-dot" style="background: rgba(0,0,0,0.35); animation-delay:-0.32s;"></div>
-                <div class="w-3 h-3 rounded-full bounce-dot" style="background: rgba(0,0,0,0.35); animation-delay:-0.16s;"></div>
-                <div class="w-3 h-3 rounded-full bounce-dot" style="background: rgba(0,0,0,0.35);"></div>
+            loading.innerHTML = `<div class="p-3 rounded-xl bg-gray-200/60 dark:bg-gray-700/60 text-gray-800 dark:text-gray-100 msg-assistant" style="max-width: 200px;">
+                <span>PrismAI is typing...</span>
             </div>`;
             chatHistory.appendChild(loading);
             chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -597,10 +654,10 @@
         async function fetchModels() {
             try {
                 modelSelector.innerHTML = `<option disabled selected>Loading models...</option>`;
-                const res = await fetch('https://text.pollinations.ai/models', {
+                const res = await fetch(config.textApiUrl.replace('/openai', '/models'), {
                     headers: {
-                        'Authorization': `Bearer ${apiKey}`,
-                        'Referer': referrer
+                        'Authorization': `Bearer ${config.apiKey}`,
+                        'Referer': config.referrer
                     }
                 });
                 if (!res.ok) {
@@ -629,20 +686,26 @@
 
         // ---------- STREAMING / TEXT RESPONSE ----------
         async function streamTextResponse() {
+            const cached = getCachedResponse(allChats[currentChatId]?.messages?.slice(-1)[0]?.content);
+            if (cached) {
+                addMessage(cached, 'assistant');
+                return;
+            }
+
             const loadingIndicator = showLoadingIndicator();
             const selectedModel = modelSelector.value || '';
             const currentMessages = allChats[currentChatId]?.messages || [];
 
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 30000);
+                const timeoutId = setTimeout(() => controller.abort(), config.requestTimeout);
 
-                const response = await fetch(textApiUrl, {
+                const response = await fetch(config.textApiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`,
-                        'Referer': referrer
+                        'Authorization': `Bearer ${config.apiKey}`,
+                        'Referer': config.referrer
                     },
                     body: JSON.stringify({
                         model: selectedModel || 'default',
@@ -673,7 +736,7 @@
 
                 if (currentChatId) {
                     if (!allChats[currentChatId]) allChats[currentChatId] = { title: 'New Chat', messages: [], createdAt: Date.now() };
-                    allChats[currentChatId].messages.push({ role: 'assistant', content: '', type: 'text' });
+                    allChats[currentChatId].messages.push({ role: 'assistant', content: '', type: 'text', timestamp: Date.now() });
                     saveAllChats();
                 }
 
@@ -716,6 +779,7 @@
                     const msgs = allChats[currentChatId].messages;
                     if (msgs && msgs.length > 0 && msgs[msgs.length - 1].role === 'assistant') {
                         msgs[msgs.length - 1].content = accumulatedContent;
+                        cacheResponse(currentMessages[currentMessages.length - 1].content, accumulatedContent);
                         saveAllChats();
                     }
                 }
@@ -726,14 +790,14 @@
 
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 30000);
+                    const timeoutId = setTimeout(() => controller.abort(), config.requestTimeout);
 
-                    const fallbackRes = await fetch(textApiUrl, {
+                    const fallbackRes = await fetch(config.textApiUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`,
-                            'Referer': referrer
+                            'Authorization': `Bearer ${config.apiKey}`,
+                            'Referer': config.referrer
                         },
                         body: JSON.stringify({
                             model: selectedModel || 'default',
@@ -760,7 +824,8 @@
 
                     addMessage(fallbackMessage, 'assistant');
                     if (currentChatId) {
-                        allChats[currentChatId].messages.push({ role: 'assistant', content: fallbackMessage, type: 'text' });
+                        allChats[currentChatId].messages.push({ role: 'assistant', content: fallbackMessage, type: 'text', timestamp: Date.now() });
+                        cacheResponse(currentMessages[currentMessages.length - 1].content, fallbackMessage);
                         saveAllChats();
                     }
                 } catch (fallbackError) {
@@ -769,7 +834,7 @@
                     addMessage(errorMessage, 'assistant');
                     showErrorNotification(errorMessage);
                     if (currentChatId) {
-                        allChats[currentChatId].messages.push({ role: 'assistant', content: errorMessage, type: 'text' });
+                        allChats[currentChatId].messages.push({ role: 'assistant', content: errorMessage, type: 'text', timestamp: Date.now() });
                         saveAllChats();
                     }
                 }
@@ -778,16 +843,16 @@
 
         // ---------- IMAGE RESPONSE ----------
         async function handleImageResponse(prompt) {
-            const imageUrl = `${imageApiUrl}${encodeURIComponent(prompt)}?key=${apiKey}&referrer=${encodeURIComponent(referrer)}`;
+            const imageUrl = `${config.imageApiUrl}${encodeURIComponent(prompt)}?key=${config.apiKey}&referrer=${encodeURIComponent(config.referrer)}`;
             const loading = showLoadingIndicator();
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 30000);
+                const timeoutId = setTimeout(() => controller.abort(), config.requestTimeout);
 
                 const res = await fetch(imageUrl, {
                     method: 'GET',
                     headers: {
-                        'Referer': referrer
+                        'Referer': config.referrer
                     },
                     signal: controller.signal
                 });
@@ -813,6 +878,7 @@
         async function handleChatSubmission() {
             const userMessage = chatInput.value.trim();
             if (!userMessage) return;
+            if (!validateInput(userMessage)) return;
 
             chatInput.value = '';
             resizeTextarea();
@@ -843,6 +909,7 @@
             chatInput.style.height = 'auto';
             chatInput.style.height = `${Math.min(chatInput.scrollHeight, 400)}px`;
         }
+        const debouncedResizeTextarea = debounce(resizeTextarea, 100);
 
         // ---------- Tutorial overlay ----------
         const tutorialOverlay = document.getElementById('tutorial-overlay');
@@ -862,8 +929,6 @@
             document.body.style.overflow = '';
             localStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
         }
-        if (tutorialCloseBtn) tutorialCloseBtn.addEventListener('click', hideTutorial);
-        if (tutorialDoneBtn) tutorialDoneBtn.addEventListener('click', hideTutorial);
 
         // ---------- Event bindings ----------
         if (darkModeToggle) {
@@ -882,12 +947,36 @@
             e.preventDefault();
             handleChatSubmission();
         });
-        chatInput.addEventListener('input', resizeTextarea);
+        chatInput.addEventListener('input', debouncedResizeTextarea);
         newChatBtn.addEventListener('click', () => selectChat(null));
+        exportChatBtn.addEventListener('click', exportChat);
         chatHistoryList.addEventListener('click', (ev) => {
             const btn = ev.target.closest('.chat-history-item');
             if (!btn || !btn.dataset.chatId) return;
             selectChat(btn.dataset.chatId);
+        });
+        chatHistory.addEventListener('click', (e) => {
+            if (e.target.classList.contains('edit-message')) {
+                const bubble = e.target.parentElement;
+                const original = bubble.querySelector('div').textContent;
+                chatInput.value = original;
+                bubble.parentElement.remove();
+                allChats[currentChatId].messages = allChats[currentChatId].messages.filter(msg => msg.content !== original);
+                saveAllChats();
+            }
+        });
+        chatHistory.addEventListener('scroll', () => {
+            if (chatHistory.scrollTop === 0 && allChats[currentChatId]) {
+                const currentLength = chatHistory.children.length;
+                loadChatMessages(allChats[currentChatId].messages, currentLength, currentLength + config.messagesPerPage);
+            }
+        });
+        if (tutorialCloseBtn) tutorialCloseBtn.addEventListener('click', hideTutorial);
+        if (tutorialDoneBtn) tutorialDoneBtn.addEventListener('click', hideTutorial);
+        document.getElementById('close-error').addEventListener('click', () => {
+            const errorNotification = document.getElementById('error-notification');
+            errorNotification.style.opacity = '0';
+            setTimeout(() => errorNotification.classList.add('hidden'), 300);
         });
 
         // ---------- Init ----------
