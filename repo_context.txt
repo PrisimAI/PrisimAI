@@ -1,0 +1,23 @@
+Repository structure:
+./LICENSE
+./manifest.json
+./index.html
+./script.js
+./favicon-32x32.png
+./style.css
+./test-setup.js
+./favicon-16x16.png
+./repo_context.txt
+./README.md
+./preview-image.png
+./apple-touch-icon.png
+./TEST_README.md
+./dev/index.test.js
+./dev/index.html
+./package.json
+./sw.js
+./favicon.ico
+./offline.html
+./BingSiteAuth.xml
+./sitemap.xml
+./TEST_SUITE_SUMMARY.md
