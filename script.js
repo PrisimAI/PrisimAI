@@ -869,40 +869,50 @@ async function handleChatSubmit(event) {
     }
 }
 
-// ---------- Model Selector ----------
-function populateModelSelector() {
-    const modelInfo = {
-        "gpt-4o-mini": { name: "GPT-4o Mini", desc: "Fast, affordable, and highly capable." },
-        "gpt-4-turbo": { name: "GPT-4 Turbo", desc: "High-end model for complex reasoning." },
-        "gpt-4": { name: "GPT-4 (Powerful)", desc: "Previous generation powerful model." },
-        "claude-3-opus": { name: "Claude 3 Opus", desc: "Anthropic's most powerful model." },
-        "gpt-3.5-turbo": { name: "GPT-3.5 Turbo", desc: "Very fast and cost-effective." },
-        "claude-3-sonnet": { name: "Claude 3 Sonnet", desc: "Balance of intelligence and speed." },
-        "claude-3-haiku": { name: "Claude 3 Haiku (Fastest)", desc: "Anthropic's fastest model." },
-    };
-    const modelGroups = {
-        "Chat (Recommended)": ["gpt-4o-mini", "gpt-4-turbo"],
-        "Creative & Advanced": ["gpt-4", "claude-3-opus"],
-        "Fast & Light": ["gpt-3.5-turbo", "claude-3-sonnet", "claude-3-haiku"],
-    };
-    
-    dom.modelSelector.innerHTML = '';
-    Object.keys(modelGroups).forEach(groupName => {
-        const optgroup = document.createElement('optgroup');
-        optgroup.label = groupName;
-        modelGroups[groupName].forEach(modelId => {
-            const model = modelInfo[modelId];
-            if (!model) return;
-            const option = document.createElement('option');
-            option.value = modelId;
-            option.textContent = model.name;
-            option.title = model.desc;
-            optgroup.appendChild(option);
-        });
-        dom.modelSelector.appendChild(optgroup);
-    });
-    dom.modelSelector.value = "gpt-4o-mini";
+// ---------- Load Models from Pollinations API ----------
+async function loadAvailableModels() {
+    try {
+        const response = await fetch('https://enter.pollinations.ai/api/generate/openai/models');
+        if (!response.ok) throw new Error(`Failed to fetch models: ${response.status}`);
+        
+        const data = await response.json();
+        const models = data.models || data || []; // depends on how Pollinations returns it
+        
+        dom.modelSelector.innerHTML = ''; // clear old options
+        const defaultOpt = document.createElement('option');
+        defaultOpt.textContent = 'Select a model...';
+        defaultOpt.disabled = true;
+        defaultOpt.selected = true;
+        dom.modelSelector.appendChild(defaultOpt);
+
+        // If the API groups models, show them neatly
+        if (Array.isArray(models)) {
+            models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id || model.name || model;
+                option.textContent = model.id || model.name || model;
+                dom.modelSelector.appendChild(option);
+            });
+        } else {
+            // fallback if the response is an object
+            for (const key in models) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = key;
+                dom.modelSelector.appendChild(option);
+            }
+        }
+    } catch (err) {
+        console.error('Error loading models:', err);
+        showErrorNotification('Failed to load models from Pollinations API.');
+        // fallback default model
+        dom.modelSelector.innerHTML = '<option value="openai-large">openai-large (default)</option>';
+    }
 }
+
+// Call this when the app starts
+window.addEventListener('DOMContentLoaded', loadAvailableModels);
+
 
 // ---------- Dynamic UI Injection ----------
 function injectMicButton() {
