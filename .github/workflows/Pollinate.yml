@@ -69,9 +69,9 @@ jobs:
           - Return valid JSON only, no other text"
           
           # Call Pollinations AI API
-          RESPONSE=$(curl -s https://enter.pollinations.ai/api/generate/openai \
+          RESPONSE=$(curl -s https://text.pollinations.ai/openai/ \
             -H "content-type: application/json" \
-            -H "authorization: Bearer HnmNucebqbTDorAfFAkbBGUOYzQVHTcEdHdKKGQQIosjgMativUHGRrUxlYpmKGC" \
+            -H "authorization: Bearer TOEAP3DuMvvVHUsy" \
             -d "{
               \"messages\": [
                 {
@@ -112,9 +112,41 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           
-          const changes = JSON.parse(fs.readFileSync('changes.json', 'utf8'));
+          let changesText = fs.readFileSync('changes.json', 'utf8').trim();
+          console.log('Raw changes.json content:', changesText);
+          
+          // Try to parse JSON
+          let changes;
+          try {
+            changes = JSON.parse(changesText);
+          } catch (e) {
+            console.error('Failed to parse JSON:', e.message);
+            console.log('Attempting to extract JSON from response...');
+            
+            // Try to find JSON array in the text
+            const match = changesText.match(/\[[\s\S]*\]/);
+            if (match) {
+              changes = JSON.parse(match[0]);
+            } else {
+              console.error('No valid JSON array found in response');
+              process.exit(1);
+            }
+          }
+          
+          // Ensure changes is an array
+          if (!Array.isArray(changes)) {
+            console.error('Changes is not an array:', typeof changes);
+            process.exit(1);
+          }
+          
+          console.log(`Processing ${changes.length} file operations...`);
           
           for (const change of changes) {
+            if (!change.path || !change.action) {
+              console.warn('Skipping invalid change:', change);
+              continue;
+            }
+            
             const filePath = change.path;
             const dir = path.dirname(filePath);
             
@@ -122,7 +154,7 @@ jobs:
               if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, { recursive: true });
               }
-              fs.writeFileSync(filePath, change.content);
+              fs.writeFileSync(filePath, change.content || '');
               console.log(`${change.action}: ${filePath}`);
             } else if (change.action === 'delete') {
               if (fs.existsSync(filePath)) {
@@ -131,6 +163,8 @@ jobs:
               }
             }
           }
+          
+          console.log('All changes applied successfully!');
           EOF
 
       - name: Commit changes
