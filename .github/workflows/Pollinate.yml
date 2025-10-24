@@ -199,7 +199,7 @@ jobs:
                   \"content\": $(echo "$PROMPT" | jq -Rs .)
                 }
               ],
-              \"model\": \"openai\"
+              \"model\": \"openai-large\"
             }")
           
           EXPLANATION=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // .content // .')
