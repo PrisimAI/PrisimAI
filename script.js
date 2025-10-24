@@ -869,49 +869,49 @@ async function handleChatSubmit(event) {
     }
 }
 
-// ---------- Load Models from Pollinations API ----------
-async function loadAvailableModels() {
-    try {
-        const response = await fetch('https://enter.pollinations.ai/api/generate/openai/models');
-        if (!response.ok) throw new Error(`Failed to fetch models: ${response.status}`);
-        
-        const data = await response.json();
-        const models = data.models || data || []; // depends on how Pollinations returns it
-        
-        dom.modelSelector.innerHTML = ''; // clear old options
-        const defaultOpt = document.createElement('option');
-        defaultOpt.textContent = 'Select a model...';
-        defaultOpt.disabled = true;
-        defaultOpt.selected = true;
-        dom.modelSelector.appendChild(defaultOpt);
+async function populateModelSelector() {
+    dom.modelSelector.innerHTML = ''; // clear old options
 
-        // If the API groups models, show them neatly
-        if (Array.isArray(models)) {
-            models.forEach(model => {
-                const option = document.createElement('option');
-                option.value = model.id || model.name || model;
-                option.textContent = model.id || model.name || model;
-                dom.modelSelector.appendChild(option);
+    try {
+        const res = await fetch('https://enter.pollinations.ai/api/generate/openai/models');
+        const json = await res.json();
+        if (!json.data || !Array.isArray(json.data)) throw new Error('Invalid model data');
+
+        // Define groups manually for clarity
+        const modelGroups = {
+            'OpenAI Models': ['openai', 'openai-fast', 'openai-large', 'openai-reasoning', 'openai-audio'],
+            'Scaleway Models': ['qwen-coder', 'mistral', 'unity', 'evil'],
+            'Bedrock Models': ['roblox-rp', 'claudyclaude', 'chickytutor'],
+            'Other / Unknown': ['gemini', 'gemini-search', 'midijourney', 'rtist', 'bidara']
+        };
+
+        Object.keys(modelGroups).forEach(groupName => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = groupName;
+
+            modelGroups[groupName].forEach(modelId => {
+                // Only add if model exists in API response
+                if (json.data.some(m => m.id === modelId)) {
+                    const option = document.createElement('option');
+                    option.value = modelId;
+                    option.textContent = modelId;
+                    optgroup.appendChild(option);
+                }
             });
-        } else {
-            // fallback if the response is an object
-            for (const key in models) {
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = key;
-                dom.modelSelector.appendChild(option);
-            }
-        }
-    } catch (err) {
-        console.error('Error loading models:', err);
-        showErrorNotification('Failed to load models from Pollinations API.');
-        // fallback default model
-        dom.modelSelector.innerHTML = '<option value="openai-large">openai-large (default)</option>';
+
+            dom.modelSelector.appendChild(optgroup);
+        });
+
+        // Default selection
+        const firstOption = dom.modelSelector.querySelector('option');
+        if (firstOption) dom.modelSelector.value = firstOption.value;
+
+    } catch (e) {
+        console.error('Failed to load models:', e);
+        showErrorNotification('Failed to load AI models.');
     }
 }
 
-// Call this when the app starts
-window.addEventListener('DOMContentLoaded', loadAvailableModels);
 
 
 // ---------- Dynamic UI Injection ----------
