@@ -1,0 +1,3 @@
+- create: `dev/styleManager.js` - Implements a style manager to change, reset, and persist CSS variables defined in style.css.
+- create: `__tests__/styleManager.test.js` - Test suite for styleManager.js to verify dynamic CSS updates and persistence.
+- modify: `README.md` - Updates README to include new dynamic style change feature usage.
