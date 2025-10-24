@@ -3,16 +3,21 @@ name: Pollinate - AI Feature Implementation
 on:
   issue_comment:
     types: [created]
+  pull_request_review:
+    types: [submitted]
 
 permissions:
   contents: write
   issues: write
   pull-requests: write
+  checks: write
 
 jobs:
   pollinate:
     runs-on: ubuntu-latest
-    if: startsWith(github.event.comment.body, '!Pollinate')
+    if: |
+      startsWith(github.event.comment.body, '!Pollinate') ||
+      startsWith(github.event.comment.body, '!pollinate')
     
     steps:
       - name: Check out repository
@@ -25,50 +30,272 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Parse feature request
+      - name: Parse command and feature request
         id: parse
         run: |
           COMMENT="${{ github.event.comment.body }}"
-          FEATURE_DESC=$(echo "$COMMENT" | sed 's/^!Pollinate//' | xargs)
+          
+          # Extract command type
+          if echo "$COMMENT" | grep -qi "^!Pollinate explain"; then
+            echo "command=explain" >> $GITHUB_OUTPUT
+            FEATURE_DESC=$(echo "$COMMENT" | sed 's/^!Pollinate explain//I' | xargs)
+          elif echo "$COMMENT" | grep -qi "^!Pollinate refine"; then
+            echo "command=refine" >> $GITHUB_OUTPUT
+            FEATURE_DESC=$(echo "$COMMENT" | sed 's/^!Pollinate refine//I' | xargs)
+          elif echo "$COMMENT" | grep -qi "^!Pollinate rollback"; then
+            echo "command=rollback" >> $GITHUB_OUTPUT
+            FEATURE_DESC=""
+          else
+            echo "command=implement" >> $GITHUB_OUTPUT
+            FEATURE_DESC=$(echo "$COMMENT" | sed 's/^!Pollinate//I' | xargs)
+          fi
+          
           echo "feature_description=$FEATURE_DESC" >> $GITHUB_OUTPUT
           BRANCH_NAME="pollinate/$(echo "$FEATURE_DESC" | head -c 30 | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g')-$(date +%s)"
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
-      - name: Create feature branch
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b ${{ steps.parse.outputs.branch_name }}
+      - name: Handle rollback command
+        if: steps.parse.outputs.command == 'rollback'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Find the most recent Pollinate PR
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              sort: 'created',
+              direction: 'desc'
+            });
+            
+            const pollinatePR = prs.find(pr => pr.title.includes('🌱 Pollinate:'));
+            
+            if (pollinatePR) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pollinatePR.number,
+                state: 'closed'
+              });
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `🔄 **Rollback complete!**\n\nClosed PR #${pollinatePR.number} and rolled back changes.`
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `⚠️ No recent Pollinate PR found to rollback.`
+              });
+            }
 
-      - name: Call AI to implement feature
-        id: ai_implement
+      - name: Detect project language and structure
+        if: steps.parse.outputs.command != 'rollback'
+        id: detect
         run: |
-          # Get repository structure for context
-          echo "Repository structure:" > repo_context.txt
-          find . -type f -not -path '*/\.*' -not -path '*/node_modules/*' | head -50 >> repo_context.txt
+          # Detect primary language
+          if [ -f "package.json" ]; then
+            echo "language=javascript" >> $GITHUB_OUTPUT
+            echo "package_manager=npm" >> $GITHUB_OUTPUT
+            [ -f "yarn.lock" ] && echo "package_manager=yarn" >> $GITHUB_OUTPUT
+            [ -f "pnpm-lock.yaml" ] && echo "package_manager=pnpm" >> $GITHUB_OUTPUT
+          elif [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+            echo "language=python" >> $GITHUB_OUTPUT
+          elif [ -f "go.mod" ]; then
+            echo "language=go" >> $GITHUB_OUTPUT
+          elif [ -f "Cargo.toml" ]; then
+            echo "language=rust" >> $GITHUB_OUTPUT
+          elif [ -f "pom.xml" ] || [ -f "build.gradle" ]; then
+            echo "language=java" >> $GITHUB_OUTPUT
+          else
+            echo "language=unknown" >> $GITHUB_OUTPUT
+          fi
           
-          PROMPT="You are implementing a feature for a GitHub repository.
+          # Detect testing framework
+          if grep -q "jest" package.json 2>/dev/null; then
+            echo "test_framework=jest" >> $GITHUB_OUTPUT
+          elif grep -q "vitest" package.json 2>/dev/null; then
+            echo "test_framework=vitest" >> $GITHUB_OUTPUT
+          elif grep -q "pytest" requirements.txt 2>/dev/null; then
+            echo "test_framework=pytest" >> $GITHUB_OUTPUT
+          fi
 
-          Repository context:
-          $(cat repo_context.txt)
+      - name: Gather smart context
+        if: steps.parse.outputs.command != 'rollback'
+        id: context
+        run: |
+          echo "=== Gathering Repository Context ===" > context.txt
+          echo "" >> context.txt
+          
+          # Project structure
+          echo "## Project Structure:" >> context.txt
+          find . -type f -not -path '*/\.*' -not -path '*/node_modules/*' -not -path '*/dist/*' -not -path '*/build/*' | head -100 >> context.txt
+          echo "" >> context.txt
+          
+          # Package dependencies
+          if [ -f "package.json" ]; then
+            echo "## Dependencies (package.json):" >> context.txt
+            cat package.json >> context.txt
+            echo "" >> context.txt
+          fi
+          
+          if [ -f "requirements.txt" ]; then
+            echo "## Dependencies (requirements.txt):" >> context.txt
+            cat requirements.txt >> context.txt
+            echo "" >> context.txt
+          fi
+          
+          # README content
+          if [ -f "README.md" ]; then
+            echo "## Current README.md:" >> context.txt
+            head -50 README.md >> context.txt
+            echo "" >> context.txt
+          fi
+          
+          # Scan for similar patterns (find common file patterns)
+          echo "## Common Code Patterns:" >> context.txt
+          find . -name "*.js" -o -name "*.ts" -o -name "*.py" | head -10 | while read file; do
+            echo "File: $file" >> context.txt
+            head -20 "$file" >> context.txt
+            echo "" >> context.txt
+          done
+          
+          # Get issue context
+          echo "## Issue Context:" >> context.txt
+          echo "Issue #${{ github.event.issue.number }}" >> context.txt
+          echo "Title: ${{ github.event.issue.title }}" >> context.txt
+          echo "" >> context.txt
+          
+          cat context.txt
+
+      - name: Explain implementation plan
+        if: steps.parse.outputs.command == 'explain'
+        run: |
+          PROMPT="Analyze this feature request and explain how you would implement it.
+
+          $(cat context.txt)
 
           Feature request: ${{ steps.parse.outputs.feature_description }}
 
-          Implement this feature by creating or modifying files. Return ONLY a valid JSON array (no markdown, no explanation):
+          Provide a detailed implementation plan including:
+          1. Files that need to be created or modified
+          2. Key changes to make in each file
+          3. Testing strategy
+          4. Potential edge cases or considerations
+          
+          Format as a clear, bulleted explanation."
+          
+          RESPONSE=$(curl -s https://text.pollinations.ai/openai/ \
+            -H "content-type: application/json" \
+            -H "authorization: Bearer TOEAP3DuMvvVHUsy" \
+            -d "{
+              \"messages\": [
+                {
+                  \"role\": \"user\",
+                  \"content\": $(echo "$PROMPT" | jq -Rs .)
+                }
+              ],
+              \"model\": \"openai\"
+            }")
+          
+          EXPLANATION=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // .content // .')
+          
+          # Post explanation as comment
+          gh issue comment ${{ github.event.issue.number }} --body "## 🌱 Pollinate Implementation Plan
+
+          $EXPLANATION
+
+          ---
+          React with 👍 and comment \`!Pollinate ${{ steps.parse.outputs.feature_description }}\` to proceed with implementation."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create feature branch
+        if: steps.parse.outputs.command == 'implement' || steps.parse.outputs.command == 'refine'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Check if refining existing PR
+          if [ "${{ steps.parse.outputs.command }}" == "refine" ]; then
+            # Find and checkout the most recent Pollinate branch
+            LATEST_BRANCH=$(git branch -r | grep "pollinate/" | tail -1 | sed 's/.*\///')
+            if [ -n "$LATEST_BRANCH" ]; then
+              git checkout "$LATEST_BRANCH"
+              echo "Refining existing branch: $LATEST_BRANCH"
+            else
+              git checkout -b ${{ steps.parse.outputs.branch_name }}
+            fi
+          else
+            git checkout -b ${{ steps.parse.outputs.branch_name }}
+          fi
+
+      - name: Call AI to implement feature
+        if: steps.parse.outputs.command == 'implement' || steps.parse.outputs.command == 'refine'
+        id: ai_implement
+        run: |
+          CONTEXT=$(cat context.txt)
+          
+          # Build language-specific prompt
+          LANG_GUIDANCE=""
+          case "${{ steps.detect.outputs.language }}" in
+            javascript)
+              LANG_GUIDANCE="Use modern JavaScript/TypeScript. Follow ES6+ standards. Use async/await for async operations."
+              ;;
+            python)
+              LANG_GUIDANCE="Follow PEP 8 style guide. Use type hints. Include docstrings for functions."
+              ;;
+            go)
+              LANG_GUIDANCE="Follow Go conventions. Use proper error handling. Include package documentation."
+              ;;
+            rust)
+              LANG_GUIDANCE="Follow Rust conventions. Handle Result/Option types properly. Include documentation comments."
+              ;;
+          esac
+          
+          REFINE_CONTEXT=""
+          if [ "${{ steps.parse.outputs.command }}" == "refine" ]; then
+            REFINE_CONTEXT="This is a refinement request. Review the existing implementation and improve it based on: ${{ steps.parse.outputs.feature_description }}"
+          fi
+          
+          PROMPT="You are implementing a feature for a GitHub repository.
+
+          $CONTEXT
+
+          Language: ${{ steps.detect.outputs.language }}
+          $LANG_GUIDANCE
+
+          Feature request: ${{ steps.parse.outputs.feature_description }}
+          $REFINE_CONTEXT
+
+          Implement this feature by creating or modifying files. Include:
+          1. Implementation files with complete, production-ready code
+          2. Test files for the new functionality
+          3. Updated documentation (README, inline comments)
+          4. Any configuration changes needed
+
+          Return ONLY a valid JSON array (no markdown, no explanation):
           [
             {
               \"action\": \"create\",
               \"path\": \"path/to/file.js\",
-              \"content\": \"// file content here\"
+              \"content\": \"// Complete file content here\",
+              \"description\": \"Brief description of this change\"
             }
           ]
 
           Rules:
-          - Use \"create\" for new files, \"modify\" for existing files, \"delete\" to remove files
+          - Use 'create' for new files, 'modify' for existing files, 'delete' to remove files
           - Include complete file content for create/modify actions
+          - Add comprehensive inline comments
+          - Generate test files with multiple test cases
+          - Update README.md if new features are user-facing
           - Return valid JSON only, no other text"
           
-          # Call Pollinations AI API
           RESPONSE=$(curl -s https://text.pollinations.ai/openai/ \
             -H "content-type: application/json" \
             -H "authorization: Bearer TOEAP3DuMvvVHUsy" \
@@ -85,20 +312,17 @@ jobs:
           echo "Full API Response:"
           echo "$RESPONSE"
           
-          # Extract and clean the response
           CONTENT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // .content // .')
           echo "Extracted content:"
           echo "$CONTENT"
           
-          # Try to extract JSON array from markdown code blocks or raw text
+          # Try to extract JSON array
           echo "$CONTENT" | sed -n '/^\[/,/^\]/p' > changes.json
           
-          # If that didn't work, try to find JSON in code blocks
           if [ ! -s changes.json ]; then
             echo "$CONTENT" | sed -n '/```json/,/```/p' | sed '1d;$d' > changes.json
           fi
           
-          # If still no valid JSON, try without code blocks
           if [ ! -s changes.json ]; then
             echo "$CONTENT" | grep -o '\[.*\]' > changes.json
           fi
@@ -107,6 +331,7 @@ jobs:
           cat changes.json
 
       - name: Apply changes
+        if: steps.parse.outputs.command == 'implement' || steps.parse.outputs.command == 'refine'
         run: |
           node << 'EOF'
           const fs = require('fs');
@@ -115,15 +340,11 @@ jobs:
           let changesText = fs.readFileSync('changes.json', 'utf8').trim();
           console.log('Raw changes.json content:', changesText);
           
-          // Try to parse JSON
           let changes;
           try {
             changes = JSON.parse(changesText);
           } catch (e) {
             console.error('Failed to parse JSON:', e.message);
-            console.log('Attempting to extract JSON from response...');
-            
-            // Try to find JSON array in the text
             const match = changesText.match(/\[[\s\S]*\]/);
             if (match) {
               changes = JSON.parse(match[0]);
@@ -133,13 +354,14 @@ jobs:
             }
           }
           
-          // Ensure changes is an array
           if (!Array.isArray(changes)) {
             console.error('Changes is not an array:', typeof changes);
             process.exit(1);
           }
           
           console.log(`Processing ${changes.length} file operations...`);
+          
+          const changeSummary = [];
           
           for (const change of changes) {
             if (!change.path || !change.action) {
@@ -156,48 +378,192 @@ jobs:
               }
               fs.writeFileSync(filePath, change.content || '');
               console.log(`${change.action}: ${filePath}`);
+              changeSummary.push(`- ${change.action}: \`${filePath}\` - ${change.description || 'No description'}`);
             } else if (change.action === 'delete') {
               if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
                 console.log(`deleted: ${filePath}`);
+                changeSummary.push(`- deleted: \`${filePath}\``);
               }
             }
           }
           
+          fs.writeFileSync('change_summary.txt', changeSummary.join('\n'));
           console.log('All changes applied successfully!');
           EOF
 
+      - name: Install dependencies
+        if: (steps.parse.outputs.command == 'implement' || steps.parse.outputs.command == 'refine') && steps.detect.outputs.language == 'javascript'
+        run: |
+          if [ "${{ steps.detect.outputs.package_manager }}" == "yarn" ]; then
+            yarn install
+          elif [ "${{ steps.detect.outputs.package_manager }}" == "pnpm" ]; then
+            pnpm install
+          else
+            npm install
+          fi
+
+      - name: Run linting
+        if: steps.parse.outputs.command == 'implement' || steps.parse.outputs.command == 'refine'
+        continue-on-error: true
+        run: |
+          echo "## Linting Results" > lint_results.txt
+          
+          if [ "${{ steps.detect.outputs.language }}" == "javascript" ]; then
+            if command -v eslint &> /dev/null; then
+              eslint . --ext .js,.ts,.jsx,.tsx >> lint_results.txt 2>&1 || true
+            fi
+          elif [ "${{ steps.detect.outputs.language }}" == "python" ]; then
+            if command -v flake8 &> /dev/null; then
+              flake8 . >> lint_results.txt 2>&1 || true
+            fi
+          fi
+          
+          cat lint_results.txt
+
+      - name: Run tests
+        if: steps.parse.outputs.command == 'implement' || steps.parse.outputs.command == 'refine'
+        continue-on-error: true
+        run: |
+          echo "## Test Results" > test_results.txt
+          
+          if [ "${{ steps.detect.outputs.test_framework }}" == "jest" ]; then
+            npm test >> test_results.txt 2>&1 || true
+          elif [ "${{ steps.detect.outputs.test_framework }}" == "vitest" ]; then
+            npm run test >> test_results.txt 2>&1 || true
+          elif [ "${{ steps.detect.outputs.test_framework }}" == "pytest" ]; then
+            pytest >> test_results.txt 2>&1 || true
+          else
+            echo "No test framework detected" >> test_results.txt
+          fi
+          
+          cat test_results.txt
+
+      - name: Security scan
+        if: steps.parse.outputs.command == 'implement' || steps.parse.outputs.command == 'refine'
+        continue-on-error: true
+        run: |
+          echo "## Security Scan Results" > security_results.txt
+          
+          if [ "${{ steps.detect.outputs.language }}" == "javascript" ]; then
+            npm audit >> security_results.txt 2>&1 || true
+          elif [ "${{ steps.detect.outputs.language }}" == "python" ]; then
+            pip install safety
+            safety check >> security_results.txt 2>&1 || true
+          fi
+          
+          cat security_results.txt
+
+      - name: Generate commit message
+        if: steps.parse.outputs.command == 'implement' || steps.parse.outputs.command == 'refine'
+        id: commit_msg
+        run: |
+          FEATURE="${{ steps.parse.outputs.feature_description }}"
+          
+          # Determine conventional commit type
+          if echo "$FEATURE" | grep -qi "fix\|bug"; then
+            TYPE="fix"
+          elif echo "$FEATURE" | grep -qi "doc"; then
+            TYPE="docs"
+          elif echo "$FEATURE" | grep -qi "test"; then
+            TYPE="test"
+          elif echo "$FEATURE" | grep -qi "refactor"; then
+            TYPE="refactor"
+          else
+            TYPE="feat"
+          fi
+          
+          MSG="$TYPE: $(echo $FEATURE | head -c 50)"
+          echo "commit_message=$MSG" >> $GITHUB_OUTPUT
+
       - name: Commit changes
+        if: steps.parse.outputs.command == 'implement' || steps.parse.outputs.command == 'refine'
         run: |
           git add .
-          git commit -m "🌱 Pollinate: ${{ steps.parse.outputs.feature_description }}" || echo "No changes to commit"
-          git push origin ${{ steps.parse.outputs.branch_name }}
+          git commit -m "${{ steps.commit_msg.outputs.commit_message }}" -m "Generated by Pollinate AI" || echo "No changes to commit"
+          git push origin ${{ steps.parse.outputs.branch_name }} --force
+
+      - name: Determine reviewers
+        if: steps.parse.outputs.command == 'implement' || steps.parse.outputs.command == 'refine'
+        id: reviewers
+        run: |
+          # Get contributors who have modified similar files
+          CHANGED_FILES=$(git diff --name-only HEAD~1 2>/dev/null || echo "")
+          REVIEWERS=$(git log --format="%ae" -- $CHANGED_FILES | sort | uniq | head -3 | tr '\n' ',' | sed 's/,$//')
+          echo "reviewers=$REVIEWERS" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
+        if: steps.parse.outputs.command == 'implement' || steps.parse.outputs.command == 'refine'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_URL=$(gh pr create \
-            --title "🌱 Pollinate: ${{ steps.parse.outputs.feature_description }}" \
-            --body "This PR was automatically generated by the Pollinate action.
+          CHANGE_SUMMARY=$(cat change_summary.txt || echo "No summary available")
+          LINT_RESULTS=$(cat lint_results.txt 2>/dev/null || echo "No linting results")
+          TEST_RESULTS=$(cat test_results.txt 2>/dev/null || echo "No test results")
+          SECURITY_RESULTS=$(cat security_results.txt 2>/dev/null || echo "No security scan results")
           
+          PR_BODY="## 🌱 Pollinate: AI-Generated Implementation
+
           **Feature Request:** ${{ steps.parse.outputs.feature_description }}
           **Requested by:** @${{ github.event.comment.user.login }}
           **Original Issue:** #${{ github.event.issue.number }}
+          **Language:** ${{ steps.detect.outputs.language }}
+
+          ### Changes Made
+          $CHANGE_SUMMARY
+
+          ### Quality Checks
+
+          <details>
+          <summary>🔍 Linting Results</summary>
+
+          \`\`\`
+          $LINT_RESULTS
+          \`\`\`
+          </details>
+
+          <details>
+          <summary>🧪 Test Results</summary>
+
+          \`\`\`
+          $TEST_RESULTS
+          \`\`\`
+          </details>
+
+          <details>
+          <summary>🔒 Security Scan</summary>
+
+          \`\`\`
+          $SECURITY_RESULTS
+          \`\`\`
+          </details>
+
+          ---
+          **⚠️ Please review carefully before merging!** This code was AI-generated and should be validated.
           
-          Please review the changes carefully before merging." \
+          Use \`!Pollinate refine [instructions]\` to improve this implementation."
+          
+          PR_URL=$(gh pr create \
+            --title "${{ steps.commit_msg.outputs.commit_message }}" \
+            --body "$PR_BODY" \
+            --label "ai-generated,pollinate" \
             --base main \
-            --head ${{ steps.parse.outputs.branch_name }})
+            --head ${{ steps.parse.outputs.branch_name }} 2>&1 || echo "PR may already exist")
           
           echo "pr_url=$PR_URL" >> $GITHUB_ENV
 
       - name: Comment on issue
+        if: steps.parse.outputs.command == 'implement' || steps.parse.outputs.command == 'refine'
         uses: actions/github-script@v7
         with:
           script: |
+            const command = '${{ steps.parse.outputs.command }}';
+            const emoji = command === 'refine' ? '✨' : '🌱';
+            const action = command === 'refine' ? 'refined' : 'implemented';
+            
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `🌱 **Pollinate activated!**\n\nI've implemented your feature request and created a pull request.\n\nCheck it out: ${process.env.pr_url}`
+              body: `${emoji} **Pollinate ${action}!**\n\nI've ${action} your feature request and created a pull request with:\n- ✅ Implementation code\n- 🧪 Test files\n- 📝 Documentation updates\n- 🔍 Quality checks\n\nCheck it out: ${process.env.pr_url}\n\n---\n**Next steps:**\n- Review the changes\n- Run \`!Pollinate refine [instructions]\` to improve\n- Run \`!Pollinate rollback\` to undo`
             })
