@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+  <title>Colorful Testing Demo</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #111;
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .demo-text {
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      font-size: 72px;
+      letter-spacing: 8px;
+      display: inline-block;
+    }
+    .demo-text .char {
+      display: inline-block;
+      animation: colorShift 3s infinite ease-in-out;
+    }
+    /* Offset colors per letter for a cascading rainbow effect */
+    .demo-text .char:nth-child(1) { animation-delay: 0s; }
+    .demo-text .char:nth-child(2) { animation-delay: 0.15s; }
+    .demo-text .char:nth-child(3) { animation-delay: 0.30s; }
+    .demo-text .char:nth-child(4) { animation-delay: 0.45s; }
+    .demo-text .char:nth-child(5) { animation-delay: 0.60s; }
+    .demo-text .char:nth-child(6) { animation-delay: 0.75s; }
+    .demo-text .char:nth-child(7) { animation-delay: 0.90s; }
+    .demo-text .char:nth-child(8) { animation-delay: 1.05s; }
+    .demo-text .char:nth-child(9) { animation-delay: 1.20s; }
+    .demo-text .char:nth-child(10) { animation-delay: 1.35s; }
+    @keyframes colorShift {
+      0% { color: #ff4d4d; }
+      14% { color: #ff944d; }
+      28% { color: #fff36b; }
+      42% { color: #4dff77; }
+      57% { color: #4db8ff; }
+      71% { color: #a964ff; }
+      85% { color: #ff4d9a; }
+      100% { color: #ff4d4d; }
+    }
+  </style>
+</head>
+<body>
+  <div class='demo-text' aria-label='testing123'>
+    <span class='char'>t</span>
+    <span class='char'>e</span>
+    <span class='char'>s</span>
+    <span class='char'>t</span>
+    <span class='char'>i</span>
+    <span class='char'>n</span>
+    <span class='char'>g</span>
+    <span class='char'>1</span>
+    <span class='char'>2</span>
+    <span class='char'>3</span>
+  </div>
+</body>
+</html>
