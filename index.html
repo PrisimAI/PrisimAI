@@ -1,1047 +1,387 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Basic Meta Tags -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrismAI – Your AI Assistant for Everything</title>
-    <meta name="description" content="PrismAI is your ultimate AI assistant, offering tools for creativity, productivity, and smart solutions. Experience next-level AI right in your browser.">
-    <meta name="keywords" content="AI, artificial intelligence, PrismAI, AI tools, AI assistant, productivity, creative AI, smart AI">
-    <meta name="author" content="PrismAI Team">
+        <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrismAI – Your AI Assistant for Everything</title>
+    <meta name="description" content="PrismAI is your ultimate AI assistant, offering tools for creativity, productivity, and smart solutions. Experience next-level AI right in your browser.">
+    <meta name="keywords" content="AI, artificial intelligence, PrismAI, AI tools, AI assistant, productivity, creative AI, smart AI">
+    <meta name="author" content="PrismAI Team">
 
-    <!-- Open Graph / Social Sharing -->
-    <meta property="og:title" content="PrismAI – Your AI Assistant for Everything">
-    <meta property="og:description" content="PrismAI is your ultimate AI assistant, offering tools for creativity, productivity, and smart solutions.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://PrisimAI.github.io/PrismAI">
-    <meta property="og:image" content="https://PrisimAI.github.io/PrismAI/preview-image.png">
+        <meta property="og:title" content="PrismAI – Your AI Assistant for Everything">
+    <meta property="og:description" content="PrismAI is your ultimate AI assistant, offering tools for creativity, productivity, and smart solutions.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://PrisimAI.github.io/PrismAI">
+    <meta property="og:image" content="https://PrisimAI.github.io/PrismAI/preview-image.png">
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="PrismAI – Your AI Assistant for Everything">
-    <meta name="twitter:description" content="PrismAI is your ultimate AI assistant, offering tools for creativity, productivity, and smart solutions.">
-    <meta name="twitter:image" content="https://PrisimAI.github.io/PrismAI/preview-image.png">
+        <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PrismAI – Your AI Assistant for Everything">
+    <meta name="twitter:description" content="PrismAI is your ultimate AI assistant, offering tools for creativity, productivity, and smart solutions.">
+    <meta name="twitter:image" content="https://PrisimAI.github.io/PrismAI/preview-image.png">
 
-    <!-- SEO Hints -->
-    <link rel="canonical" href="https://PrisimAI.github.io/PrismAI">
+        <link rel="canonical" href="https://PrisimAI.github.io/PrismAI">
 
-    <!-- Favicon -->
-    <link rel="icon" href="https://PrisimAI.github.io/PrisimAI/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="https://PrisimAI.github.io/PrisimAI/favicon.ico" type="image/x-icon">
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --glass-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) inset, 0 4px 20px rgba(0, 0, 0, 0.1);
-            --accent: #3b82f6;
-        }
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) inset, 0 4px 20px rgba(0, 0, 0, 0.1);
+            --accent: #3b82f6;
+        }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f8fafc;
-        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8fafc;
+        }
 
-        .dark body {
-            background: linear-gradient(135deg, #0a1125 0%, #1e2a44 100%);
-        }
+        .dark body {
+            background: linear-gradient(135deg, #0a1125 0%, #1e2a44 100%);
+        }
 
-        /* Glass Styles */
-        .glass-primary {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(16px) saturate(1.2);
-            -webkit-backdrop-filter: blur(16px) saturate(1.2);
-            box-shadow: var(--glass-shadow);
-            border-radius: 1.5rem;
-        }
+        /* Glass Styles */
+        .glass-primary {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(16px) saturate(1.2);
+            -webkit-backdrop-filter: blur(16px) saturate(1.2);
+            box-shadow: var(--glass-shadow);
+            border-radius: 1.5rem;
+        }
 
-        .glass-elevated {
-            background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.08));
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-            border-radius: 1.5rem;
-        }
+        .glass-elevated {
+            background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.08));
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border-radius: 1.5rem;
+        }
 
-        /* Sheen Animation */
-        @keyframes sheen {
-            0% { transform: translateX(-150%) skewX(-15deg); opacity: 0; }
-            50% { opacity: 0.15; }
-            100% { transform: translateX(150%) skewX(-15deg); opacity: 0; }
-        }
+        /* Sheen Animation */
+        @keyframes sheen {
+            0% { transform: translateX(-150%) skewX(-15deg); opacity: 0; }
+            50% { opacity: 0.15; }
+            100% { transform: translateX(150%) skewX(-15deg); opacity: 0; }
+        }
 
-        .msg {
-            max-width: 80%;
-            line-height: 1.5;
-            word-break: break-word;
-            position: relative;
-            padding: 16px 20px;
-        }
+        .msg {
+            max-width: 80%;
+            line-height: 1.5;
+            word-break: break-word;
+            position: relative;
+            padding: 16px 20px;
+        }
 
-        .msg-assistant {
-            background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            border: 1px solid var(--glass-border);
-            border-radius: 1rem 1rem 1rem 0;
-            color: #111827;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-        .dark .msg-assistant {
-            color: #e5e7eb;
-            border-color: rgba(255,255,255,0.1);
-        }
+        .msg-assistant {
+            background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem 1rem 1rem 0;
+            color: #111827;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .dark .msg-assistant {
+            color: #e5e7eb;
+            border-color: rgba(255,255,255,0.1);
+        }
 
-        .msg-assistant:after {
-            content: "";
-            position: absolute;
-            left: -10px;
-            top: 16px;
-            width: 20px;
-            height: 20px;
-            background: inherit;
-            border-left: none;
-            transform: rotate(45deg);
-            border-radius: 4px;
-            filter: blur(0.3px);
-            z-index: -1;
-        }
+        .msg-assistant:after {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 16px;
+            width: 20px;
+            height: 20px;
+            background: inherit;
+            border-left: none;
+            transform: rotate(45deg);
+            border-radius: 4px;
+            filter: blur(0.3px);
+            z-index: -1;
+        }
 
-        .msg-assistant .sheen {
-            position: absolute;
-            top: -10px;
-            left: -50%;
-            width: 140%;
-            height: 50%;
-            transform: rotate(-10deg);
-            background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.15), rgba(255,255,255,0));
-            pointer-events: none;
-            animation: sheen 4s linear infinite;
-            opacity: 0;
-        }
+        .msg-assistant .sheen {
+            position: absolute;
+            top: -10px;
+            left: -50%;
+            width: 140%;
+            height: 50%;
+            transform: rotate(-10deg);
+            background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.15), rgba(255,255,255,0));
+            pointer-events: none;
+            animation: sheen 4s linear infinite;
+            opacity: 0;
+        }
 
-        .msg-user {
-            background: linear-gradient(180deg, #3b82f6, #60a5fa);
-            color: white;
-            border-radius: 1rem 1rem 0 1rem;
-            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
-            font-weight: 500;
-        }
+        .msg-user {
+            background: linear-gradient(180deg, #3b82f6, #60a5fa);
+            color: white;
+            border-radius: 1rem 1rem 0 1rem;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+            font-weight: 500;
+        }
 
-        .msg-user:after {
-            content: "";
-            position: absolute;
-            right: -10px;
-            top: 16px;
-            width: 20px;
-            height: 20px;
-            background: inherit;
-            transform: rotate(45deg);
-            border-radius: 4px;
-            z-index: -1;
-            filter: blur(0.3px);
-        }
+        .msg-user:after {
+            content: "";
+            position: absolute;
+            right: -10px;
+            top: 16px;
+            width: 20px;
+            height: 20px;
+            background: inherit;
+            transform: rotate(45deg);
+            border-radius: 4px;
+            z-index: -1;
+            filter: blur(0.3px);
+        }
 
-        .timestamp {
-            font-size: 0.75rem;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-        .timestamp:hover {
-            opacity: 1;
-        }
+        .timestamp {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .timestamp:hover {
+            opacity: 1;
+        }
 
-        #chat-history::-webkit-scrollbar {
-            width: 8px;
-        }
-        #chat-history::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        #chat-history::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.15);
-            border-radius: 4px;
-        }
-        .dark #chat-history::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.1);
-        }
+        #chat-history::-webkit-scrollbar {
+            width: 8px;
+        }
+        #chat-history::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #chat-history::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.15);
+            border-radius: 4px;
+        }
+        .dark #chat-history::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+        }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .fade-in { animation: fadeIn 0.3s ease-out both; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .fade-in { animation: fadeIn 0.3s ease-out both; }
 
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(0.9); }
-        }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.9); }
+        }
 
-        @media (max-width: 900px) {
-            aside { width: 72px; }
-            aside .space-y-6 > *:not(:first-child) { display: none; }
-            .msg { max-width: 90%; }
-        }
+        @media (max-width: 900px) {
+            aside { width: 72px; }
+            aside .space-y-6 > *:not(:first-child) { display: none; }
+            .msg { max-width: 90%; }
+        }
 
-        .chat-input-wrapper { z-index: 10; }
+        .chat-input-wrapper { z-index: 10; }
 
-        #tutorial-overlay { display: none; }
-        #tutorial-overlay.visible { display: flex; }
+        #tutorial-overlay { display: none; }
+        #tutorial-overlay.visible { display: flex; }
 
-        #error-notification {
-            transition: opacity 0.3s ease;
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        #error-notification.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
+        #error-notification {
+            transition: opacity 0.3s ease;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        #error-notification.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-        .edit-message {
-            background: none;
-            border: none;
-            cursor: pointer;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-            color: #f3f4f6;
-            font-size: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .edit-message:hover {
-            opacity: 1;
-        }
+        .edit-message {
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            color: #f3f4f6;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .edit-message:hover {
+            opacity: 1;
+        }
 
-        .send-button {
-            transition: all 0.2s ease;
-        }
-        .send-button:active {
-            animation: bounce 0.2s ease;
-        }
+        .send-button {
+            transition: all 0.2s ease;
+        }
+        .send-button:active {
+            animation: bounce 0.2s ease;
+        }
 
-        .sidebar-button {
-            background: linear-gradient(90deg, #3b82f6, #60a5fa);
-            transition: all 0.2s ease;
-        }
-        .sidebar-button:hover {
-            transform: scale(1.02);
-        }
-    </style>
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#3b82f6">
-
-    <script type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "tm2922ucwi");
-    </script>
+        .sidebar-button {
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            transition: all 0.2s ease;
+        }
+        .sidebar-button:hover {
+            transform: scale(1.02);
+        }
+    </style>
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
 </head>
 <body class="text-gray-800 antialiased flex h-screen overflow-hidden dark:text-gray-100 transition-colors duration-300">
 
-    <!-- Sidebar -->
-    <aside class="w-72 flex-shrink-0 flex flex-col justify-between p-8 sm:flex glass-elevated m-6 rounded-2xl">
-        <div class="space-y-8 relative">
-            <!-- Dark mode toggle -->
-            <button id="dark-mode-toggle" class="absolute top-4 right-4 p-3 rounded-full bg-white/20 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 shadow hover:bg-white/30 dark:hover:bg-gray-600/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle dark mode">
-                <svg id="dark-mode-icon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path id="sun-icon" class="block dark:hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.93l-.71-.71M12 7a5 5 0 100 10 5 5 0 000-10z" />
-                    <path id="moon-icon" class="hidden dark:block" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
-                </svg>
-            </button>
-
-            <!-- Header -->
-            <div class="flex items-center space-x-3 mb-8">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-blue-500">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9.206 13.91a4.992 4.992 0 0 0-1.745-1.924c-.394-.287-.803-.524-1.229-.715L5 10.985a2.25 2.25 0 0 1-.585-2.023c.31-.617.915-1.054 1.558-1.127l.799-.089a5.002 5.002 0 0 1 4.71-2.903c.369.043.737.087 1.106.131L15 8.169a2.25 2.25 0 0 1 2.023.585c.617.31 1.054.915 1.127 1.558l.089.799a5.002 5.002 0 0 1-2.903 4.71c-.043.369-.087.737-.131 1.106l-1.996 4.99a2.25 2.25 0 0 1-2.023.585c-.617-.31-1.054-.915-1.127-1.558l-.089-.799a5.002 5.002 0 0 1-4.71-2.903c-.043-.369-.087-.737-.131-1.106l-1.996-4.99a2.25 2.25 0 0 1-2.023-.585c-.617-.31-1.054-.915-1.127-1.558l-.089-.799a5.002 5.002 0 0 1-2.903-4.71z" />
-                </svg>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">PrismAI</h1>
-            </div>
-
-            <!-- New Chat Button -->
-            <button id="new-chat-btn" class="w-full p-3 rounded-xl sidebar-button text-white font-semibold hover:shadow-lg active:scale-95 transition-all duration-200" aria-label="Start new chat">
-                + New Chat
-            </button>
-
-            <!-- Export Chat Button -->
-            <button id="export-chat-btn" class="w-full p-3 rounded-xl sidebar-button text-white font-semibold hover:shadow-lg active:scale-95 transition-all duration-200" aria-label="Export current chat">
-                Export Chat
-            </button>
-
-            <!-- Chat History Sidebar -->
-            <div id="chat-history-list-container" class="mb-8 flex-grow overflow-y-auto max-h-[calc(100%-200px)]">
-                <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Chat History</h3>
-                <div id="chat-history-list" class="space-y-3">
-                    <button class="w-full p-3 rounded-xl text-left text-gray-700 dark:text-gray-300 font-medium hover:bg-white/20 transition-all duration-200 active:scale-95 flex items-center space-x-2 chat-history-item" data-chat-id="new-chat-placeholder" aria-label="Select new chat">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
-                        <span class="truncate">New Chat</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Model Selector -->
-            <div class="space-y-3">
-                <label for="model-selector" class="text-sm font-medium text-gray-700 dark:text-gray-200">Select Model</label>
-                <select id="model-selector" class="w-full p-3 rounded-xl border border-gray-300/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" aria-label="Select AI model">
-                    <option value="" disabled selected>Loading models...</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Profile Section -->
-        <div class="mt-8">
-            <div class="flex items-center space-x-3 p-4 hover:bg-blue-500/10 rounded-xl transition-all duration-200 cursor-pointer active:scale-95">
-                <img src="https://placehold.co/40x40" alt="Profile" class="w-12 h-12 rounded-full border-2 border-blue-400/30 shadow">
-                <div>
-                    <div class="font-semibold text-gray-900 dark:text-white">Stranger</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Free</div>
-                </div>
-            </div>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col relative p-0">
-        <div class="flex-1 flex flex-col">
-            <div id="chat-container" class="flex-1 relative w-full m-6 glass-primary overflow-hidden">
-                <div class="flex flex-col h-full">
-                    <!-- Error Notification -->
-                    <div id="error-notification" class="hidden p-4 bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl mx-4 mt-4 text-center relative flex items-center justify-between">
-                        <span id="error-message"></span>
-                        <button id="close-error" class="ml-2 text-red-600 dark:text-red-400 hover:bg-red-500/20 p-1 rounded-full transition-all" aria-label="Close error message">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <!-- Welcome Message -->
-                    <div id="welcome-message" class="flex flex-col items-center justify-center text-center p-10 space-y-6 text-gray-500 dark:text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-24 h-24 text-blue-400">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5a6 6 0 1 0-12 0v1.5a6 6 0 0 0 6 6Z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
-                        </svg>
-                        <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Hello there, Stranger!</h2>
-                        <p class="text-lg">What can I help you with today? Try typing something in the box below.</p>
-                    </div>
-
-                    <!-- Chat History -->
-                    <div id="chat-history" class="flex-1 overflow-y-auto p-8 space-y-6 hidden" role="log" aria-live="polite">
-                        <!-- Messages get appended here -->
-                    </div>
-
-                    <!-- Chat Input -->
-                    <div class="chat-input-wrapper p-6 bg-transparent border-t border-white/10 dark:border-black/10">
-                        <form id="chat-form" class="flex items-end space-x-4" role="form" aria-label="Chat input form">
-                            <textarea id="chat-input" placeholder="Message PrismAI ✨..." rows="1" class="flex-1 p-4 rounded-3xl border border-gray-300/30 dark:border-gray-600/30 bg-white/15 dark:bg-gray-700/25 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-lg transition-all duration-200 resize-none" aria-label="Enter your message"></textarea>
-                            <button type="submit" class="p-4 rounded-3xl bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-lg hover:from-blue-600 hover:to-blue-500 send-button transition-all duration-200" aria-label="Send message">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.769 59.769 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                                </svg>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Tutorial Overlay -->
-    <div id="tutorial-overlay" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 items-center justify-center transition-opacity duration-500">
-        <div class="bg-white dark:bg-gray-800 p-10 rounded-2xl shadow-2xl max-w-lg w-full text-center relative glass-elevated">
-            <button id="tutorial-close-btn" class="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors" aria-label="Close tutorial">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-            <h2 class="text-3xl font-bold mb-6 text-blue-600 dark:text-blue-400">Welcome to PrismAI!</h2>
-            <p class="text-lg mb-6 text-gray-700 dark:text-gray-300">Let's get you started with a quick tour:</p>
-
-            <div id="tutorial-steps" class="space-y-6 text-left">
-                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
-                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">1</span>
-                    <div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Start a New Chat</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Click the <strong class="font-medium">+ New Chat</strong> button in the sidebar to begin a fresh conversation. Each chat is saved automatically.</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
-                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">2</span>
-                    <div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Chat with the AI</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Type your message in the input box at the bottom and press Enter or click the send button. The AI's response will appear on the right.</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
-                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">3</span>
-                    <div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Explore Chat History</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Your previous conversations are listed in the sidebar. Click on any chat to revisit it.</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
-                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">4</span>
-                    <div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Image Generation</h3>
-                        <p class="text-gray-600 dark:text-gray-400">To generate an image, type <code>/image</code> followed by your prompt (e.g., <code>/image a cat wearing a hat</code>).</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
-                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">5</span>
-                    <div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Model Selection</h3>
-                        <p class="text-gray-600 dark:text-gray-400">In the sidebar, you can select different AI models to experiment with their unique responses.</p>
-                    </div>
-                </div>
-            </div>
-
-            <button id="tutorial-done-btn" class="mt-8 px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-400 text-white font-semibold rounded-xl shadow-lg hover:from-blue-600 hover:to-blue-500 transition-all duration-200 active:scale-95" aria-label="Complete tutorial">Got It!</button>
-        </div>
-    </div>
-
-    <script>
-        // ---------- Configuration ----------
-        const config = {
-            apiKey: 'TOEAP3DuMvvVHUsy',
-            referrer: 'https://prisimai.github.io/PrismAI/index.html',
-            textApiUrl: 'https://text.pollinations.ai/openai',
-            imageApiUrl: 'https://image.pollinations.ai/prompt/',
-            requestTimeout: 30000,
-            maxMessageLength: 1000,
-            cacheExpiration: 24 * 60 * 60 * 1000,
-            messagesPerPage: 20,
-        };
-
-        // ---------- Utilities & DOM Refs ----------
-        const darkModeToggle = document.getElementById('dark-mode-toggle');
-        const chatHistory = document.getElementById('chat-history');
-        const chatInput = document.getElementById('chat-input');
-        const chatForm = document.getElementById('chat-form');
-        const welcomeMessage = document.getElementById('welcome-message');
-        const newChatBtn = document.getElementById('new-chat-btn');
-        const exportChatBtn = document.getElementById('export-chat-btn');
-        const modelSelector = document.getElementById('model-selector');
-        const chatHistoryList = document.getElementById('chat-history-list');
-
-        let currentChatId = null;
-        let allChats = {};
-
-        // ---------- Helper Functions ----------
-        function generateChatId() {
-            return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
-        }
-
-        function escapeHTML(str) {
-            if (typeof str !== 'string') return '';
-            const div = document.createElement('div');
-            div.appendChild(document.createTextNode(str));
-            return div.innerHTML;
-        }
-
-        function debounce(func, wait) {
-            let timeout;
-            return function (...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), wait);
-            };
-        }
-
-        function validateInput(message) {
-            if (message.length > config.maxMessageLength) {
-                showErrorNotification(`Message is too long (max ${config.maxMessageLength} characters).`);
-                return false;
-            }
-            if (/[<>{}]/g.test(message)) {
-                showErrorNotification('Message contains invalid characters.');
-                return false;
-            }
-            return true;
-        }
-
-        function getCachedResponse(prompt) {
-            const cache = JSON.parse(localStorage.getItem('apiCache') || '{}');
-            const entry = cache[prompt];
-            if (entry && Date.now() - entry.timestamp < config.cacheExpiration) {
-                return entry.response;
-            }
-            return null;
-        }
-
-        function cacheResponse(prompt, response) {
-            const cache = JSON.parse(localStorage.getItem('apiCache') || '{}');
-            cache[prompt] = { response, timestamp: Date.now() };
-            localStorage.setItem('apiCache', JSON.stringify(cache));
-        }
-
-        // ---------- Error Notification ----------
-        function showErrorNotification(message) {
-            const errorNotification = document.getElementById('error-notification');
-            const errorMessage = document.getElementById('error-message');
-            if (errorNotification && errorMessage) {
-                errorMessage.textContent = message;
-                errorNotification.classList.remove('hidden');
-                errorNotification.style.opacity = '1';
-                setTimeout(() => {
-                    errorNotification.style.opacity = '0';
-                    setTimeout(() => errorNotification.classList.add('hidden'), 300);
-                }, 5000);
-            }
-        }
-
-        // ---------- Sidebar chat button management ----------
-        function addChatButton(chatId, title = 'New Chat') {
-            const existing = chatHistoryList.querySelector(`[data-chat-id="${chatId}"]`);
-            if (existing) return existing;
-
-            const chatButton = document.createElement('button');
-            chatButton.classList.add('w-full','p-3','rounded-xl','text-left','text-gray-700','dark:text-gray-300','font-medium','hover:bg-white/20','transition-all','duration-200','active:scale-95','flex','items-center','space-x-2','chat-history-item');
-            chatButton.dataset.chatId = chatId;
-            chatButton.setAttribute('aria-label', `Select chat: ${title}`);
-            const safeTitle = escapeHTML(title);
-            chatButton.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0 0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z" />
-                </svg>
-                <span class="truncate" title="${safeTitle}">${safeTitle}</span>
-            `;
-            chatHistoryList.prepend(chatButton);
-            return chatButton;
-        }
-
-        function setActiveChatButton(chatId) {
-            document.querySelectorAll('.chat-history-item').forEach(btn => {
-                if (btn.dataset.chatId === chatId) {
-                    btn.classList.add('bg-blue-500/20','text-blue-400','font-semibold');
-                } else {
-                    btn.classList.remove('bg-blue-500/20','text-blue-400','font-semibold');
-                }
-            });
-        }
-
-        function updateChatButtonTitle(chatId, newTitle) {
-            const btn = chatHistoryList.querySelector(`.chat-history-item[data-chat-id="${chatId}"]`);
-            if (!btn) return;
-            const span = btn.querySelector('span');
-            if (span) {
-                const safeTitle = escapeHTML(newTitle);
-                span.textContent = safeTitle;
-                span.title = safeTitle;
-                btn.setAttribute('aria-label', `Select chat: ${safeTitle}`);
-            }
-        }
-
-        // ---------- Chat selection & load ----------
-        function selectChat(chatId) {
-            if (chatId === null || chatId === 'new-chat-placeholder') {
-                currentChatId = generateChatId();
-                allChats[currentChatId] = { title: 'New Chat', messages: [], createdAt: Date.now() };
-                addChatButton(currentChatId, allChats[currentChatId].title);
-                setActiveChatButton(currentChatId);
-                loadChatMessages([]);
-                chatInput.placeholder = 'Message PrismAI ✨...';
-                saveAllChats();
-                return;
-            }
-
-            if (!allChats[chatId]) {
-                console.warn(`Chat ${chatId} missing, creating new`);
-                selectChat(null);
-                return;
-            }
-
-            currentChatId = chatId;
-            const chatData = allChats[chatId];
-            loadChatMessages(chatData.messages || []);
-            setActiveChatButton(chatId);
-            chatInput.placeholder = `Message ${escapeHTML(chatData.title)}...`;
-            saveAllChats();
-        }
-
-        function loadChatMessages(messages, start = 0, limit = config.messagesPerPage) {
-            chatHistory.innerHTML = '';
-            const slicedMessages = messages.slice(start, start + limit);
-            if (!slicedMessages.length && messages.length === 0) {
-                welcomeMessage.classList.remove('hidden');
-                chatHistory.classList.add('hidden');
-                return;
-            }
-            welcomeMessage.classList.add('hidden');
-            chatHistory.classList.remove('hidden');
-
-            slicedMessages.forEach(msg => {
-                addMessage(msg.content, msg.role, msg.type || 'text', false, msg.timestamp);
-            });
-            requestAnimationFrame(() => { chatHistory.scrollTop = chatHistory.scrollHeight; });
-        }
-
-        // ---------- Persisting ----------
-        function saveAllChats() {
-            try {
-                localStorage.setItem('allPrisimAIChats', JSON.stringify(allChats));
-            } catch (e) {
-                console.warn('Could not save chats to localStorage:', e);
-                showErrorNotification('Failed to save chat history.');
-            }
-        }
-
-        function loadAllChats() {
-            const saved = localStorage.getItem('allPrisimAIChats');
-            if (!saved) {
-                selectChat(null);
-                return;
-            }
-            try {
-                allChats = JSON.parse(saved) || {};
-                const sorted = Object.entries(allChats).sort((a,b) => (b[1]?.createdAt||0) - (a[1]?.createdAt||0));
-                sorted.forEach(([id, data]) => addChatButton(id, data.title || 'Chat'));
-                const first = sorted[0]?.[0];
-                if (first) selectChat(first);
-                else selectChat(null);
-            } catch (e) {
-                console.error('Error loading chats:', e);
-                localStorage.removeItem('allPrisimAIChats');
-                selectChat(null);
-                showErrorNotification('Failed to load chat history.');
-            }
-        }
-
-        function exportChat() {
-            if (!currentChatId || !allChats[currentChatId]) {
-                showErrorNotification('No chat selected to export.');
-                return;
-            }
-            const chatData = allChats[currentChatId];
-            const blob = new Blob([JSON.stringify(chatData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `prismai-chat-${currentChatId}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        // ---------- Messages rendering ----------
-        function addMessage(message, role='assistant', type='text', store=true, timestamp=null) {
-            welcomeMessage.classList.add('hidden');
-            chatHistory.classList.remove('hidden');
-            const isUser = role === 'user';
-            const displayTime = timestamp ? new Date(timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
-
-            const wrapper = document.createElement('div');
-            wrapper.classList.add('fade-in','mb-6','flex');
-            wrapper.style.alignItems = 'flex-start';
-            wrapper.style.justifyContent = isUser ? 'flex-end' : 'flex-start';
-
-            const bubble = document.createElement('div');
-            bubble.classList.add('msg');
-
-            if (type === 'image') {
-                bubble.innerHTML = `<img src="${escapeHTML(message)}" alt="Generated image" class="rounded-xl max-w-md cursor-pointer shadow-lg" onclick="window.open('${escapeHTML(message)}','_blank')"><div class="timestamp text-gray-500 dark:text-gray-400 mt-2">${displayTime}</div>`;
-            } else {
-                if (isUser) {
-                    bubble.classList.add('msg-user');
-                    bubble.innerHTML = `<div style="position:relative;"><div>${escapeHTML(message)}</div><button class="edit-message" aria-label="Edit message"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg> Edit</button><div class="timestamp text-gray-300 mt-2">${displayTime}</div></div>`;
-                } else {
-                    bubble.classList.add('msg-assistant');
-                    bubble.innerHTML = `<div style="position:relative;"><p style="margin:0;">${escapeHTML(message)}</p><div class="sheen"></div><div class="timestamp text-gray-500 dark:text-gray-400 mt-2">${displayTime}</div></div>`;
-                }
-            }
-
-            wrapper.appendChild(bubble);
-            chatHistory.appendChild(wrapper);
-
-            if (store && message !== '') {
-                if (!currentChatId) {
-                    currentChatId = generateChatId();
-                    allChats[currentChatId] = { title: 'New Chat', messages: [], createdAt: Date.now() };
-                    addChatButton(currentChatId, allChats[currentChatId].title);
-                    setActiveChatButton(currentChatId);
-                }
-                allChats[currentChatId].messages.push({ role, content: message, type, timestamp: Date.now() });
-                if (role === 'user' && allChats[currentChatId].title === 'New Chat') {
-                    const short = message.slice(0, 50) + (message.length > 50 ? '...' : '');
-                    allChats[currentChatId].title = short;
-                    updateChatButtonTitle(currentChatId, short);
-                }
-                saveAllChats();
-            }
-
-            requestAnimationFrame(() => { chatHistory.scrollTop = chatHistory.scrollHeight; });
-            return wrapper;
-        }
-
-        function showLoadingIndicator() {
-            const loading = document.createElement('div');
-            loading.classList.add('fade-in','mb-6','flex','justify-start');
-            loading.innerHTML = `<div class="p-4 rounded-xl bg-gray-200/60 dark:bg-gray-700/60 text-gray-800 dark:text-gray-100 msg-assistant" style="max-width: 240px;">
-                <span>PrismAI is typing...</span>
-            </div>`;
-            chatHistory.appendChild(loading);
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-            return loading;
-        }
-
-        // ---------- Fetch models ----------
-        async function fetchModels() {
-            try {
-                modelSelector.innerHTML = `<option disabled selected>Loading models...</option>`;
-                const res = await fetch(config.textApiUrl.replace('/openai', '/models'), {
-                    headers: {
-                        'Authorization': `Bearer ${config.apiKey}`,
-                        'Referer': config.referrer
-                    }
-                });
-                if (!res.ok) {
-                    throw new Error(`Failed to fetch models: ${res.status} - ${await res.text()}`);
-                }
-                const models = await res.json();
-                console.log('Fetched models:', models);
-                modelSelector.innerHTML = '';
-                if (Array.isArray(models) && models.length) {
-                    models.forEach(m => {
-                        const option = document.createElement('option');
-                        option.value = m.id || m.name || m.model || JSON.stringify(m);
-                        option.textContent = m.description || m.name || m.id || String(m);
-                        modelSelector.appendChild(option);
-                    });
-                    modelSelector.value = models[0].id || models[0].name || models[0].model || modelSelector.value;
-                } else {
-                    modelSelector.innerHTML = `<option disabled>No models available</option>`;
-                }
-            } catch (e) {
-                console.error('Error fetching models:', e);
-                modelSelector.innerHTML = `<option disabled>Error loading models: ${e.message}</option>`;
-                showErrorNotification(`Failed to load models: ${e.message}`);
-            }
-        }
-
-        // ---------- STREAMING / TEXT RESPONSE ----------
-        async function streamTextResponse() {
-            const cached = getCachedResponse(allChats[currentChatId]?.messages?.slice(-1)[0]?.content);
-            if (cached) {
-                addMessage(cached, 'assistant');
-                return;
-            }
-
-            const loadingIndicator = showLoadingIndicator();
-            const selectedModel = modelSelector.value || '';
-            const currentMessages = allChats[currentChatId]?.messages || [];
-
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), config.requestTimeout);
-
-                const response = await fetch(config.textApiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${config.apiKey}`,
-                        'Referer': config.referrer
-                    },
-                    body: JSON.stringify({
-                        model: selectedModel || 'default',
-                        messages: currentMessages,
-                        stream: true,
-                        private: false
-                    }),
-                    signal: controller.signal
-                });
-
-                clearTimeout(timeoutId);
-
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status} - ${await response.text()}`);
-                }
-                if (!response.body) {
-                    throw new Error('ReadableStream not supported or response body is empty');
-                }
-
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let accumulatedContent = '';
-
-                const assistantWrapper = addMessage('', 'assistant', 'text', false);
-                const contentP = assistantWrapper.querySelector('p') || assistantWrapper.querySelector('div');
-
-                if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
-
-                if (currentChatId) {
-                    if (!allChats[currentChatId]) allChats[currentChatId] = { title: 'New Chat', messages: [], createdAt: Date.now() };
-                    allChats[currentChatId].messages.push({ role: 'assistant', content: '', type: 'text', timestamp: Date.now() });
-                    saveAllChats();
-                }
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    const chunk = decoder.decode(value, { stream: true });
-                    console.log('Raw chunk:', chunk);
-                    const parts = chunk.split(/(?:\r\n|\n){1,}/).filter(s => s.trim() !== '');
-                    for (const part of parts) {
-                        const trimmed = part.replace(/^data:\s*/, '').trim();
-                        if (!trimmed || trimmed === '[DONE]') continue;
-                        try {
-                            const data = JSON.parse(trimmed);
-                            console.log('Parsed chunk:', data);
-                            const deltaContent = data.choices?.[0]?.delta?.content;
-                            const fullContent = data.choices?.[0]?.message?.content;
-                            if (deltaContent !== undefined) {
-                                accumulatedContent += deltaContent;
-                            } else if (fullContent !== undefined) {
-                                accumulatedContent = fullContent;
-                            } else {
-                                console.warn('No content in chunk:', data);
-                            }
-                        } catch (e) {
-                            console.error('Error parsing chunk:', part, e);
-                        }
-                    }
-                    if (contentP && accumulatedContent) {
-                        contentP.textContent = accumulatedContent;
-                        chatHistory.scrollTop = chatHistory.scrollHeight;
-                    }
-                }
-
-                if (!accumulatedContent) {
-                    throw new Error('No content received from API');
-                }
-
-                if (currentChatId) {
-                    const msgs = allChats[currentChatId].messages;
-                    if (msgs && msgs.length > 0 && msgs[msgs.length - 1].role === 'assistant') {
-                        msgs[msgs.length - 1].content = accumulatedContent;
-                        cacheResponse(currentMessages[currentMessages.length - 1].content, accumulatedContent);
-                        saveAllChats();
-                    }
-                }
-            } catch (error) {
-                console.error('Streaming API Error:', error);
-                if (loadingIndicator && loadingIndicator.parentNode) loadingIndicator.remove();
-                showErrorNotification(`Error: ${error.message || 'Please try again.'}`);
-
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), config.requestTimeout);
-
-                    const fallbackRes = await fetch(config.textApiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${config.apiKey}`,
-                            'Referer': config.referrer
-                        },
-                        body: JSON.stringify({
-                            model: selectedModel || 'default',
-                            messages: currentMessages,
-                            stream: false,
-                            private: false
-                        }),
-                        signal: controller.signal
-                    });
-
-                    clearTimeout(timeoutId);
-
-                    if (!fallbackRes.ok) {
-                        throw new Error(`Fallback API Error: ${fallbackRes.status} - ${await fallbackRes.text()}`);
-                    }
-
-                    const data = await fallbackRes.json();
-                    console.log('Fallback response:', data);
-                    const fallbackMessage = data.choices?.[0]?.message?.content || 'No content from API';
-
-                    if (!fallbackMessage) {
-                        throw new Error('Empty response from fallback API');
-                    }
-
-                    addMessage(fallbackMessage, 'assistant');
-                    if (currentChatId) {
-                        allChats[currentChatId].messages.push({ role: 'assistant', content: fallbackMessage, type: 'text', timestamp: Date.now() });
-                        cacheResponse(currentMessages[currentMessages.length - 1].content, fallbackMessage);
-                        saveAllChats();
-                    }
-                } catch (fallbackError) {
-                    console.error('Fallback API Error:', fallbackError);
-                    const errorMessage = `Sorry, I encountered an error: ${fallbackError.message || 'Please try again.'}`;
-                    addMessage(errorMessage, 'assistant');
-                    showErrorNotification(errorMessage);
-                    if (currentChatId) {
-                        allChats[currentChatId].messages.push({ role: 'assistant', content: errorMessage, type: 'text', timestamp: Date.now() });
-                        saveAllChats();
-                    }
-                }
-            }
-        }
-
-        // ---------- IMAGE RESPONSE ----------
-        async function handleImageResponse(prompt) {
-            const imageUrl = `${config.imageApiUrl}${encodeURIComponent(prompt)}?key=${config.apiKey}&referrer=${encodeURIComponent(config.referrer)}`;
-            const loading = showLoadingIndicator();
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), config.requestTimeout);
-
-                const res = await fetch(imageUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Referer': config.referrer
-                    },
-                    signal: controller.signal
-                });
-
-                clearTimeout(timeoutId);
-
-                if (loading && loading.parentNode) loading.remove();
-                if (res.ok) {
-                    addMessage(imageUrl, 'assistant', 'image');
-                } else {
-                    throw new Error(`Failed to generate image. Status: ${res.status} - ${await res.text()}`);
-                }
-            } catch (e) {
-                console.error('Image API error:', e);
-                if (loading && loading.parentNode) loading.remove();
-                const err = `Sorry, I couldn't generate an image: ${e.message || 'Please try again.'}`;
-                addMessage(err, 'assistant');
-                showErrorNotification(err);
-            }
-        }
-
-        // ---------- Chat submission ----------
-        async function handleChatSubmission() {
-            const userMessage = chatInput.value.trim();
-            if (!userMessage) return;
-            if (!validateInput(userMessage)) return;
-
-            chatInput.value = '';
-            resizeTextarea();
-
-            if (!currentChatId) {
-                currentChatId = generateChatId();
-                allChats[currentChatId] = { title: 'New Chat', messages: [], createdAt: Date.now() };
-                addChatButton(currentChatId, allChats[currentChatId].title);
-                setActiveChatButton(currentChatId);
-                saveAllChats();
-            }
-
-            addMessage(userMessage, 'user', 'text', true);
-
-            const lower = userMessage.toLowerCase();
-            if (lower.startsWith('/image')) {
-                const prompt = userMessage.substring(6).trim();
-                if (prompt) await handleImageResponse(prompt);
-                else addMessage("Please provide a prompt after /image command.", 'assistant', 'text', true);
-            } else {
-                await streamTextResponse();
-            }
-        }
-
-        // ---------- Textarea autosize ----------
-        function resizeTextarea() {
-            if (!chatInput) return;
-            chatInput.style.height = 'auto';
-            chatInput.style.height = `${Math.min(chatInput.scrollHeight, 400)}px`;
-        }
-        const debouncedResizeTextarea = debounce(resizeTextarea, 100);
-
-        // ---------- Tutorial overlay ----------
-        const tutorialOverlay = document.getElementById('tutorial-overlay');
-        const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
-        const tutorialDoneBtn = document.getElementById('tutorial-done-btn');
-        const TUTORIAL_SEEN_KEY = 'prisimaiTutorialSeen';
-
-        function showTutorial() {
-            if (!localStorage.getItem(TUTORIAL_SEEN_KEY) && tutorialOverlay) {
-                tutorialOverlay.classList.add('visible');
-                document.body.style.overflow = 'hidden';
-            }
-        }
-        function hideTutorial() {
-            if (!tutorialOverlay) return;
-            tutorialOverlay.classList.remove('visible');
-            document.body.style.overflow = '';
-            localStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
-        }
-
-        // ---------- Event bindings ----------
-        if (darkModeToggle) {
-            darkModeToggle.addEventListener('click', () => {
-                document.documentElement.classList.toggle('dark');
-                document.body.classList.toggle('dark');
-                localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-            });
-            if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-                document.body.classList.add('dark');
-            }
-        }
-
-        chatForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleChatSubmission();
-        });
-        chatInput.addEventListener('input', debouncedResizeTextarea);
-        newChatBtn.addEventListener('click', () => selectChat(null));
-        exportChatBtn.addEventListener('click', exportChat);
-        chatHistoryList.addEventListener('click', (ev) => {
-            const btn = ev.target.closest('.chat-history-item');
-            if (!btn || !btn.dataset.chatId) return;
-            selectChat(btn.dataset.chatId);
-        });
-        chatHistory.addEventListener('click', (e) => {
-            if (e.target.classList.contains('edit-message') || e.target.closest('.edit-message')) {
-                const bubble = e.target.closest('.msg').querySelector('div');
-                const original = bubble.querySelector('div').textContent;
-                chatInput.value = original;
-                bubble.parentElement.remove();
-                allChats[currentChatId].messages = allChats[currentChatId].messages.filter(msg => msg.content !== original);
-                saveAllChats();
-            }
-        });
-        chatHistory.addEventListener('scroll', () => {
-            if (chatHistory.scrollTop === 0 && allChats[currentChatId]) {
-                const currentLength = chatHistory.children.length;
-                loadChatMessages(allChats[currentChatId].messages, currentLength, currentLength + config.messagesPerPage);
-            }
-        });
-        if (tutorialCloseBtn) tutorialCloseBtn.addEventListener('click', hideTutorial);
-        if (tutorialDoneBtn) tutorialDoneBtn.addEventListener('click', hideTutorial);
-        document.getElementById('close-error').addEventListener('click', () => {
-            const errorNotification = document.getElementById('error-notification');
-            errorNotification.style.opacity = '0';
-            setTimeout(() => errorNotification.classList.add('hidden'), 300);
-        });
-
-        // ---------- Init ----------
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAllChats();
-            fetchModels();
-            showTutorial();
-        });
-
-        // Service worker (optional)
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker.register("sw.js")
-                    .then(reg => console.log("SW registered:", reg))
-                    .catch(err => console.error("SW failed:", err));
-            });
-        }
-    </script>
-
-    <!-- 100% privacy-first analytics -->
-    <script data-collect-dnt="true" async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-    <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif?collect-dnt=true" alt="" referrerpolicy="no-referrer-when-downgrade"/></noscript>
+        <aside class="w-72 flex-shrink-0 flex flex-col justify-between p-8 sm:flex glass-elevated m-6 rounded-2xl">
+        <div class="space-y-8 relative">
+                        <button id="dark-mode-toggle" class="absolute top-4 right-4 p-3 rounded-full bg-white/20 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 shadow hover:bg-white/30 dark:hover:bg-gray-600/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Toggle dark mode">
+                <svg id="dark-mode-icon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path id="sun-icon" class="block dark:hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.93l-.71-.71M12 7a5 5 0 100 10 5 5 0 000-10z" />
+                    <path id="moon-icon" class="hidden dark:block" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
+                </svg>
+            </button>
+
+                        <div class="flex items-center space-x-3 mb-8">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-blue-500">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9.206 13.91a4.992 4.992 0 0 0-1.745-1.924c-.394-.287-.803-.524-1.229-.715L5 10.985a2.25 2.25 0 0 1-.585-2.023c.31-.617.915-1.054 1.558-1.127l.799-.089a5.002 5.002 0 0 1 4.71-2.903c.369.043.737.087 1.106.131L15 8.169a2.25 2.25 0 0 1 2.023.585c.617.31 1.054.915 1.127 1.558l.089.799a5.002 5.002 0 0 1-2.903 4.71c-.043.369-.087.737-.131 1.106l-1.996 4.99a2.25 2.25 0 0 1-2.023.585c-.617-.31-1.054-.915-1.127-1.558l-.089-.799a5.002 5.002 0 0 1-4.71-2.903c-.043-.369-.087-.737-.131-1.106l-1.996-4.99a2.25 2.25 0 0 1-2.023-.585c-.617-.31-1.054-.915-1.127-1.558l-.089-.799a5.002 5.002 0 0 1-2.903-4.71z" />
+                </svg>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">PrismAI</h1>
+            </div>
+
+                        <button id="new-chat-btn" class="w-full p-3 rounded-xl sidebar-button text-white font-semibold hover:shadow-lg active:scale-95 transition-all duration-200" aria-label="Start new chat">
+                + New Chat
+            </button>
+
+                        <button id="export-chat-btn" class="w-full p-3 rounded-xl sidebar-button text-white font-semibold hover:shadow-lg active:scale-95 transition-all duration-200" aria-label="Export current chat">
+                Export Chat
+            </button>
+
+                        <div id="chat-history-list-container" class="mb-8 flex-grow overflow-y-auto max-h-[calc(100%-200px)]">
+                <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Chat History</h3>
+                <div id="chat-history-list" class="space-y-3">
+                    <button class="w-full p-3 rounded-xl text-left text-gray-700 dark:text-gray-300 font-medium hover:bg-white/20 transition-all duration-200 active:scale-95 flex items-center space-x-2 chat-history-item" data-chat-id="new-chat-placeholder" aria-label="Select new chat">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        <span class="truncate">New Chat</span>
+                    </button>
+                </div>
+            </div>
+
+                        <div class="space-y-3">
+                <label for="model-selector" class="text-sm font-medium text-gray-700 dark:text-gray-200">Select Model</label>
+                <select id="model-selector" class="w-full p-3 rounded-xl border border-gray-300/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" aria-label="Select AI model">
+                    <option value="" disabled selected>Loading models...</option>
+                </select>
+            </div>
+        </div>
+
+                <div class="mt-8">
+            <div class="flex items-center space-x-3 p-4 hover:bg-blue-500/10 rounded-xl transition-all duration-200 cursor-pointer active:scale-95">
+                <img src="https://placehold.co/40x40" alt="Profile" class="w-12 h-12 rounded-full border-2 border-blue-400/30 shadow">
+                <div>
+                    <div class="font-semibold text-gray-900 dark:text-white">Stranger</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">Free</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+        <main class="flex-1 flex flex-col relative p-0">
+        <div class="flex-1 flex flex-col">
+            <div id="chat-container" class="flex-1 relative w-full m-6 glass-primary overflow-hidden">
+                <div class="flex flex-col h-full">
+                                        <div id="error-notification" class="hidden p-4 bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl mx-4 mt-4 text-center relative flex items-center justify-between">
+                        <span id="error-message"></span>
+                        <button id="close-error" class="ml-2 text-red-600 dark:text-red-400 hover:bg-red-500/20 p-1 rounded-full transition-all" aria-label="Close error message">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                                        <div id="welcome-message" class="flex flex-col items-center justify-center text-center p-10 space-y-6 text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-24 h-24 text-blue-400">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5a6 6 0 1 0-12 0v1.5a6 6 0 0 0 6 6Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+                        </svg>
+                        <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Hello there, Stranger!</h2>
+                        <p class="text-lg">What can I help you with today? Try typing something in the box below.</p>
+                    </div>
+
+                                        <div id="chat-history" class="flex-1 overflow-y-auto p-8 space-y-6 hidden" role="log" aria-live="polite">
+                                            </div>
+
+                                        <div class="chat-input-wrapper p-6 bg-transparent border-t border-white/10 dark:border-black/10">
+                        <form id="chat-form" class="flex items-end space-x-4" role="form" aria-label="Chat input form">
+                            <textarea id="chat-input" placeholder="Message PrismAI ✨..." rows="1" class="flex-1 p-4 rounded-3xl border border-gray-300/30 dark:border-gray-600/30 bg-white/15 dark:bg-gray-700/25 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-lg transition-all duration-200 resize-none" aria-label="Enter your message"></textarea>
+                            <button type="submit" class="p-4 rounded-3xl bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-lg hover:from-blue-600 hover:to-blue-500 send-button transition-all duration-200" aria-label="Send message">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.769 59.769 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+        <div id="tutorial-overlay" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 items-center justify-center transition-opacity duration-500">
+        <div class="bg-white dark:bg-gray-800 p-10 rounded-2xl shadow-2xl max-w-lg w-full text-center relative glass-elevated">
+            <button id="tutorial-close-btn" class="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors" aria-label="Close tutorial">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <h2 class="text-3xl font-bold mb-6 text-blue-600 dark:text-blue-400">Welcome to PrismAI!</h2>
+            <p class="text-lg mb-6 text-gray-700 dark:text-gray-300">Let's get you started with a quick tour:</p>
+
+            <div id="tutorial-steps" class="space-y-6 text-left">
+                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
+                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">1</span>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Start a New Chat</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Click the <strong class="font-medium">+ New Chat</strong> button in the sidebar to begin a fresh conversation. Each chat is saved automatically.</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
+                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">2</span>
+                    <div>
+          _                 <h3 class="font-semibold text-gray-900 dark:text-white">Chat with the AI</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Type your message in the input box at the bottom and press Enter or click the send button. The AI's response will appear on the right.</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
+                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">3</span>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Explore Chat History</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Your previous conversations are listed in the sidebar. Click on any chat to revisit it.</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
+                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">4</span>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Image Generation</h3>
+                        <p class="text-gray-600 dark:text-gray-400">To generate an image, type <code>/image</code> followed by your prompt (e.g., <code>/image a cat wearing a hat</code>).</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4 p-4 bg-white/10 dark:bg-gray-700/10 rounded-xl">
+                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">5</span>
+        _           <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Model Selection</h3>
+                        <p class="text-gray-600 dark:text-gray-400">In the sidebar, you can select different AI models to experiment with their unique responses.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button id="tutorial-done-btn" class="mt-8 px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-400 text-white font-semibold rounded-xl shadow-lg hover:from-blue-600 hover:to-blue-500 transition-all duration-200 active:scale-95" aria-label="Complete tutorial">Got It!</button>
+        </div>
+    </div>
+
+    <script src="scripts.js" defer></script>
 </body>
 </html>
