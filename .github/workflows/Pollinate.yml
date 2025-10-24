@@ -43,20 +43,30 @@ jobs:
       - name: Call AI to implement feature
         id: ai_implement
         run: |
+          # Get repository structure for context
+          echo "Repository structure:" > repo_context.txt
+          find . -type f -not -path '*/\.*' -not -path '*/node_modules/*' | head -50 >> repo_context.txt
+          
           PROMPT="You are implementing a feature for a GitHub repository.
+
+          Repository context:
+          $(cat repo_context.txt)
 
           Feature request: ${{ steps.parse.outputs.feature_description }}
 
-          Analyze the repository structure and implement this feature. Output your response as a JSON array of file operations:
+          Implement this feature by creating or modifying files. Return ONLY a valid JSON array (no markdown, no explanation):
           [
             {
-              \"action\": \"create\" | \"modify\" | \"delete\",
-              \"path\": \"relative/file/path\",
-              \"content\": \"file content here (for create/modify)\"
+              \"action\": \"create\",
+              \"path\": \"path/to/file.js\",
+              \"content\": \"// file content here\"
             }
           ]
 
-          Only output the JSON array, nothing else."
+          Rules:
+          - Use \"create\" for new files, \"modify\" for existing files, \"delete\" to remove files
+          - Include complete file content for create/modify actions
+          - Return valid JSON only, no other text"
           
           # Call Pollinations AI API
           RESPONSE=$(curl -s https://enter.pollinations.ai/api/generate/openai \
@@ -69,12 +79,32 @@ jobs:
                   \"content\": $(echo "$PROMPT" | jq -Rs .)
                 }
               ],
-              \"model\": \"openai\",
-              \"jsonMode\": true
+              \"model\": \"openai\"
             }")
           
-          echo "$RESPONSE" | jq -r '.choices[0].message.content' > changes.json
-          echo "AI response saved to changes.json"
+          echo "Full API Response:"
+          echo "$RESPONSE"
+          
+          # Extract and clean the response
+          CONTENT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // .content // .')
+          echo "Extracted content:"
+          echo "$CONTENT"
+          
+          # Try to extract JSON array from markdown code blocks or raw text
+          echo "$CONTENT" | sed -n '/^\[/,/^\]/p' > changes.json
+          
+          # If that didn't work, try to find JSON in code blocks
+          if [ ! -s changes.json ]; then
+            echo "$CONTENT" | sed -n '/```json/,/```/p' | sed '1d;$d' > changes.json
+          fi
+          
+          # If still no valid JSON, try without code blocks
+          if [ ! -s changes.json ]; then
+            echo "$CONTENT" | grep -o '\[.*\]' > changes.json
+          fi
+          
+          echo "Final changes.json:"
+          cat changes.json
 
       - name: Apply changes
         run: |
