@@ -6,13 +6,23 @@
  * - Command System (/summarize, /rewrite, /research, /clearcache, /theme, /persona)
  * - Voice-to-Text (Web Speech API)
  * - Text-to-Speech (Web Speech API)
- * - Basic Offline Mode detection
  * - Customizable Themes (CSS Variables)
  * - AI Typing Indicator
  * - Quick Actions Toolbar
  * - Enhanced Export (.txt, .md, .json)
  * - Model Grouping (<optgroup>)
  * - Smart Retry System (1 retry)
+ * - Chat Message Animations (Slide-in)
+ * - Model Info Tooltips
+ * - Prompt Templates Bar
+ *
+ * --- NEW IN THIS VERSION ---
+ * - External CSS & All styles moved to style.css
+ * - Mobile Sidebar (Collapsible w/ burger menu)
+ * - Profile Menu (Change Name, save to localStorage)
+ * - Image Gallery (New sidebar tab, pulls from localStorage)
+ * - Plugin System (Calculator, Dictionary API, Code Formatter)
+ * - Enhanced Offline Mode Indicator
  */
 
 (function(c,l,a,r,i,t,y){
@@ -23,39 +33,59 @@
 
 // ---------- Configuration ----------
 const config = {
-    // NEW FEATURE: Updated API Endpoint and Key
     apiKey: 'HnmNucebqbTDorAfFAkbBGUOYzQVHTcEdHdKKGQQIosjgMativUHGRrUxlYpmKGC',
     referrer: 'https://prisimai.github.io/PrismAI/index.html',
-    textApiUrl: 'https://enter.pollinations.ai/api/generate/openai', // New Endpoint
+    textApiUrl: 'https://enter.pollinations.ai/api/generate/openai',
     imageApiUrl: 'https://image.pollinations.ai/prompt/',
+    dictionaryApiUrl: 'https://api.dictionaryapi.dev/api/v2/entries/en/',
     requestTimeout: 30000,
     maxMessageLength: 1000,
     cacheExpiration: 24 * 60 * 60 * 1000,
     messagesPerPage: 20,
-    maxRetries: 1, // NEW FEATURE: Smart Retry System
+    maxRetries: 1,
 };
 
-// ---------- Utilities & DOM Refs ----------
-const darkModeToggle = document.getElementById('dark-mode-toggle');
-const chatHistory = document.getElementById('chat-history');
-const chatInput = document.getElementById('chat-input');
-const chatForm = document.getElementById('chat-form');
-const welcomeMessage = document.getElementById('welcome-message');
-const newChatBtn = document.getElementById('new-chat-btn');
-const exportChatBtn = document.getElementById('export-chat-btn');
-const modelSelector = document.getElementById('model-selector');
-const chatHistoryList = document.getElementById('chat-history-list');
-const chatContainer = document.getElementById('chat-container');
+// ---------- DOM Refs ----------
+const dom = {
+    sidebar: document.getElementById('sidebar'),
+    mobileMenuBtn: document.getElementById('mobile-menu-btn'),
+    darkModeToggle: document.getElementById('dark-mode-toggle'),
+    chatHistory: document.getElementById('chat-history'),
+    chatInput: document.getElementById('chat-input'),
+    chatForm: document.getElementById('chat-form'),
+    welcomeMessage: document.getElementById('welcome-message'),
+    welcomeUserName: document.getElementById('welcome-user-name'),
+    newChatBtn: document.getElementById('new-chat-btn'),
+    exportChatBtn: document.getElementById('export-chat-btn'),
+    modelSelector: document.getElementById('model-selector'),
+    chatHistoryListContainer: document.getElementById('chat-history-list-container'),
+    chatHistoryList: document.getElementById('chat-history-list'),
+    chatHistoryTab: document.getElementById('chat-history-tab'),
+    galleryTab: document.getElementById('gallery-tab'),
+    imageGalleryPanel: document.getElementById('image-gallery-panel'),
+    imageGalleryGrid: document.getElementById('image-gallery-grid'),
+    imageGalleryPlaceholder: document.getElementById('image-gallery-placeholder'),
+    profileMenuBtn: document.getElementById('profile-menu-btn'),
+    profileMenu: document.getElementById('profile-menu'),
+    changeNameBtn: document.getElementById('change-name-btn'),
+    userName: document.getElementById('user-name'),
+    offlineIndicator: document.getElementById('offline-indicator'),
+    promptTemplatesBar: document.getElementById('prompt-templates-bar'),
+    tutorialOverlay: document.getElementById('tutorial-overlay'),
+    tutorialCloseBtn: document.getElementById('tutorial-close-btn'),
+    tutorialDoneBtn: document.getElementById('tutorial-done-btn'),
+    errorNotification: document.getElementById('error-notification'),
+    errorMessage: document.getElementById('error-message'),
+    closeErrorBtn: document.getElementById('close-error'),
+};
 
-// NEW FEATURE: Dynamic Elements
-let typingIndicator;
-let micButton;
-let quickActionsBar;
-
+// ---------- State ----------
 let currentChatId = null;
 let allChats = {};
 let isRecognizingSpeech = false;
 let speechRecognition;
+let typingIndicator;
+let micButton;
 
 // ---------- Helper Functions ----------
 function generateChatId() {
@@ -69,69 +99,105 @@ function escapeHTML(str) {
     return div.innerHTML;
 }
 
-function debounce(func, wait) {
-    let timeout;
-    return function (...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-}
-
-function validateInput(message) {
-    if (message.length > config.maxMessageLength) {
-        showErrorNotification(`Message is too long (max ${config.maxMessageLength} characters).`);
-        return false;
-    }
-    // Allowing <> for /rewrite command, but still risky.
-    // if (/[{}]/g.test(message)) {
-    //     showErrorNotification('Message contains invalid characters.');
-    //     return false;
-    // }
-    return true;
-}
-
-function getCachedResponse(prompt) {
-    const cache = JSON.parse(localStorage.getItem('apiCache') || '{}');
-    const entry = cache[prompt];
-    if (entry && Date.now() - entry.timestamp < config.cacheExpiration) {
-        return entry.response;
-    }
-    return null;
-}
-
-function cacheResponse(prompt, response) {
-    const cache = JSON.parse(localStorage.getItem('apiCache') || '{}');
-    cache[prompt] = { response, timestamp: Date.now() };
-    localStorage.setItem('apiCache', JSON.stringify(cache));
-}
-
-// NEW FEATURE: Basic Offline Mode check
 function isOffline() {
     return !navigator.onLine;
 }
 
 // ---------- Error Notification ----------
 function showErrorNotification(message) {
-    const errorNotification = document.getElementById('error-notification');
-    const errorMessage = document.getElementById('error-message');
-    if (errorNotification && errorMessage) {
-        errorMessage.textContent = message;
-        errorNotification.classList.remove('hidden');
-        errorNotification.style.opacity = '1';
+    if (dom.errorNotification && dom.errorMessage) {
+        dom.errorMessage.textContent = message;
+        dom.errorNotification.classList.remove('hidden');
+        dom.errorNotification.style.opacity = '1';
         setTimeout(() => {
-            errorNotification.style.opacity = '0';
-            setTimeout(() => errorNotification.classList.add('hidden'), 300);
+            dom.errorNotification.style.opacity = '0';
+            setTimeout(() => dom.errorNotification.classList.add('hidden'), 300);
         }, 5000);
     }
 }
 
-// ---------- Sidebar chat button management ----------
+// ---------- Sidebar & Mobile ----------
+function toggleSidebar(forceOpen = null) {
+    const isOpen = dom.sidebar.classList.contains('open');
+    if (forceOpen === true || (forceOpen === null && !isOpen)) {
+        dom.sidebar.classList.add('open');
+        document.body.classList.add('sidebar-open');
+    } else {
+        dom.sidebar.classList.remove('open');
+        document.body.classList.remove('sidebar-open');
+    }
+}
+
+function switchSidebarTab(tabName) {
+    if (tabName === 'gallery') {
+        dom.chatHistoryTab.classList.remove('active-tab');
+        dom.galleryTab.classList.add('active-tab');
+        dom.chatHistoryListContainer.classList.add('hidden');
+        dom.imageGalleryPanel.classList.remove('hidden');
+        renderImageGallery();
+    } else {
+        // Default to 'chat'
+        dom.galleryTab.classList.remove('active-tab');
+        dom.chatHistoryTab.classList.add('active-tab');
+        dom.imageGalleryPanel.classList.add('hidden');
+        dom.chatHistoryListContainer.classList.remove('hidden');
+    }
+}
+
+// ---------- Profile & User ----------
+function loadUserName() {
+    const name = localStorage.getItem('prismUserName') || 'Stranger';
+    dom.userName.textContent = name;
+    dom.welcomeUserName.textContent = `Hello there, ${name}!`;
+}
+
+function changeUserName() {
+    const currentName = localStorage.getItem('prismUserName') || 'Stranger';
+    const newName = prompt('Enter your name:', currentName);
+    if (newName && newName.trim()) {
+        localStorage.setItem('prismUserName', newName.trim());
+        loadUserName();
+    }
+    dom.profileMenu.classList.add('hidden'); // Close menu
+}
+
+// ---------- Image Gallery ----------
+function saveImageToGallery(url, prompt) {
+    let gallery = JSON.parse(localStorage.getItem('prismImageGallery') || '[]');
+    gallery.unshift({ id: generateChatId(), url, prompt, timestamp: Date.now() });
+    localStorage.setItem('prismImageGallery', JSON.stringify(gallery));
+}
+
+function renderImageGallery() {
+    let gallery = JSON.parse(localStorage.getItem('prismImageGallery') || '[]');
+    dom.imageGalleryGrid.innerHTML = '';
+    
+    if (gallery.length === 0) {
+        dom.imageGalleryPlaceholder.classList.remove('hidden');
+        return;
+    }
+    
+    dom.imageGalleryPlaceholder.classList.add('hidden');
+    gallery.forEach(item => {
+        const imgWrapper = document.createElement('div');
+        imgWrapper.classList.add('gallery-image');
+        imgWrapper.title = item.prompt; // Show prompt on hover
+        imgWrapper.innerHTML = `<img src="${item.url}" alt="${item.prompt}">`;
+        
+        // Optional: Click to view full
+        imgWrapper.onclick = () => window.open(item.url, '_blank');
+        
+        dom.imageGalleryGrid.appendChild(imgWrapper);
+    });
+}
+
+// ---------- Chat History List ----------
 function addChatButton(chatId, title = 'New Chat') {
-    const existing = chatHistoryList.querySelector(`[data-chat-id="${chatId}"]`);
+    const existing = dom.chatHistoryList.querySelector(`[data-chat-id="${chatId}"]`);
     if (existing) return existing;
 
     const chatButton = document.createElement('button');
-    chatButton.classList.add('w-full','p-3','rounded-xl','text-left','text-gray-700','dark:text-gray-300','font-medium','hover:bg-white/20','transition-all','duration-200','active:scale-95','flex','items-center','space-x-2','chat-history-item');
+    chatButton.className = 'w-full p-3 rounded-xl text-left text-gray-700 dark:text-gray-300 font-medium hover:bg-white/20 transition-all duration-200 active:scale-95 flex items-center space-x-2 chat-history-item';
     chatButton.dataset.chatId = chatId;
     chatButton.setAttribute('aria-label', `Select chat: ${title}`);
     const safeTitle = escapeHTML(title);
@@ -141,7 +207,7 @@ function addChatButton(chatId, title = 'New Chat') {
         </svg>
         <span class="truncate" title="${safeTitle}">${safeTitle}</span>
     `;
-    chatHistoryList.prepend(chatButton);
+    dom.chatHistoryList.prepend(chatButton);
     return chatButton;
 }
 
@@ -156,7 +222,7 @@ function setActiveChatButton(chatId) {
 }
 
 function updateChatButtonTitle(chatId, newTitle) {
-    const btn = chatHistoryList.querySelector(`.chat-history-item[data-chat-id="${chatId}"]`);
+    const btn = dom.chatHistoryList.querySelector(`.chat-history-item[data-chat-id="${chatId}"]`);
     if (!btn) return;
     const span = btn.querySelector('span');
     if (span) {
@@ -167,7 +233,7 @@ function updateChatButtonTitle(chatId, newTitle) {
     }
 }
 
-// ---------- Chat selection & load ----------
+// ---------- Chat Selection & Load ----------
 function selectChat(chatId) {
     if (chatId === null || chatId === 'new-chat-placeholder') {
         currentChatId = generateChatId();
@@ -175,8 +241,10 @@ function selectChat(chatId) {
         addChatButton(currentChatId, allChats[currentChatId].title);
         setActiveChatButton(currentChatId);
         loadChatMessages([]);
-        chatInput.placeholder = 'Message PrismAI ✨...';
+        dom.chatInput.placeholder = 'Message PrismAI ✨...';
         saveAllChats();
+        switchSidebarTab('chat'); // Ensure chat tab is active
+        toggleSidebar(false); // Close sidebar on mobile
         return;
     }
 
@@ -190,28 +258,29 @@ function selectChat(chatId) {
     const chatData = allChats[chatId];
     loadChatMessages(chatData.messages || []);
     setActiveChatButton(chatId);
-    chatInput.placeholder = `Message ${escapeHTML(chatData.title)}...`;
+    dom.chatInput.placeholder = `Message ${escapeHTML(chatData.title)}...`;
     saveAllChats();
+    switchSidebarTab('chat'); // Ensure chat tab is active
+    toggleSidebar(false); // Close sidebar on mobile
 }
 
 function loadChatMessages(messages, start = 0, limit = config.messagesPerPage) {
-    chatHistory.innerHTML = '';
+    dom.chatHistory.innerHTML = '';
     const slicedMessages = messages.slice(start, start + limit);
     if (!slicedMessages.length && messages.length === 0) {
-        welcomeMessage.classList.remove('hidden');
-        chatHistory.classList.add('hidden');
+        dom.welcomeMessage.classList.remove('hidden');
+        dom.chatHistory.classList.add('hidden');
         return;
     }
-    welcomeMessage.classList.add('hidden');
-    chatHistory.classList.remove('hidden');
+    dom.welcomeMessage.classList.add('hidden');
+    dom.chatHistory.classList.remove('hidden');
 
     slicedMessages.forEach(msg => {
         addMessage(msg.content, msg.role, msg.type || 'text', false, msg.timestamp);
     });
-    requestAnimationFrame(() => { chatHistory.scrollTop = chatHistory.scrollHeight; });
 }
 
-// ---------- Persisting ----------
+// ---------- Data Persisting ----------
 function saveAllChats() {
     try {
         localStorage.setItem('allPrisimAIChats', JSON.stringify(allChats));
@@ -242,7 +311,6 @@ function loadAllChats() {
     }
 }
 
-// NEW FEATURE: Enhanced Export Options
 function exportChat() {
     if (!currentChatId || !allChats[currentChatId]) {
         showErrorNotification('No chat selected to export.');
@@ -251,30 +319,21 @@ function exportChat() {
     
     const format = prompt("Enter export format: 'json', 'txt', or 'md'", 'md');
     if (!format || !['json', 'txt', 'md'].includes(format.toLowerCase())) {
-        return; // User cancelled or entered invalid format
+        return;
     }
     
     const chatData = allChats[currentChatId];
-    let content = '';
-    let mimeType = '';
-    let fileExt = '';
+    let content = '', mimeType = '', fileExt = '';
 
     switch (format.toLowerCase()) {
         case 'txt':
-            content = formatChatAsTxt(chatData);
-            mimeType = 'text/plain';
-            fileExt = 'txt';
+            content = formatChatAsTxt(chatData); mimeType = 'text/plain'; fileExt = 'txt';
             break;
         case 'md':
-            content = formatChatAsMd(chatData);
-            mimeType = 'text/markdown';
-            fileExt = 'md';
+            content = formatChatAsMd(chatData); mimeType = 'text/markdown'; fileExt = 'md';
             break;
-        case 'json':
         default:
-            content = JSON.stringify(chatData, null, 2);
-            mimeType = 'application/json';
-            fileExt = 'json';
+            content = JSON.stringify(chatData, null, 2); mimeType = 'application/json'; fileExt = 'json';
             break;
     }
 
@@ -290,8 +349,7 @@ function exportChat() {
 }
 
 function formatChatAsTxt(chatData) {
-    let text = `Chat Title: ${chatData.title}\n`;
-    text += `Exported: ${new Date().toLocaleString()}\n\n`;
+    let text = `Chat Title: ${chatData.title}\nExported: ${new Date().toLocaleString()}\n\n`;
     chatData.messages.forEach(msg => {
         const time = new Date(msg.timestamp).toLocaleTimeString();
         text += `[${time}] ${msg.role === 'user' ? 'You' : 'PrismAI'}:\n${msg.content}\n\n`;
@@ -300,170 +358,129 @@ function formatChatAsTxt(chatData) {
 }
 
 function formatChatAsMd(chatData) {
-    let md = `# Chat: ${chatData.title}\n`;
-    md += `**Exported:** ${new Date().toLocaleString()}\n\n---\n\n`;
+    let md = `# Chat: ${chatData.title}\n**Exported:** ${new Date().toLocaleString()}\n\n---\n\n`;
     chatData.messages.forEach(msg => {
         const time = new Date(msg.timestamp).toLocaleTimeString();
         const sender = msg.role === 'user' ? 'You' : 'PrismAI';
         md += `**${sender}** (*${time}*):\n\n`;
-        if (msg.type === 'image') {
-            md += `![Generated Image](${msg.content})\n\n`;
-        } else {
-            // Basic code block detection
-            if (msg.content.includes('```')) {
-                md += `${msg.content}\n\n`;
-            } else {
-                md += `${msg.content.replace(/\n/g, '  \n')}\n\n`;
-            }
-        }
+        if (msg.type === 'image') md += `![Generated Image](${msg.content})\n\n`;
+        else if (msg.type === 'code') md += `${msg.content}\n\n`; // Already formatted
+        else md += `${msg.content.replace(/\n/g, '  \n')}\n\n`;
     });
     return md;
 }
 
 // ---------- Chat UI Management ----------
 function addMessage(content, role, type = 'text', animate = true, timestamp = Date.now()) {
-    if (welcomeMessage) welcomeMessage.classList.add('hidden');
-    if (chatHistory) chatHistory.classList.remove('hidden');
+    dom.welcomeMessage.classList.add('hidden');
+    dom.chatHistory.classList.remove('hidden');
 
     const messageWrapper = document.createElement('div');
-    messageWrapper.classList.add('flex', 'w-full', 'fade-in');
+    messageWrapper.classList.add('flex', 'w-full', 'slide-in-up', 'opacity-0');
+    if (animate) messageWrapper.style.animationFillMode = 'forwards';
+    else messageWrapper.classList.remove('slide-in-up', 'opacity-0');
     
     const messageContent = document.createElement('div');
     messageContent.classList.add('msg', 'relative');
     
-    // NEW FEATURE: Text-to-Speech Button
-    const speakButton = document.createElement('button');
-    speakButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" /></svg>`;
-    speakButton.classList.add('absolute', '-top-2', '-right-2', 'p-1', 'rounded-full', 'bg-white/20', 'text-gray-600', 'dark:text-gray-300', 'hover:bg-white/40', 'transition-all', 'opacity-0', 'group-hover:opacity-100');
-    speakButton.setAttribute('aria-label', 'Read message aloud');
-    speakButton.onclick = (e) => {
-        e.stopPropagation();
-        speakText(content);
-    };
-
     if (role === 'user') {
         messageWrapper.classList.add('justify-end');
         messageContent.classList.add('msg-user');
     } else {
         messageWrapper.classList.add('justify-start');
-        messageContent.classList.add('msg-assistant', 'group'); // Add group for hover
+        messageContent.classList.add('msg-assistant', 'group');
     }
 
+    // --- Render based on type ---
     if (type === 'image') {
-        const img = document.createElement('img');
-        img.src = content;
-        img.alt = 'Generated image';
-        img.classList.add('rounded-lg', 'max-w-xs', 'md:max-w-md', 'shadow-lg');
-        messageContent.appendChild(img);
+        messageContent.innerHTML = `<img src="${content}" alt="Generated image" class="rounded-lg max-w-xs md:max-w-md shadow-lg">`;
+    } else if (type === 'calculator') {
+        messageContent.innerHTML = content; // content is pre-formatted HTML
+    } else if (type === 'dictionary') {
+        messageContent.innerHTML = content; // content is pre-formatted HTML
+    } else if (type === 'code') {
+        messageContent.innerHTML = content; // content is pre-formatted HTML
     } else {
-        messageContent.textContent = content; // Using textContent to prevent XSS
-    }
-    
-    const time = document.createElement('div');
-    time.textContent = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    time.classList.add('timestamp', 'text-xs', 'text-gray-500', 'dark:text-gray-400', 'mt-2');
-    
-    if (role === 'user') {
-        time.classList.add('text-right');
-    } else {
-        time.classList.add('text-left');
-        if (type === 'text') {
-             messageContent.appendChild(speakButton);
+        // Default: text
+        messageContent.textContent = content;
+        if (role === 'assistant') {
+            const speakButton = document.createElement('button');
+            speakButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" /></svg>`;
+            speakButton.className = 'absolute -top-2 -right-2 p-1 rounded-full bg-white/20 text-gray-600 dark:text-gray-300 hover:bg-white/40 transition-all opacity-0 group-hover:opacity-100';
+            speakButton.setAttribute('aria-label', 'Read message aloud');
+            speakButton.onclick = (e) => { e.stopPropagation(); speakText(content); };
+            messageContent.appendChild(speakButton);
         }
     }
 
+    const time = document.createElement('div');
+    time.textContent = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    time.className = 'timestamp text-xs text-gray-500 dark:text-gray-400 mt-2';
+    if (role === 'user') time.classList.add('text-right');
+    else time.classList.add('text-left');
+
     messageWrapper.appendChild(messageContent);
-    chatHistory.appendChild(messageWrapper);
+    dom.chatHistory.appendChild(messageWrapper);
     
-    // Append timestamp *after* the message bubble, aligned correctly
     const timestampWrapper = document.createElement('div');
-    timestampWrapper.classList.add('w-full', 'flex', 'px-2', 'fade-in');
-    if (role === 'user') {
-        timestampWrapper.classList.add('justify-end');
-    } else {
-        timestampWrapper.classList.add('justify-start');
-    }
-    timestampWrapper.appendChild(time);
-    chatHistory.appendChild(timestampWrapper);
-
-    // Scroll to bottom
-    requestAnimationFrame(() => {
-        chatHistory.scrollTop = chatHistory.scrollHeight;
-    });
-
+    timestampWrapper.className = 'w-full flex px-2 slide-in-up opacity-0';
     if (animate) {
-        // Simple animation, can be enhanced
-        messageWrapper.style.animation = 'fadeIn 0.3s ease-out';
-        timestampWrapper.style.animation = 'fadeIn 0.3s ease-out';
+        timestampWrapper.style.animationFillMode = 'forwards';
+        timestampWrapper.style.animationDelay = '0.1s';
+    } else {
+        timestampWrapper.classList.remove('slide-in-up', 'opacity-0');
     }
+    if (role === 'user') timestampWrapper.classList.add('justify-end');
+    else timestampWrapper.classList.add('justify-start');
+    
+    timestampWrapper.appendChild(time);
+    dom.chatHistory.appendChild(timestampWrapper);
+
+    requestAnimationFrame(() => {
+        dom.chatHistory.scrollTop = dom.chatHistory.scrollHeight;
+    });
     
     return messageWrapper;
 }
 
-// NEW FEATURE: Typing Indicator
 function showTypingIndicator() {
     if (!typingIndicator) {
         typingIndicator = document.createElement('div');
-        typingIndicator.classList.add('flex', 'w-full', 'justify-start', 'fade-in', 'p-4');
+        typingIndicator.className = 'flex w-full justify-start slide-in-up opacity-0 p-4';
+        typingIndicator.style.animationFillMode = 'forwards';
         typingIndicator.innerHTML = `
             <div class="msg msg-assistant" style="padding: 12px 20px;">
                 <div class="flex space-x-1.5">
-                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0s;"></div>
-                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s;"></div>
-                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot" style="animation-delay: 0s;"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot" style="animation-delay: 0.1s;"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot" style="animation-delay: 0.2s;"></div>
                 </div>
             </div>
         `;
-        // Add bounce keyframes to head if not present
-        if (!document.getElementById('anim-bounce')) {
-            const style = document.createElement('style');
-            style.id = 'anim-bounce';
-            style.innerHTML = `
-                @keyframes bounce {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-6px); }
-                }
-                .animate-bounce { animation: bounce 1s infinite ease-in-out; }
-            `;
-            document.head.appendChild(style);
-        }
     }
-    chatHistory.appendChild(typingIndicator);
-    chatHistory.scrollTop = chatHistory.scrollHeight;
+    dom.chatHistory.appendChild(typingIndicator);
+    dom.chatHistory.scrollTop = dom.chatHistory.scrollHeight;
 }
 
 function hideTypingIndicator() {
-    if (typingIndicator && typingIndicator.parentNode === chatHistory) {
-        chatHistory.removeChild(typingIndicator);
+    if (typingIndicator && typingIndicator.parentNode === dom.chatHistory) {
+        typingIndicator.style.animation = 'fadeOut 0.3s ease-out forwards';
+        setTimeout(() => {
+            if (typingIndicator && typingIndicator.parentNode) {
+                typingIndicator.parentNode.removeChild(typingIndicator);
+                typingIndicator.style.animation = '';
+            }
+        }, 300);
     }
 }
 
 // ---------- API Communication ----------
 async function getAIResponse(messages, model, retryCount = 0) {
-    // NEW FEATURE: Offline Check
-    if (isOffline()) {
-        throw new Error("You are offline. Please check your internet connection.");
-    }
+    if (isOffline()) throw new Error("You are offline. Please check your internet connection.");
     
-    // NEW FEATURE: Prepend Memory and Persona
-    const systemPrompt = `
-        ${getPersonaPrompt()}
-        
-        Here are some facts you should remember about me:
-        ${getUserFacts()}
-        
-        Now, please respond to the following conversation.
-    `.trim();
-
-    const messagesWithContext = [
-        { role: "system", content: systemPrompt },
-        ...messages
-    ];
-    
-    const requestBody = {
-        model: model,
-        messages: messagesWithContext,
-    };
+    const systemPrompt = `${getPersonaPrompt()}\nHere are some facts you should remember about me:\n${getUserFacts()}\nNow, please respond to the following conversation.`.trim();
+    const messagesWithContext = [{ role: "system", content: systemPrompt }, ...messages];
+    const requestBody = { model: model, messages: messagesWithContext };
     
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), config.requestTimeout);
@@ -471,61 +488,33 @@ async function getAIResponse(messages, model, retryCount = 0) {
     try {
         const response = await fetch(config.textApiUrl, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${config.apiKey}`,
-                'Referer': config.referrer,
-            },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.apiKey}`, 'Referer': config.referrer },
             body: JSON.stringify(requestBody),
             signal: controller.signal,
         });
-
         clearTimeout(timeoutId);
-
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`APIError: ${response.status} ${response.statusText} - ${errorText}`);
         }
-
         const data = await response.json();
-        
-        // Handle different possible response structures
-        if (data.choices && data.choices[0] && data.choices[0].message) {
-            return data.choices[0].message.content;
-        } else if (data.text) {
-            return data.text;
-        } else {
-            throw new Error("Invalid API response structure.");
-        }
-
+        if (data.choices && data.choices[0] && data.choices[0].message) return data.choices[0].message.content;
+        if (data.text) return data.text;
+        throw new Error("Invalid API response structure.");
     } catch (error) {
         clearTimeout(timeoutId);
-        
-        // NEW FEATURE: Smart Retry System
         if (retryCount < config.maxRetries && error.name !== 'AbortError') {
-            console.warn(`Request failed, retrying... (${retryCount + 1}/${config.maxRetries})`);
-            await new Promise(res => setTimeout(res, 1000)); // Wait 1s before retry
+            await new Promise(res => setTimeout(res, 1000));
             return getAIResponse(messages, model, retryCount + 1);
         }
-
-        console.error('Error fetching AI response:', error);
-        if (error.name === 'AbortError') {
-            throw new Error('The request timed out. Please try again.');
-        }
+        if (error.name === 'AbortError') throw new Error('The request timed out. Please try again.');
         throw error;
     }
 }
 
 async function getImageResponse(prompt) {
-    if (isOffline()) {
-        throw new Error("You are offline. Please check your internet connection.");
-    }
-
+    if (isOffline()) throw new Error("You are offline. Please check your internet connection.");
     const url = `${config.imageApiUrl}${encodeURIComponent(prompt)}`;
-    // We expect the URL itself to be the image source, as per Pollinations.
-    // No fetch needed, just return the URL.
-    
-    // Let's add a check to see if the image loads, otherwise return an error.
     return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => resolve(url);
@@ -534,8 +523,7 @@ async function getImageResponse(prompt) {
     });
 }
 
-// ---------- Command Handling ----------
-// NEW FEATURE: Command System
+// ---------- Plugin System & Commands ----------
 async function handleCommand(message) {
     const parts = message.trim().split(' ');
     const command = parts[0].toLowerCase();
@@ -545,167 +533,205 @@ async function handleCommand(message) {
         case '/image':
             addMessage(message, 'user');
             await handleImageGeneration(args);
-            return true; // Command was handled
-
-        case '/remember':
-            const fact = args.trim();
-            if (!fact) {
-                addMessage("Usage: /remember [fact about you]", 'assistant', 'text', true);
-                return true;
-            }
-            saveUserFact(fact);
-            addMessage(`Got it. I'll remember that: "${fact}"`, 'assistant', 'text', true);
             return true;
 
+        // --- Memory ---
+        case '/remember':
+            if (!args) { addMessage("Usage: /remember [fact about you]", 'assistant', 'text', true); return true; }
+            saveUserFact(args);
+            addMessage(`Got it. I'll remember that: "${args}"`, 'assistant', 'text', true);
+            return true;
         case '/whoami':
         case '/memory':
             const facts = getUserFacts();
-            const response = facts ? `Here's what I remember about you:\n\n${facts}` : "I don't have any facts stored for you yet. Use `/remember [fact]` to teach me.";
-            addMessage(response, 'assistant', 'text', true);
+            const factResponse = facts ? `Here's what I remember about you:\n\n${facts}` : "I don't have any facts stored for you yet.";
+            addMessage(factResponse, 'assistant', 'text', true);
             return true;
         
+        // --- Cache & Config ---
         case '/clearcache':
             localStorage.removeItem('apiCache');
             addMessage("API cache cleared.", 'assistant', 'text', true);
             return true;
-
+        case '/theme':
+            if (!args) { addMessage("Usage: /theme [color name or hex code]", 'assistant', 'text', true); return true; }
+            applyTheme(args);
+            addMessage(`Theme accent color changed to ${args}.`, 'assistant', 'text', true);
+            return true;
+        case '/persona':
+            savePersona(args);
+            const personaMsg = args ? `Understood. I will now act as a: "${args}"` : `Persona cleared. I'm back to my default self.`;
+            addMessage(personaMsg, 'assistant', 'text', true);
+            return true;
+            
+        // --- AI Tools ---
         case '/summarize':
             addMessage(message, 'user');
             await handleSummarizeChat();
             return true;
-
         case '/rewrite':
             const [tone, ...textToRewrite] = args.split(' ');
-            const text = textToRewrite.join(' ');
-            if (!tone || !text) {
-                addMessage("Usage: /rewrite [tone] [text to rewrite]\nExample: /rewrite professional I can't do this", 'assistant', 'text', true);
-                return true;
-            }
+            if (!tone || !textToRewrite.length) { addMessage("Usage: /rewrite [tone] [text to rewrite]", 'assistant', 'text', true); return true; }
             addMessage(message, 'user');
-            await handleRewriteText(tone, text);
+            await handleRewriteText(tone, textToRewrite.join(' '));
             return true;
-
         case '/research':
-            if (!args) {
-                addMessage("Usage: /research [topic]", 'assistant', 'text', true);
-                return true;
-            }
-            const researchPrompt = `Please conduct research on the following topic: "${args}". Provide a structured answer, including a summary, key points, and any relevant sources you can find.`;
-            // This is now a regular prompt, so we return false to let the normal flow handle it.
-            // We just modified the user's message.
-            chatInput.value = researchPrompt;
-            return false; // Let the normal message handler send this
+            if (!args) { addMessage("Usage: /research [topic]", 'assistant', 'text', true); return true; }
+            dom.chatInput.value = `Please conduct research on the following topic: "${args}". Provide a structured answer, including a summary, key points, and any relevant sources you can find.`;
+            return false; // Let normal submit handle this modified prompt
         
-        case '/theme':
-            const color = args.trim().toLowerCase();
-            if (!color) {
-                addMessage("Usage: /theme [color name or hex code]\nExample: /theme purple  (or /theme #8b5cf6)", 'assistant', 'text', true);
-                return true;
-            }
-            applyTheme(color);
-            addMessage(`Theme accent color changed to ${color}.`, 'assistant', 'text', true);
+        // --- Plugins ---
+        case '/calc':
+            addMessage(message, 'user');
+            handleCalculator(args);
+            return true;
+        case '/define':
+            addMessage(message, 'user');
+            await handleDictionary(args);
+            return true;
+        case '/code':
+            const [lang, ...code] = args.split(' ');
+            if (!lang || !code.length) { addMessage("Usage: /code [language] [code...]", 'assistant', 'text', true); return true; }
+            addMessage(message, 'user');
+            handleCodeFormatter(lang, code.join(' '));
             return true;
 
-        case '/persona':
-            const persona = args.trim();
-            if (!persona) {
-                addMessage(`Persona cleared. I'm back to my default self.`, 'assistant', 'text', true);
-                savePersona('');
-                return true;
-            }
-            savePersona(persona);
-            addMessage(`Understood. I will now act as a: "${persona}"`, 'assistant', 'text', true);
-            return true;
-
+        // --- Help ---
         case '/help':
             const helpText = `
 Available Commands:
 - /help: Shows this message.
 - /image [prompt]: Generates an image.
 - /summarize: Summarizes the current chat.
-- /rewrite [tone] [text]: Rewrites your text in a new tone.
-- /research [topic]: Performs in-depth research on a topic.
+- /rewrite [tone] [text]: Rewrites your text.
+- /research [topic]: Performs in-depth research.
 - /remember [fact]: Stores a fact about you.
 - /whoami: Retrieves your stored facts.
-- /persona [description]: Sets the AI's personality (e.g., "sarcastic friend"). Leave blank to clear.
-- /theme [color]: Changes the UI accent color (e.g., 'green', '#FF5733').
+- /persona [desc]: Sets the AI's personality.
+- /theme [color]: Changes the UI accent color.
 - /clearcache: Clears cached API responses.
+Plugins:
+- /calc [expression]: (e.g., /calc 5 * (10 + 2))
+- /define [word]: Looks up a word definition.
+- /code [lang] [code]: Formats a code snippet.
             `;
-            addMessage(helpText.trim(), 'assistant', 'text', true);
+            addMessage(helpText.trim().replace(/^\s+/gm, ''), 'assistant', 'text', true);
             return true;
     }
-    
     return false; // Not a command
 }
 
+// --- Command Handlers ---
 async function handleImageGeneration(prompt) {
-    if (!prompt) {
-        addMessage('Please provide a prompt for the image. \nExample: `/image a cat wearing a hat`', 'assistant', 'text', true);
-        return;
-    }
-    
+    if (!prompt) { addMessage('Usage: `/image [prompt]`', 'assistant', 'text', true); return; }
     showTypingIndicator();
     try {
         const imageUrl = await getImageResponse(prompt);
+        hideTypingIndicator();
         addMessage(imageUrl, 'assistant', 'image', true);
         saveMessageToHistory(imageUrl, 'assistant', 'image');
+        saveImageToGallery(imageUrl, prompt); // Save to gallery
     } catch (error) {
-        console.error('Image generation error:', error);
-        showErrorNotification(error.message || 'Failed to generate image.');
-    } finally {
         hideTypingIndicator();
+        showErrorNotification(error.message || 'Failed to generate image.');
     }
 }
 
 async function handleSummarizeChat() {
     const chatData = allChats[currentChatId];
-    if (!chatData || !chatData.messages.length) {
-        addMessage("There's nothing to summarize yet.", 'assistant', 'text', true);
-        return;
-    }
-
-    const currentModel = modelSelector.value;
-    const historyText = chatData.messages
-        .filter(m => m.type === 'text')
-        .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
-        .join('\n');
-    
+    if (!chatData || !chatData.messages.length) { addMessage("There's nothing to summarize yet.", 'assistant', 'text', true); return; }
+    const historyText = chatData.messages.filter(m => m.type === 'text').map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n');
     const prompt = `Please summarize the following conversation:\n\n${historyText}`;
-    
     showTypingIndicator();
     try {
-        const summary = await getAIResponse([{ role: 'user', content: prompt }], currentModel);
+        const summary = await getAIResponse([{ role: 'user', content: prompt }], dom.modelSelector.value);
+        hideTypingIndicator();
         addMessage(summary, 'assistant', 'text', true);
-        // Don't save this summary request to history, but DO save the response.
         saveMessageToHistory(summary, 'assistant', 'text');
     } catch (error) {
-        console.error('Summarize error:', error);
-        showErrorNotification(error.message || 'Failed to summarize chat.');
-    } finally {
         hideTypingIndicator();
+        showErrorNotification(error.message || 'Failed to summarize chat.');
     }
 }
 
 async function handleRewriteText(tone, text) {
-    const currentModel = modelSelector.value;
     const prompt = `Rewrite the following text in a "${tone}" tone:\n\nText: "${text}"`;
-    
     showTypingIndicator();
     try {
-        const rewrittenText = await getAIResponse([{ role: 'user', content: prompt }], currentModel);
+        const rewrittenText = await getAIResponse([{ role: 'user', content: prompt }], dom.modelSelector.value);
+        hideTypingIndicator();
         addMessage(rewrittenText, 'assistant', 'text', true);
-        // Don't save the rewrite request, but save the response
         saveMessageToHistory(rewrittenText, 'assistant', 'text');
     } catch (error) {
-        console.error('Rewrite error:', error);
-        showErrorNotification(error.message || 'Failed to rewrite text.');
-    } finally {
         hideTypingIndicator();
+        showErrorNotification(error.message || 'Failed to rewrite text.');
     }
 }
 
+// --- Plugin Handlers ---
+function handleCalculator(expression) {
+    if (!expression) { addMessage('Usage: /calc [mathematical expression]', 'assistant', 'text', true); return; }
+    try {
+        // Basic validation
+        if (/[^0-9\s\.\+\-\*\/\(\)]/g.test(expression)) {
+            throw new Error('Invalid characters. Only numbers and operators are allowed.');
+        }
+        // Safer eval
+        const result = new Function(`return ${expression}`)();
+        const html = `
+            <div class="plugin-container">
+                <div class="calc-expression">${escapeHTML(expression)}</div>
+                <div class="calc-result">${result}</div>
+            </div>
+        `;
+        addMessage(html, 'assistant', 'calculator', true);
+        saveMessageToHistory(html, 'assistant', 'calculator');
+    } catch (error) {
+        addMessage(`Error: ${error.message}`, 'assistant', 'text', true);
+    }
+}
+
+async function handleDictionary(word) {
+    if (!word) { addMessage('Usage: /define [word]', 'assistant', 'text', true); return; }
+    showTypingIndicator();
+    try {
+        const response = await fetch(`${config.dictionaryApiUrl}${word}`);
+        if (!response.ok) throw new Error('Could not find definition.');
+        const data = await response.json();
+        
+        const entry = data[0];
+        const phonetic = entry.phonetics.find(p => p.text)?.text || 'N/A';
+        const definition = entry.meanings[0]?.definitions[0]?.definition || 'No definition found.';
+        
+        const html = `
+            <div class="plugin-container">
+                <div class="dict-word">${escapeHTML(entry.word)}</div>
+                <div class="dict-phonetic">${escapeHTML(phonetic)}</div>
+                <div class="dict-definition">${escapeHTML(definition)}</div>
+            </div>
+        `;
+        hideTypingIndicator();
+        addMessage(html, 'assistant', 'dictionary', true);
+        saveMessageToHistory(html, 'assistant', 'dictionary');
+    } catch (error) {
+        hideTypingIndicator();
+        showErrorNotification(error.message || `Could not define "${word}".`);
+    }
+}
+
+function handleCodeFormatter(lang, code) {
+    const html = `
+        <div class="code-block">
+            <pre><code class="language-${escapeHTML(lang)}">${escapeHTML(code)}</code></pre>
+        </div>
+    `;
+    addMessage(html, 'assistant', 'code', true);
+    saveMessageToHistory(html, 'assistant', 'code');
+    // Note: For actual syntax highlighting, a library like Prism.js or highlight.js
+    // would need to be added and initialized (e.g., `Prism.highlightAll()`).
+}
+
 // ---------- Memory System ----------
-// NEW FEATURE: Memory
 function saveUserFact(fact) {
     let facts = JSON.parse(localStorage.getItem('prismUserFacts') || '[]');
     facts.push({ id: generateChatId(), text: fact });
@@ -717,13 +743,9 @@ function getUserFacts() {
     return facts.map(f => `- ${f.text}`).join('\n');
 }
 
-// NEW FEATURE: Personas
 function savePersona(persona) {
-    if (persona) {
-        localStorage.setItem('prismPersona', persona);
-    } else {
-        localStorage.removeItem('prismPersona');
-    }
+    if (persona) localStorage.setItem('prismPersona', persona);
+    else localStorage.removeItem('prismPersona');
 }
 
 function getPersonaPrompt() {
@@ -732,13 +754,9 @@ function getPersonaPrompt() {
 
 
 // ---------- Voice System ----------
-// NEW FEATURE: Speech-to-Text
 function initializeSpeechRecognition() {
     window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!window.SpeechRecognition) {
-        console.warn('Speech Recognition not supported by this browser.');
-        return;
-    }
+    if (!window.SpeechRecognition) { console.warn('Speech Recognition not supported.'); return; }
     
     speechRecognition = new SpeechRecognition();
     speechRecognition.continuous = false;
@@ -750,29 +768,25 @@ function initializeSpeechRecognition() {
         isRecognizingSpeech = true;
         micButton.classList.add('bg-red-500', 'text-white');
         micButton.classList.remove('text-gray-500', 'dark:text-gray-400');
-        chatInput.placeholder = 'Listening...';
+        dom.chatInput.placeholder = 'Listening...';
     };
 
     speechRecognition.onresult = (event) => {
-        let interimTranscript = '';
-        let finalTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-                finalTranscript += event.results[i][0].transcript;
-            } else {
-                interimTranscript += event.results[i][0].transcript;
-            }
-        }
-        chatInput.value = finalTranscript || interimTranscript;
+        let transcript = Array.from(event.results)
+            .map(result => result[0].transcript)
+            .join('');
+        dom.chatInput.value = transcript;
+        dom.chatInput.style.height = 'auto';
+        dom.chatInput.style.height = (dom.chatInput.scrollHeight) + 'px';
     };
 
     speechRecognition.onend = () => {
         isRecognizingSpeech = false;
         micButton.classList.remove('bg-red-500', 'text-white');
         micButton.classList.add('text-gray-500', 'dark:text-gray-400');
-        chatInput.placeholder = 'Message PrismAI ✨...';
-        if (chatInput.value.trim()) {
-            chatForm.dispatchEvent(new Event('submit', { bubbles: true }));
+        dom.chatInput.placeholder = 'Message PrismAI ✨...';
+        if (dom.chatInput.value.trim()) {
+            dom.chatForm.dispatchEvent(new Event('submit', { bubbles: true }));
         }
     };
 
@@ -784,26 +798,14 @@ function initializeSpeechRecognition() {
 }
 
 function toggleSpeechRecognition() {
-    if (!speechRecognition) {
-        showErrorNotification('Speech recognition is not supported in your browser.');
-        return;
-    }
-    if (isRecognizingSpeech) {
-        speechRecognition.stop();
-    } else {
-        speechRecognition.start();
-    }
+    if (!speechRecognition) { showErrorNotification('Speech recognition is not supported.'); return; }
+    if (isRecognizingSpeech) speechRecognition.stop();
+    else speechRecognition.start();
 }
 
-// NEW FEATURE: Text-to-Speech
 function speakText(text) {
-    if (!window.speechSynthesis) {
-        showErrorNotification('Text-to-speech is not supported in your browser.');
-        return;
-    }
-    // Stop any previous speech
+    if (!window.speechSynthesis) { showErrorNotification('Text-to-speech is not supported.'); return; }
     window.speechSynthesis.cancel();
-    
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
     utterance.rate = 1.0;
@@ -812,306 +814,238 @@ function speakText(text) {
 }
 
 // ---------- Theme System ----------
-// NEW FEATURE: Customizable Themes
 function applyTheme(color) {
-    // Simple check for hex or named color
-    const isValidColor = CSS.supports('color', color);
-    if (!isValidColor) {
-        showErrorNotification(`Invalid color: ${color}`);
-        return;
-    }
-    
+    if (!CSS.supports('color', color)) { showErrorNotification(`Invalid color: ${color}`); return; }
     document.documentElement.style.setProperty('--accent', color);
     localStorage.setItem('prismTheme', color);
-
-    // Update user message bubble CSS
-    updateThemeStyles(color);
-}
-
-function updateThemeStyles(color) {
-    let styleTag = document.getElementById('prism-theme-styles');
-    if (!styleTag) {
-        styleTag = document.createElement('style');
-        styleTag.id = 'prism-theme-styles';
-        document.head.appendChild(styleTag);
-    }
-    
-    // This is a bit of a hack. Ideally, Tailwind would be configured to use this.
-    // For now, we manually override the user message and buttons.
-    styleTag.innerHTML = `
-        .msg-user {
-            background: linear-gradient(180deg, ${color}, ${color}d0);
-            box-shadow: 0 4px 16px ${color}30;
-        }
-        .sidebar-button, .send-button {
-            background: linear-gradient(90deg, ${color}, ${color}d0);
-        }
-        .sidebar-button:hover, .send-button:hover {
-            background: linear-gradient(90deg, ${color}d0, ${color}b0);
-        }
-        .chat-history-item.bg-blue-500\\/20 {
-            background-color: ${color}30; /* 30 = ~20% opacity */
-        }
-        .chat-history-item.text-blue-400 {
-            color: ${color};
-        }
-    `;
+    // The styles are now handled by `style.css` using the CSS variable
 }
 
 function loadTheme() {
-    const savedTheme = localStorage.getItem('prismTheme');
-    if (savedTheme) {
-        applyTheme(savedTheme);
-    } else {
-        applyTheme('#3b82f6'); // Default blue
-    }
+    const savedTheme = localStorage.getItem('prismTheme') || '#3b82f6';
+    applyTheme(savedTheme);
 }
 
 // ---------- Chat Logic ----------
 function saveMessageToHistory(content, role, type = 'text') {
-    if (!currentChatId || !allChats[currentChatId]) {
-        console.warn('Cannot save message, no active chat.');
-        return;
-    }
-    
-    const message = {
-        role: role,
-        content: content,
-        type: type,
-        timestamp: Date.now(),
-    };
-    
+    if (!currentChatId || !allChats[currentChatId]) return;
+    const message = { role, content, type, timestamp: Date.now() };
     allChats[currentChatId].messages.push(message);
-    
-    // Update title
     if (allChats[currentChatId].messages.length === 1 && role === 'user') {
         const newTitle = content.length > 30 ? content.slice(0, 27) + '...' : content;
         allChats[currentChatId].title = newTitle;
         updateChatButtonTitle(currentChatId, newTitle);
     }
-    
     saveAllChats();
 }
 
 async function handleChatSubmit(event) {
     event.preventDefault();
-    const message = chatInput.value.trim();
+    if (isOffline()) { showErrorNotification('You are offline. Please check your connection.'); return; }
     
+    const message = dom.chatInput.value.trim();
     if (!message) return;
-    if (!validateInput(message)) return;
-
-    // Clear input
-    chatInput.value = '';
-    chatInput.style.height = 'auto'; // Reset height
     
-    // NEW FEATURE: Command Handling
+    dom.chatInput.value = '';
+    dom.chatInput.style.height = 'auto';
+    
     const isCommand = await handleCommand(message);
-    if (isCommand) {
-        return; // Command was handled, stop processing.
-    }
+    if (isCommand) return;
     
-    // Add user message to UI and history
     addMessage(message, 'user');
     saveMessageToHistory(message, 'user', 'text');
-    
-    // Show typing indicator
     showTypingIndicator();
     
     try {
-        const currentModel = modelSelector.value;
         const chatData = allChats[currentChatId];
-        
-        // Get relevant history
-        const historyForApi = chatData.messages
-            .filter(m => m.type === 'text') // Only send text messages
-            .slice(-10) // Get last 10 messages
-            .map(m => ({ role: m.role, content: m.content }));
-        
-        const aiResponse = await getAIResponse(historyForApi, currentModel);
-        
+        const historyForApi = chatData.messages.filter(m => m.type === 'text').slice(-10).map(m => ({ role: m.role, content: m.content }));
+        const aiResponse = await getAIResponse(historyForApi, dom.modelSelector.value);
         hideTypingIndicator();
         addMessage(aiResponse, 'assistant', 'text', true);
         saveMessageToHistory(aiResponse, 'assistant', 'text');
-        
-        // Cache this response
-        cacheResponse(message, aiResponse);
-        
     } catch (error) {
         hideTypingIndicator();
-        console.error('Error in chat submit:', error);
         showErrorNotification(error.message || 'An unknown error occurred.');
     }
 }
 
 // ---------- Model Selector ----------
 function populateModelSelector() {
-    // NEW FEATURE: Model Grouping
-    // Mock model list, replace with actual API call if available
+    const modelInfo = {
+        "gpt-4o-mini": { name: "GPT-4o Mini", desc: "Fast, affordable, and highly capable." },
+        "gpt-4-turbo": { name: "GPT-4 Turbo", desc: "High-end model for complex reasoning." },
+        "gpt-4": { name: "GPT-4 (Powerful)", desc: "Previous generation powerful model." },
+        "claude-3-opus": { name: "Claude 3 Opus", desc: "Anthropic's most powerful model." },
+        "gpt-3.5-turbo": { name: "GPT-3.5 Turbo", desc: "Very fast and cost-effective." },
+        "claude-3-sonnet": { name: "Claude 3 Sonnet", desc: "Balance of intelligence and speed." },
+        "claude-3-haiku": { name: "Claude 3 Haiku (Fastest)", desc: "Anthropic's fastest model." },
+    };
     const modelGroups = {
-        "Chat (Recommended)": [
-            { id: "gpt-4o-mini", name: "GPT-4o Mini (Fast & Smart)" },
-            { id: "gpt-4-turbo", name: "GPT-4 Turbo" },
-        ],
-        "Creative & Advanced": [
-            { id: "gpt-4", name: "GPT-4 (Powerful)" },
-            { id: "claude-3-opus", name: "Claude 3 Opus" },
-        ],
-        "Fast & Light": [
-            { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo" },
-            { id: "claude-3-sonnet", name: "Claude 3 Sonnet" },
-            { id: "claude-3-haiku", name: "Claude 3 Haiku (Fastest)" },
-        ],
+        "Chat (Recommended)": ["gpt-4o-mini", "gpt-4-turbo"],
+        "Creative & Advanced": ["gpt-4", "claude-3-opus"],
+        "Fast & Light": ["gpt-3.5-turbo", "claude-3-sonnet", "claude-3-haiku"],
     };
     
-    modelSelector.innerHTML = ''; // Clear "Loading..."
-
+    dom.modelSelector.innerHTML = '';
     Object.keys(modelGroups).forEach(groupName => {
         const optgroup = document.createElement('optgroup');
         optgroup.label = groupName;
-        
-        modelGroups[groupName].forEach(model => {
+        modelGroups[groupName].forEach(modelId => {
+            const model = modelInfo[modelId];
+            if (!model) return;
             const option = document.createElement('option');
-            option.value = model.id;
+            option.value = modelId;
             option.textContent = model.name;
+            option.title = model.desc;
             optgroup.appendChild(option);
         });
-        
-        modelSelector.appendChild(optgroup);
+        dom.modelSelector.appendChild(optgroup);
     });
-
-    // Set default
-    modelSelector.value = "gpt-4o-mini";
+    dom.modelSelector.value = "gpt-4o-mini";
 }
 
 // ---------- Dynamic UI Injection ----------
-// NEW FEATURE: Inject Mic Button
 function injectMicButton() {
     micButton = document.createElement('button');
     micButton.type = 'button';
     micButton.id = 'mic-button';
-    micButton.classList.add('p-3', 'rounded-full', 'text-gray-500', 'dark:text-gray-400', 'hover:bg-gray-100', 'dark:hover:bg-gray-700', 'transition-all', 'absolute', 'right-20', 'bottom-8');
+    micButton.className = 'p-3 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all absolute right-20 bottom-8';
     micButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5a6 6 0 1 0-12 0v1.5a6 6 0 0 0 6 6Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>`;
     micButton.setAttribute('aria-label', 'Use voice input');
-    
-    // Adjust input padding to make space
-    chatInput.classList.add('pr-16');
-
-    // Add click listener
+    dom.chatInput.classList.add('pr-16');
     micButton.addEventListener('click', toggleSpeechRecognition);
-    
-    // Insert into the form
-    chatForm.classList.add('relative');
-    chatForm.appendChild(micButton);
+    dom.chatForm.classList.add('relative');
+    dom.chatForm.appendChild(micButton);
 }
 
-// NEW FEATURE: Inject Quick Actions
 function injectQuickActions() {
-    quickActionsBar = document.createElement('div');
-    quickActionsBar.id = 'quick-actions';
-    quickActionsBar.classList.add('flex', 'flex-wrap', 'gap-2', 'p-2', 'pb-0', 'absolute', '-top-12', 'left-0', 'w-full');
+    const inputWrapper = dom.chatForm.parentElement;
+    if (!inputWrapper) return;
     
+    const quickActionsBar = document.createElement('div');
+    quickActionsBar.className = 'flex flex-wrap gap-2 p-2 pb-0 absolute -top-12 left-0 w-full';
     const actions = [
         { label: 'Image', command: '/image ' },
         { label: 'Summarize', command: '/summarize' },
         { label: 'Rewrite', command: '/rewrite ' },
         { label: 'Help', command: '/help' }
     ];
-    
     actions.forEach(action => {
         const button = document.createElement('button');
         button.type = 'button';
         button.textContent = action.label;
-        button.classList.add('px-3', 'py-1.5', 'text-sm', 'font-medium', 'rounded-full', 'bg-white/20', 'dark:bg-gray-700/30', 'text-gray-700', 'dark:text-gray-200', 'hover:bg-white/40', 'dark:hover:bg-gray-600/50', 'transition-all');
-        button.onclick = () => {
-            chatInput.value = action.command;
-            chatInput.focus();
-        };
+        button.className = 'px-3 py-1.5 text-sm font-medium rounded-full bg-white/20 dark:bg-gray-700/30 text-gray-700 dark:text-gray-200 hover:bg-white/40 dark:hover:bg-gray-600/50 transition-all';
+        button.onclick = () => { dom.chatInput.value = action.command; dom.chatInput.focus(); };
         quickActionsBar.appendChild(button);
     });
     
-    // Find the wrapper and make it relative to position the bar
-    const inputWrapper = chatForm.parentElement;
-    if (inputWrapper) {
-        inputWrapper.classList.add('relative');
-        inputWrapper.style.paddingTop = '3rem'; // Add space for the bar
-        inputWrapper.prepend(quickActionsBar);
+    inputWrapper.classList.add('relative');
+    inputWrapper.style.paddingTop = '3rem';
+    inputWrapper.prepend(quickActionsBar);
+}
+
+function injectPromptTemplates() {
+    const templates = [
+        { label: 'Debug Code', prompt: '/code python ' },
+        { label: 'Write Email', prompt: 'Write a professional email to [RECIPIENT] about [TOPIC].' },
+        { label: 'Explain This', prompt: 'Explain this concept like I am five years old:\n\n' },
+        { label: 'Story Idea', prompt: 'Give me a story idea about a [GENRE] that involves [CHARACTER].' }
+    ];
+    templates.forEach(template => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = template.label;
+        button.className = 'px-3 py-1.5 text-sm font-medium rounded-full bg-white/10 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 hover:bg-white/30 dark:hover:bg-gray-600/40 transition-all';
+        button.onclick = () => {
+            dom.chatInput.value = template.prompt;
+            dom.chatInput.focus();
+            dom.chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+        dom.promptTemplatesBar.appendChild(button);
+    });
+}
+
+// ---------- Offline Handling ----------
+function updateOfflineStatus() {
+    if (isOffline()) {
+        dom.offlineIndicator.classList.remove('hidden');
+    } else {
+        dom.offlineIndicator.classList.add('hidden');
     }
 }
 
 // ---------- Initialization ----------
 document.addEventListener('DOMContentLoaded', () => {
-    // Dark Mode
-    const savedMode = localStorage.getItem('darkMode');
-    if (savedMode === 'true') {
-        document.documentElement.classList.add('dark');
-    }
-    darkModeToggle.addEventListener('click', () => {
+    // --- Load Base Systems ---
+    loadTheme();
+    loadUserName();
+    loadAllChats();
+    populateModelSelector();
+    
+    // --- Inject Dynamic UI ---
+    injectMicButton();
+    injectQuickActions();
+    injectPromptTemplates();
+    
+    // --- Init Speech ---
+    initializeSpeechRecognition();
+
+    // --- Event Listeners ---
+    dom.darkModeToggle.addEventListener('click', () => {
         const isDark = document.documentElement.classList.toggle('dark');
         localStorage.setItem('darkMode', isDark);
     });
-
-    // Chat
-    chatForm.addEventListener('submit', handleChatSubmit);
     
-    // Auto-resize textarea
-    chatInput.addEventListener('input', () => {
-        chatInput.style.height = 'auto';
-        chatInput.style.height = (chatInput.scrollHeight) + 'px';
+    // Mobile Sidebar
+    dom.mobileMenuBtn.addEventListener('click', () => toggleSidebar());
+    document.body.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BODY' && document.body.classList.contains('sidebar-open')) {
+            toggleSidebar(false);
+        }
     });
-    chatInput.addEventListener('keydown', (e) => {
+    dom.chatHistoryTab.addEventListener('click', () => switchSidebarTab('chat'));
+    dom.galleryTab.addEventListener('click', () => switchSidebarTab('gallery'));
+    
+    // Profile Menu
+    dom.profileMenuBtn.addEventListener('click', () => dom.profileMenu.classList.toggle('hidden'));
+    dom.changeNameBtn.addEventListener('click', changeUserName);
+    
+    // Chat
+    dom.chatForm.addEventListener('submit', handleChatSubmit);
+    dom.chatInput.addEventListener('input', () => {
+        dom.chatInput.style.height = 'auto';
+        dom.chatInput.style.height = (dom.chatInput.scrollHeight) + 'px';
+    });
+    dom.chatInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            chatForm.dispatchEvent(new Event('submit', { bubbles: true }));
+            dom.chatForm.dispatchEvent(new Event('submit', { bubbles: true }));
         }
     });
 
     // Sidebar
-    newChatBtn.addEventListener('click', () => selectChat(null));
-    exportChatBtn.addEventListener('click', exportChat);
-    
-    // Sidebar chat history clicks
-    chatHistoryList.addEventListener('click', (e) => {
+    dom.newChatBtn.addEventListener('click', () => selectChat(null));
+    dom.exportChatBtn.addEventListener('click', exportChat);
+    dom.chatHistoryList.addEventListener('click', (e) => {
         const button = e.target.closest('.chat-history-item');
-        if (button) {
-            const chatId = button.dataset.chatId;
-            if (chatId) {
-                selectChat(chatId);
-            }
-        }
+        if (button) selectChat(button.dataset.chatId);
     });
 
-    // Error close button
-    document.getElementById('close-error').addEventListener('click', () => {
-        document.getElementById('error-notification').classList.add('hidden');
-    });
+    // Error
+    dom.closeErrorBtn.addEventListener('click', () => dom.errorNotification.classList.add('hidden'));
 
-    // Tutorial (assuming it's still present in HTML)
-    const tutorial = document.getElementById('tutorial-overlay');
-    const closeTutorialBtn = document.getElementById('tutorial-close-btn');
-    const doneTutorialBtn = document.getElementById('tutorial-done-btn');
+    // Tutorial
     const hasSeenTutorial = localStorage.getItem('hasSeenPrismTutorial');
-
-    if (!hasSeenTutorial && tutorial) {
-        tutorial.classList.add('visible');
-    }
-    
+    if (!hasSeenTutorial && dom.tutorialOverlay) dom.tutorialOverlay.classList.add('visible');
     const closeTutorial = () => {
-        if (tutorial) tutorial.classList.remove('visible');
+        if (dom.tutorialOverlay) dom.tutorialOverlay.classList.remove('visible');
         localStorage.setItem('hasSeenPrismTutorial', 'true');
     };
+    if (dom.tutorialCloseBtn) dom.tutorialCloseBtn.addEventListener('click', closeTutorial);
+    if (dom.tutorialDoneBtn) dom.tutorialDoneBtn.addEventListener('click', closeTutorial);
     
-    if (closeTutorialBtn) closeTutorialBtn.addEventListener('click', closeTutorial);
-    if (doneTutorialBtn) doneTutorialBtn.addEventListener('click', closeTutorial);
-
-    // --- Initialize New Features ---
-    loadTheme();
-    loadAllChats();
-    populateModelSelector();
-    
-    // Inject dynamic UI
-    injectMicButton();
-    injectQuickActions();
-    
-    // Init speech
-    initializeSpeechRecognition();
+    // Offline Listeners
+    window.addEventListener('online', updateOfflineStatus);
+    window.addEventListener('offline', updateOfflineStatus);
+    updateOfflineStatus(); // Initial check
 });
