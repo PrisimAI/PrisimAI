@@ -1,0 +1,3 @@
+- modify: `offline.html` - Redesign offline.html to visually match the site's sleek dark theme and modern style with responsive layout and retry button.
+- create: `dev/offline.test.js` - Test suite for offline.html verifying UI elements and button functionality.
+- modify: `README.md` - Update README to document the redesigned offline page and its features.

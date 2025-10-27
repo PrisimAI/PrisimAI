@@ -1,44 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PrisimAI - Offline</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#2563eb">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline - PrisimAI</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
   <style>
+    /* Inline critical styles in case external CSS fails to load offline */
     body {
-      font-family: sans-serif;
+      font-family: 'Inter', sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
       text-align: center;
+      padding: 1rem;
+    }
+    .offline-container {
+      max-width: 500px;
+      background-color: rgba(255, 255, 255, 0.05);
       padding: 2rem;
-      background: #f9fafb;
-      color: #1f2937;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     }
     h1 {
-      font-size: 1.8rem;
+      font-size: 2rem;
       margin-bottom: 1rem;
+      font-weight: 700;
+      color: #38bdf8;
     }
     p {
-      font-size: 1.1rem;
-      margin-bottom: 2rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
     }
-    .retry-btn {
-      display: inline-block;
-      padding: 0.75rem 1.5rem;
-      background: #2563eb;
-      color: white;
+    button {
+      background-color: #38bdf8;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
       border-radius: 8px;
-      text-decoration: none;
+      cursor: pointer;
+      color: #0f172a;
       font-weight: 600;
+      transition: background-color 0.3s;
     }
-    .retry-btn:hover {
-      background: #1d4ed8;
+    button:hover {
+      background-color: #0ea5e9;
     }
   </style>
 </head>
 <body>
-  <h1>⚡ You’re Offline</h1>
-  <p>No internet connection. Don’t worry — PrisimAI will be ready when you’re back online.</p>
-  <a href="/" class="retry-btn">🔄 Retry</a>
+  <div class="offline-container">
+    <h1>You are offline</h1>
+    <p>It looks like you have lost your internet connection. You can continue browsing cached content, or try reconnecting to resume your chat.</p>
+    <button onclick="window.location.reload()">Retry Connection</button>
+  </div>
 </body>
 </html>

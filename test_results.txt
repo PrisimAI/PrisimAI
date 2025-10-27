@@ -1,0 +1,1041 @@
+## Test Results
+
+> prisimai-tests@1.0.0 test
+> jest
+
+FAIL dev/offline.test.js
+  ● Console
+
+    console.error
+      Error: Not implemented: navigation (except hash changes)
+          at module.exports (/home/runner/work/PrisimAI/PrisimAI/node_modules/jsdom/lib/jsdom/browser/not-implemented.js:9:17)
+          at navigateFetch (/home/runner/work/PrisimAI/PrisimAI/node_modules/jsdom/lib/jsdom/living/window/navigation.js:77:3)
+          at exports.navigate (/home/runner/work/PrisimAI/PrisimAI/node_modules/jsdom/lib/jsdom/living/window/navigation.js:55:3)
+          at LocationImpl.reload (/home/runner/work/PrisimAI/PrisimAI/node_modules/jsdom/lib/jsdom/living/window/Location-impl.js:230:5)
+          at Location.reload (/home/runner/work/PrisimAI/PrisimAI/node_modules/jsdom/lib/jsdom/living/generated/Location.js:102:36)
+          at HTMLButtonElement.onclick (http://localhost/:6:17)
+          at HTMLButtonElement.invokeTheCallbackFunction (/home/runner/work/PrisimAI/PrisimAI/node_modules/jsdom/lib/jsdom/living/generated/EventHandlerNonNull.js:14:28)
+          at HTMLButtonElement.<anonymous> (/home/runner/work/PrisimAI/PrisimAI/node_modules/jsdom/lib/jsdom/living/helpers/create-event-accessor.js:35:32)
+          at innerInvokeEventListeners (/home/runner/work/PrisimAI/PrisimAI/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:350:25)
+          at invokeEventListeners (/home/runner/work/PrisimAI/PrisimAI/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:286:3)
+          at HTMLButtonElementImpl._dispatch (/home/runner/work/PrisimAI/PrisimAI/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:233:9)
+          at fireAnEvent (/home/runner/work/PrisimAI/PrisimAI/node_modules/jsdom/lib/jsdom/living/helpers/events.js:18:36)
+          at HTMLButtonElementImpl.click (/home/runner/work/PrisimAI/PrisimAI/node_modules/jsdom/lib/jsdom/living/nodes/HTMLElement-impl.js:79:5)
+          at HTMLButtonElement.click (/home/runner/work/PrisimAI/PrisimAI/node_modules/jsdom/lib/jsdom/living/generated/HTMLElement.js:108:34)
+          at Object.click (/home/runner/work/PrisimAI/PrisimAI/dev/offline.test.js:25:12)
+          at Promise.then.completed (/home/runner/work/PrisimAI/PrisimAI/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/runner/work/PrisimAI/PrisimAI/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/runner/work/PrisimAI/PrisimAI/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:95:5)
+          at _runTest (/home/runner/work/PrisimAI/PrisimAI/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/runner/work/PrisimAI/PrisimAI/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/runner/work/PrisimAI/PrisimAI/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/runner/work/PrisimAI/PrisimAI/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/runner/work/PrisimAI/PrisimAI/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/runner/work/PrisimAI/PrisimAI/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/runner/work/PrisimAI/PrisimAI/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/runner/work/PrisimAI/PrisimAI/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/runner/work/PrisimAI/PrisimAI/node_modules/jest-runner/build/testWorker.js:106:12) {
+        type: 'not implemented'
+      }
+
+      at VirtualConsole.<anonymous> (node_modules/jest-environment-jsdom/build/index.js:63:23)
+      at module.exports (node_modules/jsdom/lib/jsdom/browser/not-implemented.js:12:26)
+      at navigateFetch (node_modules/jsdom/lib/jsdom/living/window/navigation.js:77:3)
+      at exports.navigate (node_modules/jsdom/lib/jsdom/living/window/navigation.js:55:3)
+      at LocationImpl.reload (node_modules/jsdom/lib/jsdom/living/window/Location-impl.js:230:5)
+      at Location.reload (node_modules/jsdom/lib/jsdom/living/generated/Location.js:102:36)
+      at HTMLButtonElement.onclick (http:/localhost:6:17)
+      at HTMLButtonElement.invokeTheCallbackFunction (node_modules/jsdom/lib/jsdom/living/generated/EventHandlerNonNull.js:14:28)
+      at HTMLButtonElement.<anonymous> (node_modules/jsdom/lib/jsdom/living/helpers/create-event-accessor.js:35:32)
+      at innerInvokeEventListeners (node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:350:25)
+      at invokeEventListeners (node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:286:3)
+      at HTMLButtonElementImpl._dispatch (node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:233:9)
+      at fireAnEvent (node_modules/jsdom/lib/jsdom/living/helpers/events.js:18:36)
+      at HTMLButtonElementImpl.click (node_modules/jsdom/lib/jsdom/living/nodes/HTMLElement-impl.js:79:5)
+      at HTMLButtonElement.click (node_modules/jsdom/lib/jsdom/living/generated/HTMLElement.js:108:34)
+      at Object.click (dev/offline.test.js:25:12)
+
+  ● Offline Page UI › retry button reloads the page
+
+    expect(jest.fn()).toHaveBeenCalled()
+
+    Expected number of calls: >= 1
+    Received number of calls:    0
+
+    [0m [90m 24 |[39m     window[33m.[39mlocation[33m.[39mreload [33m=[39m reloadMock[33m;[39m
+     [90m 25 |[39m     button[33m.[39mclick()[33m;[39m
+    [31m[1m>[22m[39m[90m 26 |[39m     expect(reloadMock)[33m.[39mtoHaveBeenCalled()[33m;[39m
+     [90m    |[39m                        [31m[1m^[22m[39m
+     [90m 27 |[39m   })[33m;[39m
+     [90m 28 |[39m })[33m;[39m[0m
+
+      at Object.toHaveBeenCalled (dev/offline.test.js:26:24)
+
+FAIL dev/index.test.js
+  ● PrisimAI Chat Application - Core Functionality › Utility Functions › escapeHTML › should escape HTML special characters
+
+    TypeError: Cannot read properties of undefined (reading 'createElement')
+
+    [0m [90m 74 |[39m       [36mfunction[39m escapeHTML(str) {
+     [90m 75 |[39m         [36mif[39m ([36mtypeof[39m str [33m!==[39m [32m'string'[39m) [36mreturn[39m [32m''[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 76 |[39m         [36mconst[39m div [33m=[39m document[33m.[39mcreateElement([32m'div'[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 77 |[39m         div[33m.[39mappendChild(document[33m.[39mcreateTextNode(str))[33m;[39m
+     [90m 78 |[39m         [36mreturn[39m div[33m.[39minnerHTML[33m;[39m
+     [90m 79 |[39m       }[0m
+
+      at createElement (dev/index.test.js:76:30)
+      at Object.escapeHTML (dev/index.test.js:82:16)
+
+  ● PrisimAI Chat Application - Core Functionality › Utility Functions › escapeHTML › should escape ampersands
+
+    TypeError: Cannot read properties of undefined (reading 'createElement')
+
+    [0m [90m 74 |[39m       [36mfunction[39m escapeHTML(str) {
+     [90m 75 |[39m         [36mif[39m ([36mtypeof[39m str [33m!==[39m [32m'string'[39m) [36mreturn[39m [32m''[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 76 |[39m         [36mconst[39m div [33m=[39m document[33m.[39mcreateElement([32m'div'[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 77 |[39m         div[33m.[39mappendChild(document[33m.[39mcreateTextNode(str))[33m;[39m
+     [90m 78 |[39m         [36mreturn[39m div[33m.[39minnerHTML[33m;[39m
+     [90m 79 |[39m       }[0m
+
+      at createElement (dev/index.test.js:76:30)
+      at Object.escapeHTML (dev/index.test.js:87:16)
+
+  ● PrisimAI Chat Application - Core Functionality › Utility Functions › escapeHTML › should escape quotes
+
+    TypeError: Cannot read properties of undefined (reading 'createElement')
+
+    [0m [90m 74 |[39m       [36mfunction[39m escapeHTML(str) {
+     [90m 75 |[39m         [36mif[39m ([36mtypeof[39m str [33m!==[39m [32m'string'[39m) [36mreturn[39m [32m''[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 76 |[39m         [36mconst[39m div [33m=[39m document[33m.[39mcreateElement([32m'div'[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 77 |[39m         div[33m.[39mappendChild(document[33m.[39mcreateTextNode(str))[33m;[39m
+     [90m 78 |[39m         [36mreturn[39m div[33m.[39minnerHTML[33m;[39m
+     [90m 79 |[39m       }[0m
+
+      at createElement (dev/index.test.js:76:30)
+      at Object.escapeHTML (dev/index.test.js:91:16)
+
+  ● PrisimAI Chat Application - Core Functionality › Utility Functions › escapeHTML › should handle empty string
+
+    TypeError: Cannot read properties of undefined (reading 'createElement')
+
+    [0m [90m 74 |[39m       [36mfunction[39m escapeHTML(str) {
+     [90m 75 |[39m         [36mif[39m ([36mtypeof[39m str [33m!==[39m [32m'string'[39m) [36mreturn[39m [32m''[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 76 |[39m         [36mconst[39m div [33m=[39m document[33m.[39mcreateElement([32m'div'[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 77 |[39m         div[33m.[39mappendChild(document[33m.[39mcreateTextNode(str))[33m;[39m
+     [90m 78 |[39m         [36mreturn[39m div[33m.[39minnerHTML[33m;[39m
+     [90m 79 |[39m       }[0m
+
+      at createElement (dev/index.test.js:76:30)
+      at Object.escapeHTML (dev/index.test.js:96:16)
+
+  ● PrisimAI Chat Application - Core Functionality › Utility Functions › escapeHTML › should handle multiple special characters
+
+    TypeError: Cannot read properties of undefined (reading 'createElement')
+
+    [0m [90m 74 |[39m       [36mfunction[39m escapeHTML(str) {
+     [90m 75 |[39m         [36mif[39m ([36mtypeof[39m str [33m!==[39m [32m'string'[39m) [36mreturn[39m [32m''[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 76 |[39m         [36mconst[39m div [33m=[39m document[33m.[39mcreateElement([32m'div'[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 77 |[39m         div[33m.[39mappendChild(document[33m.[39mcreateTextNode(str))[33m;[39m
+     [90m 78 |[39m         [36mreturn[39m div[33m.[39minnerHTML[33m;[39m
+     [90m 79 |[39m       }[0m
+
+      at createElement (dev/index.test.js:76:30)
+      at Object.escapeHTML (dev/index.test.js:108:24)
+
+  ● PrisimAI Chat Application - Core Functionality › Chat Button Management › addChatButton › should create a new chat button with correct attributes
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:121:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Chat Button Management › addChatButton › should prepend button to list (newest first)
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:121:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Chat Button Management › addChatButton › should not create duplicate buttons for same chatId
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:121:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Chat Button Management › addChatButton › should escape HTML in title to prevent XSS
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:121:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Chat Button Management › addChatButton › should use default title when not provided
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:121:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Chat Button Management › setActiveChatButton › should set active state on correct button
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:121:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Chat Button Management › setActiveChatButton › should remove active state from previously active button
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:121:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Chat Button Management › setActiveChatButton › should handle non-existent chat ID gracefully
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:121:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Chat Button Management › updateChatButtonTitle › should update button title
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:121:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Chat Button Management › updateChatButtonTitle › should handle non-existent button gracefully
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:121:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Chat Button Management › updateChatButtonTitle › should escape HTML in new title
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:121:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Storage Functions › saveAllChats › should save chats to localStorage
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:315:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Storage Functions › saveAllChats › should handle empty chats object
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:315:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Storage Functions › saveAllChats › should handle save errors gracefully
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:315:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Storage Functions › loadAllChats › should load chats from localStorage
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:315:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Storage Functions › loadAllChats › should handle missing localStorage data
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:315:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Storage Functions › loadAllChats › should handle corrupted JSON in localStorage
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:315:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Storage Functions › loadAllChats › should sort chats by createdAt in descending order
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:315:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Storage Functions › clearCurrentChat › should remove chat from allChats and DOM
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:315:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Storage Functions › clearCurrentChat › should handle null chatId gracefully
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:315:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Storage Functions › clearCurrentChat › should handle missing button gracefully
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:315:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Message Rendering › addMessage › should create user message with correct styling
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:455:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Message Rendering › addMessage › should create assistant message with correct styling
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:455:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Message Rendering › addMessage › should hide welcome message when adding first message
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:455:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Message Rendering › addMessage › should escape HTML in messages to prevent XSS
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:455:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Message Rendering › addMessage › should create image message correctly
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:455:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Message Rendering › addMessage › should handle empty messages
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:455:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Message Rendering › showLoadingIndicator › should create loading indicator element
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:455:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Message Rendering › showLoadingIndicator › should create three bouncing dots
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:455:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Message Rendering › showLoadingIndicator › should be removable from DOM
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:455:18)
+
+  ● PrisimAI Chat Application - Core Functionality › API Integration › fetchModels › should fetch and populate model selector with models
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:595:18)
+
+  ● PrisimAI Chat Application - Core Functionality › API Integration › fetchModels › should handle fetch error gracefully
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:595:18)
+
+  ● PrisimAI Chat Application - Core Functionality › API Integration › fetchModels › should handle non-OK response
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:595:18)
+
+  ● PrisimAI Chat Application - Core Functionality › API Integration › fetchModels › should handle empty model list
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:595:18)
+
+  ● PrisimAI Chat Application - Core Functionality › API Integration › handleImageResponse › should generate correct image URL
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:595:18)
+
+  ● PrisimAI Chat Application - Core Functionality › API Integration › handleImageResponse › should encode special characters in prompt
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:595:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Event Handlers › Dark Mode Toggle › should toggle dark class on document and body
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:709:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Event Handlers › Dark Mode Toggle › should save theme preference to localStorage
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:709:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Event Handlers › Dark Mode Toggle › should toggle between light and dark
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:709:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Event Handlers › Textarea Resize › should resize textarea based on content
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:709:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Event Handlers › Textarea Resize › should cap resize at 400px
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:709:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Event Handlers › Textarea Resize › should handle null textarea gracefully
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:709:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Event Handlers › Form Submission › should prevent default form submission
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:709:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Event Handlers › Form Submission › should not submit with empty input
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:709:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Event Handlers › Form Submission › should clear input after submission
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:709:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Tutorial Overlay › showTutorial › should show tutorial if not seen before
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:814:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Tutorial Overlay › showTutorial › should not show tutorial if already seen
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:814:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Tutorial Overlay › showTutorial › should handle missing overlay element
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:814:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Tutorial Overlay › hideTutorial › should hide tutorial and mark as seen
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:814:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Tutorial Overlay › hideTutorial › should handle null overlay
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:814:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Edge Cases and Error Handling › should handle localStorage quota exceeded
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:884:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Edge Cases and Error Handling › should handle malformed chat data
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:884:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Edge Cases and Error Handling › should handle missing DOM elements gracefully
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:884:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Edge Cases and Error Handling › should handle concurrent chat operations
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:884:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Edge Cases and Error Handling › should handle very long messages
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:884:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Edge Cases and Error Handling › should handle special Unicode characters
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:884:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Integration Scenarios › should complete full chat flow: create, message, save, load
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:980:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Integration Scenarios › should handle multiple chats with different timestamps
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:980:18)
+
+  ● PrisimAI Chat Application - Core Functionality › Integration Scenarios › should properly escape XSS attempts in full workflow
+
+    TypeError: Cannot read properties of undefined (reading 'body')
+
+    [0m [90m 11 |[39m   [90m// Helper to set up DOM structure[39m
+     [90m 12 |[39m   [36mfunction[39m setupDOM() {
+    [31m[1m>[22m[39m[90m 13 |[39m     document[33m.[39mbody[33m.[39minnerHTML [33m=[39m [32m`[39m
+     [90m    |[39m              [31m[1m^[22m[39m
+     [90m 14 |[39m [32m      <button id="dark-mode-toggle"></button>[39m
+     [90m 15 |[39m [32m      <div id="chat-history"></div>[39m
+     [90m 16 |[39m [32m      <textarea id="chat-input"></textarea>[39m[0m
+
+      at body (dev/index.test.js:13:14)
+      at Object.setupDOM (dev/index.test.js:980:18)
+
+Test Suites: 2 failed, 2 total
+Tests:       65 failed, 6 passed, 71 total
+Snapshots:   0 total
+Time:        1.491 s
+Ran all test suites.

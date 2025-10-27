@@ -1,0 +1,202 @@
+=== Gathering Repository Context ===
+
+## Project Structure:
+./LICENSE
+./manifest.json
+./context.txt
+./index.html
+./script.js
+./favicon-32x32.png
+./style.css
+./test-setup.js
+./favicon-16x16.png
+./repo_context.txt
+./README.md
+./preview-image.png
+./apple-touch-icon.png
+./changes.json
+./TEST_README.md
+./demo.html
+./dev/index.test.js
+./dev/index.html
+./package.json
+./sw.js
+./favicon.ico
+./offline.html
+./BingSiteAuth.xml
+./sitemap.xml
+./TEST_SUITE_SUMMARY.md
+
+## Dependencies (package.json):
+{
+  "name": "prisimai-tests",
+  "version": "1.0.0",
+  "description": "Test suite for PrisimAI chat application",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "collectCoverageFrom": [
+      "dev/**/*.{js,html}",
+      "!dev/**/*.test.js"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/?(*.)+(spec|test).js"
+    ],
+    "setupFilesAfterEnv": ["<rootDir>/test-setup.js"]
+  }
+}
+## Current README.md:
+[![pages-build-deployment](https://github.com/PrisimAI/PrisimAI/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/PrisimAI/PrisimAI/actions/workflows/pages/pages-build-deployment)
+
+# PrisimAI
+
+PrisimAI is a progressive web app (PWA) that lets you chat with models powered by Pollinations.ai
+. It’s designed to look sleek, run fast, and stay usable even when offline. Once installed, PrisimAI behaves like a native app on desktop or mobile, complete with icons, splash screens, and offline support.
+
+## ✨ Features
+
+- Chat Interface – Seamless, modern chat UI built with Tailwind CSS.
+
+- Model Selection – Choose different AI models from Pollinations API.
+
+- PWA Support – Installable on desktop and mobile, with offline caching.
+
+- Offline Mode – Displays a custom offline page when there’s no internet.
+
+- Theming – Colors and fonts configured for a clean, modern experience.
+
+- Cross-Platform Support – Works on Chrome, Edge, Safari, and mobile browsers.
+
+`
+## 🚀 Getting Started
+### 1. Clone the Repository
+
+`git clone https://github.com/yourusername/prisimai.git`
+
+`cd prisimai`
+
+### 2. Add Icons
+
+Place your generated icons in the /icons folder.
+
+**Required: icon-192.png and icon-512.png**
+
+*Optional: Apple Touch Icon (apple-touch-icon.png) and favicons*
+
+If you don’t already have icons, you can generate them using a favicon generator (e.g. favicon.io
+).*
+
+### 3. Run Locally
+
+You need a local server to test service workers (they don’t run from file://).
+
+*Quick option: use Python’s HTTP server:*
+
+#### Python 3
+`python 
+python -m http.server 8080
+`
+
+## Common Code Patterns:
+File: ./script.js
+/*
+ * PrismAI Chat Script
+ * Updated with new features:
+ * - New API Endpoint & Key
+ * - Memory System (/remember, /whoami)
+ * - Command System (/summarize, /rewrite, /research, /clearcache, /theme, /persona)
+ * - Voice-to-Text (Web Speech API)
+ * - Text-to-Speech (Web Speech API)
+ * - Customizable Themes (CSS Variables)
+ * - AI Typing Indicator
+ * - Quick Actions Toolbar
+ * - Enhanced Export (.txt, .md, .json)
+ * - Model Grouping (<optgroup>)
+ * - Smart Retry System (1 retry)
+ * - Chat Message Animations (Slide-in)
+ * - Model Info Tooltips
+ * - Prompt Templates Bar
+ *
+ * --- NEW IN THIS VERSION ---
+ * - External CSS & All styles moved to style.css
+
+File: ./test-setup.js
+// Mock localStorage
+const localStorageMock = (() => {
+  let store = {};
+  return {
+    getItem: (key) => store[key] || null,
+    setItem: (key, value) => { store[key] = value.toString(); },
+    removeItem: (key) => { delete store[key]; },
+    clear: () => { store = {}; },
+    get length() { return Object.keys(store).length; },
+    key: (index) => Object.keys(store)[index] || null
+  };
+})();
+
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+  writable: true
+});
+
+// Mock console methods to reduce noise in tests
+global.console = {
+
+File: ./dev/index.test.js
+/**
+ * Comprehensive test suite for PrisimAI Chat Application
+ * Tests extracted JavaScript functionality from dev/index.html
+ */
+
+describe('PrisimAI Chat Application - Core Functionality', () => {
+  let document;
+  let window;
+  let localStorage;
+  
+  // Helper to set up DOM structure
+  function setupDOM() {
+    document.body.innerHTML = `
+      <button id="dark-mode-toggle"></button>
+      <div id="chat-history"></div>
+      <textarea id="chat-input"></textarea>
+      <form id="chat-form"></form>
+      <div id="welcome-message"></div>
+      <button id="new-chat-btn"></button>
+      <select id="model-selector"></select>
+
+File: ./sw.js
+const CACHE_NAME = "prisimai-cache-v5";
+
+// Core files + offline fallback
+const ASSETS = [
+  "/PrisimAI/",
+  "/PrisimAI/index.html",
+  "/PrisimAI/offline.html",
+  "/PrisimAI/manifest.json",
+
+  // PWA icons
+  "/PrisimAI/icons/icon-192.png",
+  "/PrisimAI/icons/icon-512.png",
+
+  // Apple & favicons
+  "/PrisimAI/apple-touch-icon.png",
+  "/PrisimAI/favicon-32x32.png",
+  "/PrisimAI/favicon-16x16.png",
+
+  // Fonts (served cross-origin, safer to let runtime caching handle them)
+  // Don’t precache cdn.tailwindcss.com or google fonts, they can break install
+
+## Issue Context:
+Issue #40
+Title: Change the offline page
+
