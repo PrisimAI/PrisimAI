@@ -37,11 +37,8 @@
     <meta name="theme-color" content="#3b82f6">
 </head>
 <body class="text-gray-800 antialiased flex h-screen overflow-hidden dark:text-gray-100 transition-colors duration-300">
-    <!-- Floating Particles Background (optional) -->
-    <div id="particles-bg" class="particles-bg" style="display: none;"></div>
 
-    <aside id="sidebar" class="w-72 flex-shrink-0 flex flex-col justify-between p-8 sm:flex glass-elevated m-6 rounded-2xl relative">
-        <div class="sidebar-resizer"></div>
+    <aside id="sidebar" class="w-72 flex-shrink-0 flex flex-col justify-between p-8 sm:flex glass-elevated m-6 rounded-2xl">
         <div class="space-y-8 relative flex flex-col flex-1 overflow-hidden">
             <button id="dark-mode-toggle" class="absolute top-4 right-4 p-3 rounded-full bg-white/20 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 shadow hover:bg-white/30 dark:hover:bg-gray-600/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 z-10" aria-label="Toggle dark mode">
                 <svg id="dark-mode-icon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,44 +48,18 @@
             </button>
 
             <div class="flex items-center space-x-3 mb-8">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-blue-500 ai-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-blue-500">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9.206 13.91a4.992 4.992 0 0 0-1.745-1.924c-.394-.287-.803-.524-1.229-.715L5 10.985a2.25 2.25 0 0 1-.585-2.023c.31-.617.915-1.054 1.558-1.127l.799-.089a5.002 5.002 0 0 1 4.71-2.903c.369.043.737.087 1.106.131L15 8.169a2.25 2.25 0 0 1 2.023.585c.617.31 1.054.915 1.127 1.558l.089.799a5.002 5.002 0 0 1-2.903 4.71c-.043.369-.087.737-.131 1.106l-1.996 4.99a2.25 2.25 0 0 1-2.023.585c-.617-.31-1.054-.915-1.127-1.558l-.089-.799a5.002 5.002 0 0 1-4.71-2.903c-.043-.369-.087-.737-.131-1.106l-1.996-4.99a2.25 2.25 0 0 1-2.023-.585c-.617-.31-1.054-.915-1.127-1.558l-.089-.799a5.002 5.002 0 0 1-2.903-4.71z" />
                 </svg>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">PrismAI</h1>
             </div>
 
-            <!-- Theme Selector -->
-            <div class="theme-selector">
-                <div class="theme-pill theme-blue active" data-theme="blue" title="Blue Theme"></div>
-                <div class="theme-pill theme-neon" data-theme="neon" title="Neon Theme"></div>
-                <div class="theme-pill theme-cyberpunk" data-theme="cyberpunk" title="Cyberpunk Theme"></div>
-                <div class="theme-pill theme-fire" data-theme="fire" title="Fire Theme"></div>
-                <div class="theme-pill theme-space" data-theme="space" title="Space Theme"></div>
-            </div>
-
-            <button id="new-chat-btn" class="w-full p-3 rounded-xl sidebar-button text-white font-semibold hover:shadow-lg active:scale-95 transition-all duration-200 ripple-effect" aria-label="Start new chat">
+            <button id="new-chat-btn" class="w-full p-3 rounded-xl sidebar-button text-white font-semibold hover:shadow-lg active:scale-95 transition-all duration-200" aria-label="Start new chat">
                 + New Chat
             </button>
 
-            <div class="space-y-2">
-                <button id="export-chat-btn" class="w-full p-3 rounded-xl sidebar-button text-white font-semibold hover:shadow-lg active:scale-95 transition-all duration-200 ripple-effect" aria-label="Export current chat">
-                    📤 Export Chat
-                </button>
-                <div class="flex gap-2">
-                    <button id="export-pdf-btn" class="flex-1 p-2 text-xs bg-white/10 hover:bg-white/20 rounded-lg transition-all" title="Export as PDF">
-                        📄 PDF
-                    </button>
-                    <button id="share-chat-btn" class="flex-1 p-2 text-xs bg-white/10 hover:bg-white/20 rounded-lg transition-all" title="Share Chat Link">
-                        🔗 Share
-                    </button>
-                    <button id="auto-title-btn" class="flex-1 p-2 text-xs bg-white/10 hover:bg-white/20 rounded-lg transition-all" title="Auto-title with AI">
-                        🤖 Title
-                    </button>
-                </div>
-            </div>
-
-            <button id="particles-toggle-btn" class="w-full p-3 rounded-xl bg-white/10 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 font-semibold hover:bg-white/20 dark:hover:bg-gray-600/30 active:scale-95 transition-all duration-200 ripple-effect" aria-label="Toggle floating particles">
-                ✨ Particles
+            <button id="export-chat-btn" class="w-full p-3 rounded-xl sidebar-button text-white font-semibold hover:shadow-lg active:scale-95 transition-all duration-200" aria-label="Export current chat">
+                Export Chat
             </button>
 
             <div class="flex border-b border-white/10 pt-4" role="tablist" aria-label="Sidebar content">
@@ -100,34 +71,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm1.5-6a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg>
                     <span>Gallery</span>
                 </button>
-                <button id="prompts-tab" class="sidebar-tab" aria-label="Show prompt history">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>
-                    <span>Prompts</span>
-                </button>
-                <button id="memory-tab" class="sidebar-tab" aria-label="Show memory management">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" /></svg>
-                    <span>Memory</span>
-                </button>
             </div>
 
             <div id="chat-history-list-container" class="flex-1 overflow-y-auto pt-4">
-                <!-- Chat Organization Controls -->
-                <div class="mb-4 space-y-2">
-                    <div class="flex gap-2">
-                        <button id="create-folder-btn" class="flex-1 p-2 text-xs bg-white/10 hover:bg-white/20 rounded-lg transition-all" title="Create Folder">
-                            📁 Folder
-                        </button>
-                        <button id="chat-tags-btn" class="flex-1 p-2 text-xs bg-white/10 hover:bg-white/20 rounded-lg transition-all" title="Manage Tags">
-                            🏷️ Tags
-                        </button>
-                    </div>
-                    <select id="chat-filter" class="w-full p-2 text-xs bg-white/10 border border-white/20 rounded-lg">
-                        <option value="all">All Chats</option>
-                        <option value="pinned">📌 Pinned</option>
-                        <option value="recent">🕒 Recent</option>
-                    </select>
-                </div>
-                
                 <div id="chat-history-list" class="space-y-3">
                     <button class="w-full p-3 rounded-xl text-left text-gray-700 dark:text-gray-300 font-medium hover:bg-white/20 transition-all duration-200 active:scale-95 flex items-center space-x-2 chat-history-item" data-chat-id="new-chat-placeholder" aria-label="Select new chat">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
@@ -138,42 +84,6 @@
                 </div>
             </div>
 
-            <!-- Prompt History Panel -->
-            <div id="prompt-history-panel" role="tabpanel" aria-labelledby="prompts-tab" class="hidden flex-1 overflow-y-auto pt-4">
-                <div class="space-y-2">
-                    <div class="text-sm text-gray-500 dark:text-gray-400 mb-3">Recent Prompts</div>
-                    <div id="prompt-history-list" class="space-y-2">
-                        <div class="text-xs text-gray-400 text-center py-4">No prompts yet. Start chatting to see your prompt history here.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Memory Management Panel -->
-            <div id="memory-panel" role="tabpanel" aria-labelledby="memory-tab" class="hidden flex-1 overflow-y-auto pt-4">
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="text-sm text-gray-500 dark:text-gray-400">AI Memory</div>
-                        <button id="add-memory-btn" class="px-3 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all">
-                            + Add Memory
-                        </button>
-                    </div>
-                    
-                    <div id="memory-list" class="space-y-2">
-                        <div class="text-xs text-gray-400 text-center py-4">No memories stored yet. Add facts for the AI to remember about you.</div>
-                    </div>
-                    
-                    <!-- Add Memory Form -->
-                    <div id="add-memory-form" class="hidden space-y-3 p-3 bg-white/10 dark:bg-gray-800/30 rounded-lg">
-                        <input type="text" id="memory-key" placeholder="Memory key (e.g., 'name', 'job')" class="w-full p-2 rounded-lg border border-gray-300/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <textarea id="memory-value" placeholder="Memory value (e.g., 'John Smith', 'Software Engineer')" rows="2" class="w-full p-2 rounded-lg border border-gray-300/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
-                        <div class="flex gap-2">
-                            <button id="save-memory-btn" class="flex-1 px-3 py-2 text-sm bg-green-500 hover:bg-green-600 text-white rounded-lg transition-all">Save</button>
-                            <button id="cancel-memory-btn" class="flex-1 px-3 py-2 text-sm bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-all">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div id="image-gallery-panel" role="tabpanel" aria-labelledby="gallery-tab" class="hidden flex-1 overflow-y-auto pt-4">
                 <div id="image-gallery-grid" class="grid grid-cols-2 gap-2">
                     </div>
@@ -181,16 +91,6 @@
             </div>
 
             <div class="space-y-3 pt-4 border-t border-white/10">
-                <label for="persona-selector" class="text-sm font-medium text-gray-700 dark:text-gray-200">AI Persona</label>
-                <select id="persona-selector" class="w-full p-3 rounded-xl border border-gray-300/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" aria-label="Select AI persona">
-                    <option value="default">🤖 Default Assistant</option>
-                    <option value="teacher">👨‍🏫 Teacher</option>
-                    <option value="coder">💻 Coding Expert</option>
-                    <option value="creative">🎨 Creative Writer</option>
-                    <option value="analyst">📊 Data Analyst</option>
-                    <option value="casual">😎 Casual Friend</option>
-                </select>
-                
                 <label for="model-selector" class="text-sm font-medium text-gray-700 dark:text-gray-200">Select Model</label>
                 <select id="model-selector" class="w-full p-3 rounded-xl border border-gray-300/30 dark:border-gray-600/30 bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" aria-label="Select AI model">
                     <option value="" disabled selected>Loading models...</option>
@@ -223,19 +123,7 @@
         </button>
 
         <div class="flex-1 flex flex-col">
-            <!-- Mobile Sticky Header -->
-            <div id="mobile-sticky-header" class="sticky-header lg:hidden">
-                <select id="mobile-model-selector" class="mobile-model-selector">
-                    <option value="" disabled selected>Loading models...</option>
-                </select>
-                <button id="mobile-new-chat-btn" class="mobile-new-chat-btn ripple-effect">
-                    + New Chat
-                </button>
-            </div>
-            
-            <div id="chat-container" class="flex-1 relative w-full m-6 glass-primary overflow-hidden chat-container-with-shadows">
-                <div class="scroll-shadow-top" style="opacity: 0;"></div>
-                <div class="scroll-shadow-bottom" style="opacity: 0;"></div>
+            <div id="chat-container" class="flex-1 relative w-full m-6 glass-primary overflow-hidden">
                 <div class="flex flex-col h-full">
                     <div id="error-notification" class="hidden p-4 bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl mx-4 mt-4 text-center relative flex items-center justify-between">
                         <span id="error-message"></span>
@@ -257,13 +145,6 @@
                     <div id="chat-history" class="flex-1 overflow-y-auto p-8 space-y-6 hidden" role="log" aria-live="polite">
                         </div>
 
-                    <!-- Continue Conversation Button -->
-                    <div id="continue-conversation" class="hidden px-6 pb-4">
-                        <button id="continue-btn" class="w-full p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium transition-all duration-200 ripple-effect">
-                            ✨ Continue Conversation
-                        </button>
-                    </div>
-
                     <div class="chat-input-wrapper p-6 bg-transparent border-t border-white/10 dark:border-black/10">
                         <div id="offline-indicator" class="hidden text-center text-red-500 text-sm mb-2">
                             Offline. Messages will not be sent.
@@ -272,7 +153,7 @@
                             </div>
                         <form id="chat-form" class="flex items-end space-x-4" role="form" aria-label="Chat input form">
                             <textarea id="chat-input" placeholder="Message PrismAI ✨..." rows="1" class="flex-1 p-4 rounded-3xl border border-gray-300/30 dark:border-gray-600/30 bg-white/15 dark:bg-gray-700/25 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-lg transition-all duration-200 resize-none" aria-label="Enter your message"></textarea>
-                            <button type="submit" class="p-4 rounded-3xl bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-lg hover:from-blue-600 hover:to-blue-500 send-button transition-all duration-200 ripple-effect" aria-label="Send message">
+                            <button type="submit" class="p-4 rounded-3xl bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-lg hover:from-blue-600 hover:to-blue-500 send-button transition-all duration-200" aria-label="Send message">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.769 59.769 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                                 </svg>
@@ -283,21 +164,6 @@
             </div>
         </div>
     </main>
-
-    <!-- Share Chat Modal -->
-    <div id="share-modal" class="share-modal">
-        <div class="share-modal-content">
-            <h3 class="text-lg font-semibold mb-4">Share Chat</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Anyone with this link can view this chat conversation.
-            </p>
-            <input id="share-link-input" class="share-link-input" readonly placeholder="Generating link...">
-            <div class="flex justify-center gap-2">
-                <button id="copy-link-btn" class="copy-link-btn">Copy Link</button>
-                <button id="close-share-modal" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all">Close</button>
-            </div>
-        </div>
-    </div>
 
     <div id="tutorial-overlay" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 items-center justify-center transition-opacity duration-500">
         <div class="bg-white dark:bg-gray-800 p-10 rounded-2xl shadow-2xl max-w-lg w-full text-center relative glass-elevated">
