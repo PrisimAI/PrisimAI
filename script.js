@@ -1,4 +1,4 @@
-* PrismAI Chat Script - Fixed & Optimized Version
+/** PrismAI Chat Script - Fixed & Optimized Version
  * 
  * FIXES APPLIED:
  * ✅ Updated API endpoints to enter.pollinations.ai
@@ -15,9 +15,9 @@
 
 (function(c,l,a,r,i,t,y){
     c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-    t=l.createElement(r);t.async=1;t.src=\"https://www.clarity.ms/tag/\"+i;
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
     y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-})(window, document, \"clarity\", \"script\", \"tm2922ucwi\");
+})(window, document, "clarity", "script", "tm2922ucwi");
 
 // ---------- Configuration ----------
 const config = {
@@ -66,6 +66,11 @@ const dom = {
     errorNotification: document.getElementById('error-notification'),
     errorMessage: document.getElementById('error-message'),
     closeErrorBtn: document.getElementById('close-error'),
+    voiceInputBtn: document.getElementById('voice-input-btn'),
+    settingsBtn: document.getElementById('settings-btn'),
+    keyboardShortcutsBtn: document.getElementById('keyboard-shortcuts-btn'),
+    shortcutsModal: document.getElementById('shortcuts-modal'),
+    shortcutsCloseBtn: document.getElementById('shortcuts-close-btn'),
 };
 
 // ---------- State ----------
@@ -79,7 +84,7 @@ let currentImageModel = null;
 
 // ---------- Helper Functions ----------
 function generateChatId() {
-    return Date.now().toString(36) + \"-\" + Math.random().toString(36).slice(2, 8);
+    return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
 }
 
 function escapeHTML(str) {
@@ -198,9 +203,29 @@ function renderImageGallery() {
     dom.imageGalleryPlaceholder.classList.add('hidden');
     gallery.forEach(item => {
         const imgWrapper = document.createElement('div');
-        imgWrapper.classList.add('gallery-image');
+        imgWrapper.classList.add('gallery-image', 'group', 'relative');
         imgWrapper.title = item.prompt;
-        imgWrapper.innerHTML = `<img src=\"${escapeHTML(item.url)}\" alt=\"${escapeHTML(item.prompt)}\" loading=\"lazy\">`;
+        
+        const img = document.createElement('img');
+        img.src = item.url;
+        img.alt = item.prompt;
+        img.loading = 'lazy';
+        
+        const downloadBtn = document.createElement('button');
+        downloadBtn.className = 'absolute bottom-2 right-2 p-2 rounded-full bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 opacity-0 group-hover:opacity-100 transition-all hover:scale-110';
+        downloadBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>`;
+        downloadBtn.onclick = (e) => {
+            e.stopPropagation();
+            const a = document.createElement('a');
+            a.href = item.url;
+            a.download = `PrismAI_Image_${item.id}.png`;
+            a.target = '_blank';
+            a.click();
+            showSuccessNotification('Downloading image...');
+        };
+        
+        imgWrapper.appendChild(img);
+        imgWrapper.appendChild(downloadBtn);
         imgWrapper.onclick = () => window.open(item.url, '_blank');
         dom.imageGalleryGrid.appendChild(imgWrapper);
     });
@@ -208,7 +233,7 @@ function renderImageGallery() {
 
 // ---------- Chat History List ----------
 function addChatButton(chatId, title = 'New Chat') {
-    const existing = dom.chatHistoryList.querySelector(`[data-chat-id=\"${chatId}\"]`);
+    const existing = dom.chatHistoryList.querySelector(`[data-chat-id="${chatId}"]`);
     if (existing) return existing;
 
     const chatButton = document.createElement('button');
@@ -217,10 +242,10 @@ function addChatButton(chatId, title = 'New Chat') {
     chatButton.setAttribute('aria-label', `Select chat: ${title}`);
     const safeTitle = escapeHTML(title);
     chatButton.innerHTML = `
-        <svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"w-5 h-5 flex-shrink-0\" aria-hidden=\"true\">
-            <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0 0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z\" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0 0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z" />
         </svg>
-        <span class=\"truncate\" title=\"${safeTitle}\">${safeTitle}</span>
+        <span class="truncate" title="${safeTitle}">${safeTitle}</span>
     `;
     dom.chatHistoryList.prepend(chatButton);
     return chatButton;
@@ -237,7 +262,7 @@ function setActiveChatButton(chatId) {
 }
 
 function updateChatButtonTitle(chatId, newTitle) {
-    const btn = dom.chatHistoryList.querySelector(`.chat-history-item[data-chat-id=\"${chatId}\"]`);
+    const btn = dom.chatHistoryList.querySelector(`.chat-history-item[data-chat-id="${chatId}"]`);
     if (!btn) return;
     const span = btn.querySelector('span');
     if (span) {
@@ -345,7 +370,7 @@ function exportChat() {
         return;
     }
     
-    const format = prompt(\"Enter export format: 'json', 'txt', or 'md'\", 'md');
+    const format = prompt("Enter export format: 'json', 'txt', or 'md'", 'md');
     if (!format || !['json', 'txt', 'md'].includes(format.toLowerCase())) {
         return;
     }
@@ -411,11 +436,7 @@ function formatChatAsMd(chatData) {
         else if (msg.type === 'code') md += `${msg.content}\
 \
 `;
-        else md += `${msg.content.replace(/\
-/g, '  \
-')}\
-\
-`;
+        else md += `${msg.content.replace(/\n/g, '  \n')}\n\n`;
     });
     return md;
 }
@@ -443,18 +464,40 @@ function addMessage(content, role, type = 'text', animate = true, timestamp = Da
 
     // --- Render based on type ---
     if (type === 'image') {
-        messageContent.innerHTML = `<img src=\"${escapeHTML(content)}\" alt=\"Generated image\" class=\"rounded-lg max-w-xs md:max-w-md shadow-lg\" loading=\"lazy\">`;
+        messageContent.innerHTML = `<img src="${escapeHTML(content)}" alt="Generated image" class="rounded-lg max-w-xs md:max-w-md shadow-lg" loading="lazy">`;
     } else if (type === 'calculator' || type === 'dictionary' || type === 'code') {
         messageContent.innerHTML = content;
     } else {
         messageContent.textContent = content;
         if (role === 'assistant') {
+            // Action buttons container
+            const actionButtons = document.createElement('div');
+            actionButtons.className = 'absolute -top-2 -right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all';
+            
+            // Copy button
+            const copyButton = document.createElement('button');
+            copyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" /></svg>`;
+            copyButton.className = 'p-1.5 rounded-full bg-white/20 text-gray-600 dark:text-gray-300 hover:bg-white/40 transition-all';
+            copyButton.setAttribute('aria-label', 'Copy message');
+            copyButton.onclick = (e) => { 
+                e.stopPropagation(); 
+                navigator.clipboard.writeText(content).then(() => {
+                    showSuccessNotification('Message copied!');
+                }).catch(() => {
+                    showErrorNotification('Failed to copy');
+                });
+            };
+            
+            // Speak button
             const speakButton = document.createElement('button');
-            speakButton.innerHTML = `<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"w-4 h-4\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z\" /></svg>`;
-            speakButton.className = 'absolute -top-2 -right-2 p-1 rounded-full bg-white/20 text-gray-600 dark:text-gray-300 hover:bg-white/40 transition-all opacity-0 group-hover:opacity-100';
+            speakButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" /></svg>`;
+            speakButton.className = 'p-1.5 rounded-full bg-white/20 text-gray-600 dark:text-gray-300 hover:bg-white/40 transition-all';
             speakButton.setAttribute('aria-label', 'Read message aloud');
             speakButton.onclick = (e) => { e.stopPropagation(); speakText(content); };
-            messageContent.appendChild(speakButton);
+            
+            actionButtons.appendChild(copyButton);
+            actionButtons.appendChild(speakButton);
+            messageContent.appendChild(actionButtons);
         }
     }
 
@@ -494,11 +537,11 @@ function showTypingIndicator() {
         typingIndicator.className = 'flex w-full justify-start slide-in-up opacity-0 p-4';
         typingIndicator.style.animationFillMode = 'forwards';
         typingIndicator.innerHTML = `
-            <div class=\"msg msg-assistant\" style=\"padding: 12px 20px;\">
-                <div class=\"flex space-x-1.5\">
-                    <div class=\"w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot\" style=\"animation-delay: 0s;\"></div>
-                    <div class=\"w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot\" style=\"animation-delay: 0.1s;\"></div>
-                    <div class=\"w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot\" style=\"animation-delay: 0.2s;\"></div>
+            <div class="msg msg-assistant" style="padding: 12px 20px;">
+                <div class="flex space-x-1.5">
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot" style="animation-delay: 0s;"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot" style="animation-delay: 0.1s;"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot" style="animation-delay: 0.2s;"></div>
                 </div>
             </div>
         `;
@@ -521,13 +564,13 @@ function hideTypingIndicator() {
 
 // ---------- API Communication ----------
 async function getAIResponse(messages, model, retryCount = 0) {
-    if (isOffline()) throw new Error(\"You are offline. Please check your internet connection.\");
+    if (isOffline()) throw new Error("You are offline. Please check your internet connection.");
     
     const systemPrompt = `${getPersonaPrompt()}\
 Here are some facts you should remember about me:\
 ${getUserFacts()}\
 Now, please respond to the following conversation.`.trim();
-    const messagesWithContext = [{ role: \"system\", content: systemPrompt }, ...messages];
+    const messagesWithContext = [{ role: "system", content: systemPrompt }, ...messages];
     const requestBody = { 
         model: model, 
         messages: messagesWithContext,
@@ -561,7 +604,7 @@ Now, please respond to the following conversation.`.trim();
         if (data.text) return data.text;
         if (data.response) return data.response;
         
-        throw new Error(\"Invalid API response structure.\");
+        throw new Error("Invalid API response structure.");
     } catch (error) {
         clearTimeout(timeoutId);
         if (retryCount < config.maxRetries && error.name !== 'AbortError') {
@@ -574,7 +617,7 @@ Now, please respond to the following conversation.`.trim();
 }
 
 async function getImageResponse(prompt, model = null) {
-    if (isOffline()) throw new Error(\"You are offline. Please check your internet connection.\");
+    if (isOffline()) throw new Error("You are offline. Please check your internet connection.");
     
     try {
         const requestBody = { 
@@ -625,11 +668,11 @@ async function handleCommand(message) {
 
         case '/remember':
             if (!args) { 
-                addMessage(\"Usage: /remember [fact about you]\", 'assistant', 'text', true); 
+                addMessage("Usage: /remember [fact about you]", 'assistant', 'text', true); 
                 return true; 
             }
             saveUserFact(args);
-            addMessage(`Got it. I'll remember that: \"${args}\"`, 'assistant', 'text', true);
+            addMessage(`Got it. I'll remember that: "${args}"`, 'assistant', 'text', true);
             return true;
             
         case '/whoami':
@@ -637,18 +680,18 @@ async function handleCommand(message) {
             const facts = getUserFacts();
             const factResponse = facts ? `Here's what I remember about you:\
 \
-${facts}` : \"I don't have any facts stored for you yet.\";
+${facts}` : "I don't have any facts stored for you yet.";
             addMessage(factResponse, 'assistant', 'text', true);
             return true;
         
         case '/clearcache':
             localStorage.removeItem('apiCache');
-            addMessage(\"API cache cleared.\", 'assistant', 'text', true);
+            addMessage("API cache cleared.", 'assistant', 'text', true);
             return true;
             
         case '/theme':
             if (!args) { 
-                addMessage(\"Usage: /theme [color name or hex code]\", 'assistant', 'text', true); 
+                addMessage("Usage: /theme [color name or hex code]", 'assistant', 'text', true); 
                 return true; 
             }
             applyTheme(args);
@@ -657,7 +700,7 @@ ${facts}` : \"I don't have any facts stored for you yet.\";
             
         case '/persona':
             savePersona(args);
-            const personaMsg = args ? `Understood. I will now act as: \"${args}\"` : `Persona cleared. I'm back to my default self.`;
+            const personaMsg = args ? `Understood. I will now act as: "${args}"` : `Persona cleared. I'm back to my default self.`;
             addMessage(personaMsg, 'assistant', 'text', true);
             return true;
             
@@ -669,15 +712,10 @@ ${facts}` : \"I don't have any facts stored for you yet.\";
         case '/rewrite':
             const [tone, ...textToRewrite] = args.split(' ');
             if (!tone || !textToRewrite.length) { 
-                addMessage(\"Usage: /rewrite [tone] [text to rewrite]\", 'assistant', 'text', true); 
+                addMessage("Usage: /rewrite [tone] [text to rewrite]", 'assistant', 'text', true); 
                 return true; 
             }
             addMessage(message, 'user');
-            await handleRewriteText(tone, textToRewrite.join(' `,
-  `language`: `javascript`
-}
-
-                                addMessage(message, 'user');
             await handleRewriteText(tone, textToRewrite.join(' '));
             return true;
             
@@ -892,7 +930,8 @@ function getPersonaPrompt() {
 function initializeSpeechRecognition() {
     window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!window.SpeechRecognition) { 
-        console.warn('Speech Recognition not supported.'); 
+        console.warn('Speech Recognition not supported.');
+        if (dom.voiceInputBtn) dom.voiceInputBtn.style.display = 'none';
         return; 
     }
     
@@ -904,8 +943,9 @@ function initializeSpeechRecognition() {
 
     speechRecognition.onstart = () => {
         isRecognizingSpeech = true;
-        micButton.classList.add('bg-red-500', 'text-white');
-        micButton.classList.remove('text-gray-500', 'dark:text-gray-400');
+        if (dom.voiceInputBtn) {
+            dom.voiceInputBtn.classList.add('recording');
+        }
         dom.chatInput.placeholder = 'Listening...';
     };
 
@@ -920,8 +960,9 @@ function initializeSpeechRecognition() {
 
     speechRecognition.onend = () => {
         isRecognizingSpeech = false;
-        micButton.classList.remove('bg-red-500', 'text-white');
-        micButton.classList.add('text-gray-500', 'dark:text-gray-400');
+        if (dom.voiceInputBtn) {
+            dom.voiceInputBtn.classList.remove('recording');
+        }
         dom.chatInput.placeholder = 'Message PrismAI ✨...';
         if (dom.chatInput.value.trim()) {
             dom.chatForm.dispatchEvent(new Event('submit', { bubbles: true }));
@@ -932,6 +973,9 @@ function initializeSpeechRecognition() {
         console.error('Speech recognition error:', event.error);
         showErrorNotification(`Speech error: ${event.error}`);
         isRecognizingSpeech = false;
+        if (dom.voiceInputBtn) {
+            dom.voiceInputBtn.classList.remove('recording');
+        }
     };
 }
 
@@ -1175,16 +1219,17 @@ function injectQuickActions() {
 
 function injectPromptTemplates() {
     const templates = [
-        { label: 'Debug Code', prompt: '/code python ' },
-        { label: 'Write Email', prompt: 'Write a professional email to [RECIPIENT] about [TOPIC].' },
-        { label: 'Explain This', prompt: 'Explain this concept like I am five years old:\n\n' },
-        { label: 'Story Idea', prompt: 'Give me a story idea about a [GENRE] that involves [CHARACTER].' }
+        { label: '✨ Summarize', prompt: 'Summarize this in simple terms:\n\n' },
+        { label: '💡 Explain', prompt: 'Explain this concept like I am five years old:\n\n' },
+        { label: '🎨 Generate Image', prompt: '/image ' },
+        { label: '📧 Write Email', prompt: 'Write a professional email to [RECIPIENT] about [TOPIC].' },
+        { label: '🔍 Research', prompt: 'Research and provide detailed information about:\n\n' },
     ];
     templates.forEach(template => {
         const button = document.createElement('button');
         button.type = 'button';
         button.textContent = template.label;
-        button.className = 'px-3 py-1.5 text-sm font-medium rounded-full bg-white/10 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 hover:bg-white/30 dark:hover:bg-gray-600/40 transition-all';
+        button.className = 'px-4 py-2 text-sm font-medium rounded-full bg-white/20 dark:bg-gray-700/30 text-gray-700 dark:text-gray-200 hover:bg-white/40 dark:hover:bg-gray-600/50 transition-all claymorphic-button';
         button.onclick = () => {
             dom.chatInput.value = template.prompt;
             dom.chatInput.focus();
@@ -1192,6 +1237,61 @@ function injectPromptTemplates() {
         };
         dom.promptTemplatesBar.appendChild(button);
     });
+}
+
+// ---------- Keyboard Shortcuts ----------
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+        // Check for Ctrl/Cmd key combinations
+        if (e.ctrlKey || e.metaKey) {
+            switch(e.key.toLowerCase()) {
+                case 'k':
+                    e.preventDefault();
+                    selectChat(null);
+                    break;
+                case '/':
+                    e.preventDefault();
+                    dom.chatInput.focus();
+                    break;
+                case 'd':
+                    e.preventDefault();
+                    dom.darkModeToggle.click();
+                    break;
+                case 'm':
+                    e.preventDefault();
+                    if (dom.voiceInputBtn) dom.voiceInputBtn.click();
+                    break;
+                case 'e':
+                    e.preventDefault();
+                    exportChat();
+                    break;
+            }
+        }
+        
+        // ESC to close modals
+        if (e.key === 'Escape') {
+            if (dom.shortcutsModal && !dom.shortcutsModal.classList.contains('hidden')) {
+                dom.shortcutsModal.classList.add('hidden');
+            }
+            if (dom.profileMenu && !dom.profileMenu.classList.contains('hidden')) {
+                dom.profileMenu.classList.add('hidden');
+            }
+        }
+    });
+}
+
+function showShortcutsModal() {
+    if (dom.shortcutsModal) {
+        dom.shortcutsModal.classList.remove('hidden');
+        dom.shortcutsModal.style.display = 'flex';
+    }
+}
+
+function hideShortcutsModal() {
+    if (dom.shortcutsModal) {
+        dom.shortcutsModal.classList.add('hidden');
+        dom.shortcutsModal.style.display = 'none';
+    }
 }
 
 // ---------- Offline Handling ----------
@@ -1276,6 +1376,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Error
     dom.closeErrorBtn.addEventListener('click', () => dom.errorNotification.classList.add('hidden'));
+
+    // Voice Input
+    if (dom.voiceInputBtn) {
+        dom.voiceInputBtn.addEventListener('click', toggleSpeechRecognition);
+    }
+
+    // Settings and Shortcuts
+    if (dom.settingsBtn) {
+        dom.settingsBtn.addEventListener('click', () => {
+            showSuccessNotification('Settings panel coming soon!');
+        });
+    }
+    if (dom.keyboardShortcutsBtn) {
+        dom.keyboardShortcutsBtn.addEventListener('click', () => {
+            dom.profileMenu.classList.add('hidden');
+            showShortcutsModal();
+        });
+    }
+    if (dom.shortcutsCloseBtn) {
+        dom.shortcutsCloseBtn.addEventListener('click', hideShortcutsModal);
+    }
+    
+    // Setup Keyboard Shortcuts
+    setupKeyboardShortcuts();
 
     // Tutorial
     const hasSeenTutorial = localStorage.getItem('hasSeenPrismTutorial');

@@ -1,40 +1,75 @@
-/* ---------- Base and Fonts ---------- */
+/* ---------- Base and Fonts - Claymorphic Design ---------- */
 :root {
+    /* Claymorphic color palette - warm, tactile tones */
+    --clay-bg-light: #e8e4df;
+    --clay-bg-dark: #2a2522;
+    --clay-surface-light: #f5f1ed;
+    --clay-surface-dark: #3d3834;
+    --clay-elevated-light: #ebe7e2;
+    --clay-elevated-dark: #322e2a;
+    
+    /* Glass fallback */
     --glass-bg: rgba(255, 255, 255, 0.1);
     --glass-border: rgba(255, 255, 255, 0.15);
     --glass-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) inset, 0 4px 20px rgba(0, 0, 0, 0.1);
-    --accent: #3b82f6; /* Default accent, will be overwritten by JS */
+    
+    /* Accent colors - warmer for clay effect */
+    --accent: #6b8afd; /* Soft blue */
+    --accent-dark: #5c7ae6;
+    
+    /* Clay shadows - soft and deep */
+    --clay-shadow-light: 
+        8px 8px 16px rgba(163, 150, 137, 0.4),
+        -8px -8px 16px rgba(255, 255, 255, 0.8);
+    --clay-shadow-dark:
+        8px 8px 16px rgba(0, 0, 0, 0.5),
+        -8px -8px 16px rgba(66, 58, 52, 0.5);
+    --clay-shadow-inset-light:
+        inset 4px 4px 8px rgba(163, 150, 137, 0.3),
+        inset -4px -4px 8px rgba(255, 255, 255, 0.7);
+    --clay-shadow-inset-dark:
+        inset 4px 4px 8px rgba(0, 0, 0, 0.4),
+        inset -4px -4px 8px rgba(66, 58, 52, 0.4);
 }
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: #f8fafc;
+    background: var(--clay-bg-light);
+    transition: background 0.3s ease;
 }
 
 .dark body {
-    background: linear-gradient(135deg, #0a1125 0%, #1e2a44 100%);
+    background: var(--clay-bg-dark);
 }
 
-/* ---------- Glass Styles ---------- */
+/* ---------- Claymorphic Styles ---------- */
 .glass-primary {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(16px) saturate(1.2);
-    -webkit-backdrop-filter: blur(16px) saturate(1.2);
-    box-shadow: var(--glass-shadow);
-    border-radius: 1.5rem;
+    background: var(--clay-surface-light);
+    border: none;
+    box-shadow: var(--clay-shadow-light);
+    border-radius: 2rem;
+    transition: all 0.3s ease;
+}
+
+.dark .glass-primary {
+    background: var(--clay-surface-dark);
+    box-shadow: var(--clay-shadow-dark);
 }
 
 .glass-elevated {
-    background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.08));
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    border-radius: 1.5rem;
+    background: var(--clay-elevated-light);
+    border: none;
+    box-shadow: var(--clay-shadow-light);
+    border-radius: 2rem;
+    transition: all 0.3s ease;
 }
 
-/* ---------- Chat Bubble Styles ---------- */
+.dark .glass-elevated {
+    background: var(--clay-elevated-dark);
+    box-shadow: var(--clay-shadow-dark);
+}
+
+/* ---------- Claymorphic Chat Bubble Styles ---------- */
 .msg {
     max-width: 80%;
     line-height: 1.5;
@@ -44,53 +79,58 @@ body {
 }
 
 .msg-assistant {
-    background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-    border: 1px solid var(--glass-border);
-    border-radius: 1rem 1rem 1rem 0;
-    color: #111827;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: var(--clay-surface-light);
+    border-radius: 1.5rem 1.5rem 1.5rem 0.5rem;
+    color: #2d2a26;
+    box-shadow: 
+        6px 6px 12px rgba(163, 150, 137, 0.3),
+        -2px -2px 8px rgba(255, 255, 255, 0.8);
 }
 .dark .msg-assistant {
+    background: var(--clay-surface-dark);
     color: #e5e7eb;
-    border-color: rgba(255,255,255,0.1);
+    box-shadow:
+        6px 6px 12px rgba(0, 0, 0, 0.4),
+        -2px -2px 8px rgba(66, 58, 52, 0.4);
 }
 
 .msg-assistant:after {
     content: "";
     position: absolute;
-    left: -10px;
+    left: -8px;
     top: 16px;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     background: inherit;
-    border-left: none;
-    transform: rotate(45deg);
     border-radius: 4px;
-    filter: blur(0.3px);
+    box-shadow: inherit;
+    transform: rotate(45deg);
     z-index: -1;
 }
 
 .msg-user {
-    background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black));
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
     color: white;
-    border-radius: 1rem 1rem 0 1rem;
-    box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 20%, transparent);
+    border-radius: 1.5rem 1.5rem 0.5rem 1.5rem;
+    box-shadow: 
+        6px 6px 12px rgba(107, 138, 253, 0.4),
+        -2px -2px 6px rgba(139, 163, 255, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.2);
     font-weight: 500;
 }
 
 .msg-user:after {
     content: "";
     position: absolute;
-    right: -10px;
+    right: -8px;
     top: 16px;
-    width: 20px;
-    height: 20px;
-    background: inherit;
+    width: 16px;
+    height: 16px;
+    background: var(--accent-dark);
     transform: rotate(45deg);
     border-radius: 4px;
     z-index: -1;
-    filter: blur(0.3px);
+    box-shadow: 3px 3px 6px rgba(107, 138, 253, 0.3);
 }
 
 .timestamp {
@@ -170,7 +210,7 @@ body {
     100% { transform: translateX(150%) skewX(-15deg); opacity: 0; }
 }
 
-/* ---------- UI Components ---------- */
+/* ---------- Claymorphic UI Components ---------- */
 .chat-input-wrapper { z-index: 10; }
 
 #tutorial-overlay { display: none; }
@@ -179,8 +219,11 @@ body {
 #error-notification {
     transition: opacity 0.3s ease;
     background: rgba(239, 68, 68, 0.15);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 
+        4px 4px 8px rgba(239, 68, 68, 0.3),
+        -2px -2px 4px rgba(255, 200, 200, 0.2);
 }
 #error-notification.hidden {
     opacity: 0;
@@ -189,38 +232,65 @@ body {
 
 .send-button {
     transition: all 0.2s ease;
-    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black));
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    box-shadow: 
+        4px 4px 8px rgba(107, 138, 253, 0.4),
+        -2px -2px 4px rgba(139, 163, 255, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.2);
 }
 .send-button:active {
     animation: bounce 0.2s ease;
+    box-shadow: 
+        inset 3px 3px 6px rgba(92, 122, 230, 0.5),
+        inset -2px -2px 4px rgba(139, 163, 255, 0.3);
 }
 .send-button:hover {
-    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 90%, black), color-mix(in srgb, var(--accent) 70%, black));
+    transform: translateY(-1px);
+    box-shadow: 
+        6px 6px 12px rgba(107, 138, 253, 0.5),
+        -3px -3px 6px rgba(139, 163, 255, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 .sidebar-button {
-    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black));
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
     transition: all 0.2s ease;
+    box-shadow: 
+        4px 4px 8px rgba(107, 138, 253, 0.4),
+        -2px -2px 4px rgba(139, 163, 255, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.2);
 }
 .sidebar-button:hover {
-    transform: scale(1.02);
-    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 90%, black), color-mix(in srgb, var(--accent) 70%, black));
+    transform: scale(1.02) translateY(-1px);
+    box-shadow: 
+        6px 6px 12px rgba(107, 138, 253, 0.5),
+        -3px -3px 6px rgba(139, 163, 255, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+.sidebar-button:active {
+    box-shadow: 
+        inset 3px 3px 6px rgba(92, 122, 230, 0.5),
+        inset -2px -2px 4px rgba(139, 163, 255, 0.3);
 }
 
 /* Active chat button */
 .chat-history-item.bg-blue-500\/20 {
-    background-color: color-mix(in srgb, var(--accent) 20%, transparent);
+    background-color: rgba(107, 138, 253, 0.2);
+    box-shadow: var(--clay-shadow-inset-light);
+}
+.dark .chat-history-item.bg-blue-500\/20 {
+    box-shadow: var(--clay-shadow-inset-dark);
 }
 .chat-history-item.text-blue-400 {
     color: var(--accent);
 }
 
-/* ---------- NEW: Sidebar Tabs ---------- */
+/* ---------- Claymorphic Sidebar Tabs ---------- */
 .sidebar-tab {
     flex: 1;
     padding: 0.75rem 0.5rem;
     font-weight: 500;
-    color: #9ca3af; /* gray-400 */
+    color: #9ca3af;
     border-bottom: 2px solid transparent;
     transition: all 0.2s ease;
     display: flex;
@@ -229,7 +299,7 @@ body {
     gap: 0.5rem;
 }
 .dark .sidebar-tab {
-    color: #6b7280; /* gray-500 */
+    color: #6b7280;
 }
 .sidebar-tab:hover {
     color: var(--accent);
@@ -237,19 +307,30 @@ body {
 .sidebar-tab.active-tab {
     color: var(--accent);
     border-bottom-color: var(--accent);
+    box-shadow: 0 2px 4px rgba(107, 138, 253, 0.3);
 }
 .dark .sidebar-tab.active-tab {
     color: var(--accent);
 }
 
-/* ---------- NEW: Image Gallery ---------- */
+/* ---------- Claymorphic Image Gallery ---------- */
 #image-gallery-grid .gallery-image {
     position: relative;
     aspect-ratio: 1 / 1;
-    border-radius: 0.75rem;
+    border-radius: 1rem;
     overflow: hidden;
     cursor: pointer;
-    border: 1px solid var(--glass-border);
+    background: var(--clay-surface-light);
+    box-shadow: 
+        4px 4px 8px rgba(163, 150, 137, 0.3),
+        -2px -2px 6px rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+}
+.dark #image-gallery-grid .gallery-image {
+    background: var(--clay-surface-dark);
+    box-shadow:
+        4px 4px 8px rgba(0, 0, 0, 0.4),
+        -2px -2px 6px rgba(66, 58, 52, 0.3);
 }
 #image-gallery-grid .gallery-image img {
     width: 100%;
@@ -257,20 +338,80 @@ body {
     object-fit: cover;
     transition: transform 0.2s ease;
 }
+#image-gallery-grid .gallery-image:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        6px 6px 12px rgba(163, 150, 137, 0.4),
+        -3px -3px 8px rgba(255, 255, 255, 0.8);
+}
+.dark #image-gallery-grid .gallery-image:hover {
+    box-shadow:
+        6px 6px 12px rgba(0, 0, 0, 0.5),
+        -3px -3px 8px rgba(66, 58, 52, 0.4);
+}
 #image-gallery-grid .gallery-image:hover img {
     transform: scale(1.05);
 }
 
-/* ---------- NEW: Plugin Styles ---------- */
+/* ---------- Claymorphic Plugin Styles ---------- */
 .plugin-container {
     padding: 1rem;
-    border-radius: 0.75rem;
-    border: 1px solid var(--glass-border);
-    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    background: var(--clay-surface-light);
+    box-shadow: var(--clay-shadow-inset-light);
     margin-top: 0.5rem;
 }
 .dark .plugin-container {
-    background: rgba(0, 0, 0, 0.1);
+    background: var(--clay-surface-dark);
+    box-shadow: var(--clay-shadow-inset-dark);
+}
+
+/* Claymorphic Input */
+.claymorphic-input {
+    box-shadow: var(--clay-shadow-inset-light);
+}
+.dark .claymorphic-input {
+    box-shadow: var(--clay-shadow-inset-dark);
+}
+
+/* Claymorphic Button */
+.claymorphic-button {
+    box-shadow: 
+        4px 4px 8px rgba(163, 150, 137, 0.3),
+        -2px -2px 6px rgba(255, 255, 255, 0.7);
+    transition: all 0.2s ease;
+}
+.dark .claymorphic-button {
+    box-shadow:
+        4px 4px 8px rgba(0, 0, 0, 0.4),
+        -2px -2px 6px rgba(66, 58, 52, 0.3);
+}
+.claymorphic-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+        6px 6px 12px rgba(163, 150, 137, 0.4),
+        -3px -3px 8px rgba(255, 255, 255, 0.8);
+}
+.dark .claymorphic-button:hover {
+    box-shadow:
+        6px 6px 12px rgba(0, 0, 0, 0.5),
+        -3px -3px 8px rgba(66, 58, 52, 0.4);
+}
+.claymorphic-button:active {
+    box-shadow: var(--clay-shadow-inset-light);
+}
+.dark .claymorphic-button:active {
+    box-shadow: var(--clay-shadow-inset-dark);
+}
+
+/* Voice Recording Animation */
+.claymorphic-button.recording {
+    background: rgba(239, 68, 68, 0.2) !important;
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
 }
 
 /* Calculator */
@@ -304,15 +445,17 @@ body {
 
 /* Code */
 .code-block {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 0.5rem;
+    background: var(--clay-surface-light);
+    box-shadow: var(--clay-shadow-inset-light);
+    border-radius: 0.75rem;
     padding: 1rem;
     overflow-x: auto;
     font-family: monospace;
     font-size: 0.875rem;
 }
 .dark .code-block {
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--clay-surface-dark);
+    box-shadow: var(--clay-shadow-inset-dark);
 }
 .code-block pre {
     margin: 0;
