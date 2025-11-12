@@ -1,4 +1,4 @@
-* PrismAI Chat Script - Fixed & Optimized Version
+/** PrismAI Chat Script - Fixed & Optimized Version
  * 
  * FIXES APPLIED:
  * ✅ Updated API endpoints to enter.pollinations.ai
@@ -15,9 +15,9 @@
 
 (function(c,l,a,r,i,t,y){
     c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-    t=l.createElement(r);t.async=1;t.src=\"https://www.clarity.ms/tag/\"+i;
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
     y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-})(window, document, \"clarity\", \"script\", \"tm2922ucwi\");
+})(window, document, "clarity", "script", "tm2922ucwi");
 
 // ---------- Configuration ----------
 const config = {
@@ -84,7 +84,7 @@ let currentImageModel = null;
 
 // ---------- Helper Functions ----------
 function generateChatId() {
-    return Date.now().toString(36) + \"-\" + Math.random().toString(36).slice(2, 8);
+    return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
 }
 
 function escapeHTML(str) {
@@ -233,7 +233,7 @@ function renderImageGallery() {
 
 // ---------- Chat History List ----------
 function addChatButton(chatId, title = 'New Chat') {
-    const existing = dom.chatHistoryList.querySelector(`[data-chat-id=\"${chatId}\"]`);
+    const existing = dom.chatHistoryList.querySelector(`[data-chat-id="${chatId}"]`);
     if (existing) return existing;
 
     const chatButton = document.createElement('button');
@@ -242,10 +242,10 @@ function addChatButton(chatId, title = 'New Chat') {
     chatButton.setAttribute('aria-label', `Select chat: ${title}`);
     const safeTitle = escapeHTML(title);
     chatButton.innerHTML = `
-        <svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" class=\"w-5 h-5 flex-shrink-0\" aria-hidden=\"true\">
-            <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0 0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z\" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0 0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z" />
         </svg>
-        <span class=\"truncate\" title=\"${safeTitle}\">${safeTitle}</span>
+        <span class="truncate" title="${safeTitle}">${safeTitle}</span>
     `;
     dom.chatHistoryList.prepend(chatButton);
     return chatButton;
@@ -262,7 +262,7 @@ function setActiveChatButton(chatId) {
 }
 
 function updateChatButtonTitle(chatId, newTitle) {
-    const btn = dom.chatHistoryList.querySelector(`.chat-history-item[data-chat-id=\"${chatId}\"]`);
+    const btn = dom.chatHistoryList.querySelector(`.chat-history-item[data-chat-id="${chatId}"]`);
     if (!btn) return;
     const span = btn.querySelector('span');
     if (span) {
@@ -370,7 +370,7 @@ function exportChat() {
         return;
     }
     
-    const format = prompt(\"Enter export format: 'json', 'txt', or 'md'\", 'md');
+    const format = prompt("Enter export format: 'json', 'txt', or 'md'", 'md');
     if (!format || !['json', 'txt', 'md'].includes(format.toLowerCase())) {
         return;
     }
@@ -436,11 +436,7 @@ function formatChatAsMd(chatData) {
         else if (msg.type === 'code') md += `${msg.content}\
 \
 `;
-        else md += `${msg.content.replace(/\
-/g, '  \
-')}\
-\
-`;
+        else md += `${msg.content.replace(/\n/g, '  \n')}\n\n`;
     });
     return md;
 }
@@ -468,7 +464,7 @@ function addMessage(content, role, type = 'text', animate = true, timestamp = Da
 
     // --- Render based on type ---
     if (type === 'image') {
-        messageContent.innerHTML = `<img src=\"${escapeHTML(content)}\" alt=\"Generated image\" class=\"rounded-lg max-w-xs md:max-w-md shadow-lg\" loading=\"lazy\">`;
+        messageContent.innerHTML = `<img src="${escapeHTML(content)}" alt="Generated image" class="rounded-lg max-w-xs md:max-w-md shadow-lg" loading="lazy">`;
     } else if (type === 'calculator' || type === 'dictionary' || type === 'code') {
         messageContent.innerHTML = content;
     } else {
@@ -541,11 +537,11 @@ function showTypingIndicator() {
         typingIndicator.className = 'flex w-full justify-start slide-in-up opacity-0 p-4';
         typingIndicator.style.animationFillMode = 'forwards';
         typingIndicator.innerHTML = `
-            <div class=\"msg msg-assistant\" style=\"padding: 12px 20px;\">
-                <div class=\"flex space-x-1.5\">
-                    <div class=\"w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot\" style=\"animation-delay: 0s;\"></div>
-                    <div class=\"w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot\" style=\"animation-delay: 0.1s;\"></div>
-                    <div class=\"w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot\" style=\"animation-delay: 0.2s;\"></div>
+            <div class="msg msg-assistant" style="padding: 12px 20px;">
+                <div class="flex space-x-1.5">
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot" style="animation-delay: 0s;"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot" style="animation-delay: 0.1s;"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce-dot" style="animation-delay: 0.2s;"></div>
                 </div>
             </div>
         `;
@@ -568,13 +564,13 @@ function hideTypingIndicator() {
 
 // ---------- API Communication ----------
 async function getAIResponse(messages, model, retryCount = 0) {
-    if (isOffline()) throw new Error(\"You are offline. Please check your internet connection.\");
+    if (isOffline()) throw new Error("You are offline. Please check your internet connection.");
     
     const systemPrompt = `${getPersonaPrompt()}\
 Here are some facts you should remember about me:\
 ${getUserFacts()}\
 Now, please respond to the following conversation.`.trim();
-    const messagesWithContext = [{ role: \"system\", content: systemPrompt }, ...messages];
+    const messagesWithContext = [{ role: "system", content: systemPrompt }, ...messages];
     const requestBody = { 
         model: model, 
         messages: messagesWithContext,
@@ -608,7 +604,7 @@ Now, please respond to the following conversation.`.trim();
         if (data.text) return data.text;
         if (data.response) return data.response;
         
-        throw new Error(\"Invalid API response structure.\");
+        throw new Error("Invalid API response structure.");
     } catch (error) {
         clearTimeout(timeoutId);
         if (retryCount < config.maxRetries && error.name !== 'AbortError') {
@@ -621,7 +617,7 @@ Now, please respond to the following conversation.`.trim();
 }
 
 async function getImageResponse(prompt, model = null) {
-    if (isOffline()) throw new Error(\"You are offline. Please check your internet connection.\");
+    if (isOffline()) throw new Error("You are offline. Please check your internet connection.");
     
     try {
         const requestBody = { 
@@ -672,11 +668,11 @@ async function handleCommand(message) {
 
         case '/remember':
             if (!args) { 
-                addMessage(\"Usage: /remember [fact about you]\", 'assistant', 'text', true); 
+                addMessage("Usage: /remember [fact about you]", 'assistant', 'text', true); 
                 return true; 
             }
             saveUserFact(args);
-            addMessage(`Got it. I'll remember that: \"${args}\"`, 'assistant', 'text', true);
+            addMessage(`Got it. I'll remember that: "${args}"`, 'assistant', 'text', true);
             return true;
             
         case '/whoami':
@@ -684,18 +680,18 @@ async function handleCommand(message) {
             const facts = getUserFacts();
             const factResponse = facts ? `Here's what I remember about you:\
 \
-${facts}` : \"I don't have any facts stored for you yet.\";
+${facts}` : "I don't have any facts stored for you yet.";
             addMessage(factResponse, 'assistant', 'text', true);
             return true;
         
         case '/clearcache':
             localStorage.removeItem('apiCache');
-            addMessage(\"API cache cleared.\", 'assistant', 'text', true);
+            addMessage("API cache cleared.", 'assistant', 'text', true);
             return true;
             
         case '/theme':
             if (!args) { 
-                addMessage(\"Usage: /theme [color name or hex code]\", 'assistant', 'text', true); 
+                addMessage("Usage: /theme [color name or hex code]", 'assistant', 'text', true); 
                 return true; 
             }
             applyTheme(args);
@@ -704,7 +700,7 @@ ${facts}` : \"I don't have any facts stored for you yet.\";
             
         case '/persona':
             savePersona(args);
-            const personaMsg = args ? `Understood. I will now act as: \"${args}\"` : `Persona cleared. I'm back to my default self.`;
+            const personaMsg = args ? `Understood. I will now act as: "${args}"` : `Persona cleared. I'm back to my default self.`;
             addMessage(personaMsg, 'assistant', 'text', true);
             return true;
             
@@ -716,15 +712,10 @@ ${facts}` : \"I don't have any facts stored for you yet.\";
         case '/rewrite':
             const [tone, ...textToRewrite] = args.split(' ');
             if (!tone || !textToRewrite.length) { 
-                addMessage(\"Usage: /rewrite [tone] [text to rewrite]\", 'assistant', 'text', true); 
+                addMessage("Usage: /rewrite [tone] [text to rewrite]", 'assistant', 'text', true); 
                 return true; 
             }
             addMessage(message, 'user');
-            await handleRewriteText(tone, textToRewrite.join(' `,
-  `language`: `javascript`
-}
-
-                                addMessage(message, 'user');
             await handleRewriteText(tone, textToRewrite.join(' '));
             return true;
             
