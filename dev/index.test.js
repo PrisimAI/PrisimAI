@@ -4,10 +4,6 @@
  */
 
 describe('PrisimAI Chat Application - Core Functionality', () => {
-  let document;
-  let window;
-  let localStorage;
-  
   // Helper to set up DOM structure
   function setupDOM() {
     document.body.innerHTML = `
@@ -132,20 +128,28 @@ describe('PrisimAI Chat Application - Core Functionality', () => {
           'duration-200','active:scale-95','flex','items-center','space-x-2','chat-history-item');
         chatButton.dataset.chatId = chatId;
         
-        const escapeHTML = (str) => {
-          if (typeof str !== 'string') return '';
-          const div = document.createElement('div');
-          div.appendChild(document.createTextNode(str));
-          return div.innerHTML;
-        };
-        const safeTitle = escapeHTML(title);
+        // Create SVG icon
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('stroke-width', '1.5');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.classList.add('w-5', 'h-5', 'flex-shrink-0');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('stroke-linejoin', 'round');
+        path.setAttribute('d', 'M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0 0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z');
+        svg.appendChild(path);
         
-        chatButton.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0 0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z" />
-          </svg>
-          <span class="truncate" title="${safeTitle}">${safeTitle}</span>
-        `;
+        // Create span with text content (automatically escaped)
+        const span = document.createElement('span');
+        span.classList.add('truncate');
+        span.textContent = title;
+        span.title = title;
+        
+        chatButton.appendChild(svg);
+        chatButton.appendChild(span);
         chatHistoryList.prepend(chatButton);
         return chatButton;
       }
@@ -183,8 +187,13 @@ describe('PrisimAI Chat Application - Core Functionality', () => {
         const maliciousTitle = '<script>alert("xss")</script>';
         const button = addChatButton(elements.chatHistoryList, 'xss-test', maliciousTitle);
         
-        expect(button.innerHTML).not.toContain('<script>');
-        expect(button.querySelector('span').textContent).toContain('&lt;script&gt;');
+        // The text should be rendered as plain text, not as executable HTML
+        // textContent contains the literal characters (safe)
+        expect(button.querySelector('span').textContent).toBe('<script>alert("xss")</script>');
+        // The title attribute should also contain the safe literal text
+        expect(button.querySelector('span').title).toBe('<script>alert("xss")</script>');
+        // innerHTML will contain HTML-encoded entities in the text node
+        expect(button.innerHTML).toContain('&lt;script&gt;');
       });
 
       test('should use default title when not provided', () => {
@@ -254,20 +263,12 @@ describe('PrisimAI Chat Application - Core Functionality', () => {
 
     describe('updateChatButtonTitle', () => {
       function updateChatButtonTitle(chatHistoryList, chatId, newTitle) {
-        const escapeHTML = (str) => {
-          if (typeof str !== 'string') return '';
-          const div = document.createElement('div');
-          div.appendChild(document.createTextNode(str));
-          return div.innerHTML;
-        };
-        
         const btn = chatHistoryList.querySelector(`.chat-history-item[data-chat-id="${chatId}"]`);
         if (!btn) return;
         const span = btn.querySelector('span');
         if (span) {
-          const safeTitle = escapeHTML(newTitle);
-          span.textContent = safeTitle;
-          span.title = safeTitle;
+          span.textContent = newTitle;
+          span.title = newTitle;
         }
       }
 
@@ -302,7 +303,8 @@ describe('PrisimAI Chat Application - Core Functionality', () => {
 
         updateChatButtonTitle(elements.chatHistoryList, 'xss-chat', '<script>bad</script>');
 
-        expect(span.textContent).not.toContain('<script>');
+        // textContent contains the literal string (safe, not executed)
+        expect(span.textContent).toBe('<script>bad</script>');
       });
     });
   });
@@ -531,7 +533,8 @@ describe('PrisimAI Chat Application - Core Functionality', () => {
         const wrapper = addMessage(maliciousMessage, 'user', 'text', elements.chatHistory, elements.welcomeMessage);
 
         expect(wrapper.innerHTML).not.toContain('<script>alert');
-        expect(wrapper.textContent).toContain('&lt;script&gt;');
+        // textContent returns decoded text, innerHTML should have the escaped version
+        expect(wrapper.innerHTML).toContain('&lt;script&gt;');
       });
 
       test('should create image message correctly', () => {
@@ -911,9 +914,9 @@ describe('PrisimAI Chat Application - Core Functionality', () => {
       };
 
       Object.entries(chatData).forEach(([id, data]) => {
-        if (!data || !Array.isArray(data.messages)) {
-          expect(data).toBeFalsy();
-        }
+        // The condition checks if data is invalid
+        const isInvalid = !data || !Array.isArray(data.messages);
+        expect(isInvalid).toBeTruthy();
       });
     });
 
@@ -1053,10 +1056,17 @@ describe('PrisimAI Chat Application - Core Functionality', () => {
 
       xssAttempts.forEach(attempt => {
         const escaped = escapeHTML(attempt);
+        // The key is that angle brackets are escaped, preventing tag execution
         expect(escaped).not.toContain('<script>');
         expect(escaped).not.toContain('<iframe');
-        expect(escaped).not.toContain('onerror=');
-        expect(escaped).not.toContain('javascript:');
+        expect(escaped).not.toContain('<img src=');
+        // Check that angle brackets are properly escaped
+        if (attempt.includes('<')) {
+          expect(escaped).toContain('&lt;');
+        }
+        if (attempt.includes('>')) {
+          expect(escaped).toContain('&gt;');
+        }
       });
     });
   });

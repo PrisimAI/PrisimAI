@@ -395,13 +395,29 @@ function addChatButton(chatId, title = 'New Chat') {
     const chatButton = document.createElement('button');
     chatButton.classList.add('w-full','p-2','rounded-xl','text-left','text-gray-700','dark:text-gray-300','font-medium','hover:bg-white/20','transition-all','duration-200','active:scale-95','flex','items-center','space-x-2','chat-history-item');
     chatButton.dataset.chatId = chatId;
-    const safeTitle = escapeHTML(title);
-    chatButton.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0 0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z" />
-        </svg>
-        <span class="truncate" title="${safeTitle}">${safeTitle}</span>
-    `;
+    
+    // Create SVG icon
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('stroke-width', '1.5');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.classList.add('w-5', 'h-5', 'flex-shrink-0');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('stroke-linejoin', 'round');
+    path.setAttribute('d', 'M8 10h.01M12 10h.01M16 10h.01M3 7.5A2.5 2.5 0 015.5 5h13A2.5 2.5 0 0121 7.5v9A2.5 2.5 0 0118.5 19h-13A2.5 2.5 0 013 16.5v-9z');
+    svg.appendChild(path);
+    
+    // Create span with text content (automatically escaped)
+    const span = document.createElement('span');
+    span.classList.add('truncate');
+    span.textContent = title; // textContent automatically escapes
+    span.title = title; // setAttribute also automatically escapes
+    
+    chatButton.appendChild(svg);
+    chatButton.appendChild(span);
     chatHistoryList.prepend(chatButton);
     return chatButton;
 }
@@ -421,9 +437,8 @@ function updateChatButtonTitle(chatId, newTitle) {
     if (!btn) return;
     const span = btn.querySelector('span');
     if (span) {
-        const safeTitle = escapeHTML(newTitle);
-        span.textContent = safeTitle;
-        span.title = safeTitle;
+        span.textContent = newTitle; // textContent automatically escapes
+        span.title = newTitle; // setting attribute also automatically escapes
     }
 }
 
