@@ -1228,16 +1228,17 @@ function injectQuickActions() {
 
 function injectPromptTemplates() {
     const templates = [
-        { label: 'Debug Code', prompt: '/code python ' },
-        { label: 'Write Email', prompt: 'Write a professional email to [RECIPIENT] about [TOPIC].' },
-        { label: 'Explain This', prompt: 'Explain this concept like I am five years old:\n\n' },
-        { label: 'Story Idea', prompt: 'Give me a story idea about a [GENRE] that involves [CHARACTER].' }
+        { label: '✨ Summarize', prompt: 'Summarize this in simple terms:\n\n' },
+        { label: '💡 Explain', prompt: 'Explain this concept like I am five years old:\n\n' },
+        { label: '🎨 Generate Image', prompt: '/image ' },
+        { label: '📧 Write Email', prompt: 'Write a professional email to [RECIPIENT] about [TOPIC].' },
+        { label: '🔍 Research', prompt: 'Research and provide detailed information about:\n\n' },
     ];
     templates.forEach(template => {
         const button = document.createElement('button');
         button.type = 'button';
         button.textContent = template.label;
-        button.className = 'px-3 py-1.5 text-sm font-medium rounded-full bg-white/10 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 hover:bg-white/30 dark:hover:bg-gray-600/40 transition-all';
+        button.className = 'px-4 py-2 text-sm font-medium rounded-full bg-white/20 dark:bg-gray-700/30 text-gray-700 dark:text-gray-200 hover:bg-white/40 dark:hover:bg-gray-600/50 transition-all claymorphic-button';
         button.onclick = () => {
             dom.chatInput.value = template.prompt;
             dom.chatInput.focus();
