@@ -21,7 +21,7 @@
 
 // ---------- Configuration ----------
 const config = {
-    apiKey: 'pk_3GhuMhutfgfIa5NsmkI92G',
+    apiKey: 'plln_sk_Exn5fOH2dt5evuKUeYYWh4kVPflDaomA',
     textApiUrl: 'https://enter.pollinations.ai/api/generate/openai',
     imageApiUrl: 'https://enter.pollinations.ai/api/generate/image',
     modelsApiUrl: 'https://enter.pollinations.ai/api/generate/openai/models',
