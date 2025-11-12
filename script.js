@@ -1,7 +1,8 @@
 /** PrismAI Chat Script - Fixed & Optimized Version
  * 
  * FIXES APPLIED:
- * ✅ Updated API endpoints to enter.pollinations.ai
+ * ✅ Updated API endpoints to enter.pollinations.ai/api/generate/v1
+ * ✅ Fixed tutorial modal persistence issue
  * ✅ Fixed API key and authentication
  * ✅ Fixed model loading from correct endpoint
  * ✅ Fixed image generation endpoint
@@ -22,9 +23,9 @@
 // ---------- Configuration ----------
 const config = {
     apiKey: 'plln_sk_Exn5fOH2dt5evuKUeYYWh4kVPflDaomA',
-    textApiUrl: 'https://enter.pollinations.ai/api/generate/openai',
+    textApiUrl: 'https://enter.pollinations.ai/api/generate/v1',
     imageApiUrl: 'https://enter.pollinations.ai/api/generate/image',
-    modelsApiUrl: 'https://enter.pollinations.ai/api/generate/openai/models',
+    modelsApiUrl: 'https://enter.pollinations.ai/api/generate/v1/models',
     imageModelsApiUrl: 'https://enter.pollinations.ai/api/generate/image/models',
     dictionaryApiUrl: 'https://api.dictionaryapi.dev/api/v2/entries/en/',
     requestTimeout: 30000,
@@ -1404,10 +1405,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tutorial
     const hasSeenTutorial = localStorage.getItem('hasSeenPrismTutorial');
     if (!hasSeenTutorial && dom.tutorialOverlay) {
-        dom.tutorialOverlay.classList.add('visible');
+        dom.tutorialOverlay.classList.remove('hidden');
     }
     const closeTutorial = () => {
-        if (dom.tutorialOverlay) dom.tutorialOverlay.classList.remove('visible');
+        if (dom.tutorialOverlay) dom.tutorialOverlay.classList.add('hidden');
         localStorage.setItem('hasSeenPrismTutorial', 'true');
     };
     if (dom.tutorialCloseBtn) dom.tutorialCloseBtn.addEventListener('click', closeTutorial);
