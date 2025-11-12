@@ -526,6 +526,21 @@ code {
     display: none;
 }
 
+/* Chat history container */
+#chat-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    scroll-behavior: smooth;
+}
+
+#chat-history.hidden {
+    display: none;
+}
+
 /* ---------- Message Styles ---------- */
 .message {
     display: flex;
@@ -608,6 +623,59 @@ code {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: white;
     border: none;
+}
+
+/* ---------- Message Bubbles (msg classes) ---------- */
+.msg {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    max-width: 70%;
+    word-wrap: break-word;
+    line-height: 1.6;
+    font-size: 0.938rem;
+    transition: all var(--transition-fast);
+}
+
+.msg-user {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border-bottom-right-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+}
+
+.msg-assistant {
+    background: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+}
+
+.dark .msg-assistant {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.timestamp {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin-top: var(--spacing-xs);
+}
+
+/* Slide-in animation for messages */
+@keyframes slide-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in-up {
+    animation: slide-in-up 0.3s ease-out;
 }
 
 /* ---------- Chat Input ---------- */
