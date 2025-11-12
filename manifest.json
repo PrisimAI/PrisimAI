@@ -5,7 +5,7 @@
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#667eea",
+  "theme_color": "#10b981",
   "icons": [
     {
       "src": "https://prisimai.github.io/PrisimAI/icons/icon-192.png",

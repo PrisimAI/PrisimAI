@@ -3,231 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrisimAI – Your AI Assistant for Everything</title>
-    <meta name="description" content="PrisimAI is your ultimate AI assistant, offering tools for creativity, productivity, and smart solutions. Experience next-level AI right in your browser.">
+    <title>PrismAI – Next Generation AI Assistant</title>
+    <meta name="description" content="Experience the future of AI assistance with PrismAI. Powerful, intuitive, and designed for modern workflows.">
     <meta name="keywords" content="AI, artificial intelligence, PrisimAI, AI tools, AI assistant, productivity, creative AI, smart AI">
     <meta name="author" content="PrisimAI Team">
 
-    <meta property="og:title" content="PrisimAI – Your AI Assistant for Everything">
-    <meta property="og:description" content="PrisimAI is your ultimate AI assistant, offering tools for creativity, productivity, and smart solutions.">
+    <meta property="og:title" content="PrismAI – Next Generation AI Assistant">
+    <meta property="og:description" content="Experience the future of AI assistance with PrismAI. Powerful, intuitive, and designed for modern workflows.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://PrisimAI.github.io/PrisimAI">
     <meta property="og:image" content="https://PrisimAI.github.io/PrisimAI/preview-image.png">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="PrisimAI – Your AI Assistant for Everything">
-    <meta name="twitter:description" content="PrisimAI is your ultimate AI assistant, offering tools for creativity, productivity, and smart solutions.">
+    <meta name="twitter:title" content="PrismAI – Next Generation AI Assistant">
+    <meta name="twitter:description" content="Experience the future of AI assistance with PrismAI.">
     <meta name="twitter:image" content="https://PrisimAI.github.io/PrisimAI/preview-image.png">
 
     <link rel="canonical" href="https://PrisimAI.github.io/PrisimAI">
-
     <link rel="icon" href="https://PrisimAI.github.io/PrisimAI/favicon.ico" type="image/x-icon">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style_new.css">
 
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#667eea">
+    <meta name="theme-color" content="#10b981">
 </head>
-<body class="text-gray-800 antialiased flex h-screen overflow-hidden dark:text-gray-100 transition-colors duration-300">
-
-    <aside id="sidebar" class="w-72 flex-shrink-0 flex flex-col justify-between p-8 sm:flex glass-elevated m-6 rounded-2xl">
-        <div class="space-y-8 relative flex flex-col flex-1 overflow-hidden">
-            <button id="dark-mode-toggle" class="absolute top-4 right-4 p-3 rounded-full bg-white/20 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 shadow hover:bg-white/30 dark:hover:bg-gray-600/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 z-10" aria-label="Toggle dark mode">
-                <svg id="dark-mode-icon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path id="sun-icon" class="block dark:hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.93l-.71-.71M12 7a5 5 0 100 10 5 5 0 000-10z" />
-                    <path id="moon-icon" class="hidden dark:block" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
-                </svg>
-            </button>
-
-            <div class="flex items-center space-x-3 mb-8">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-blue-500">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9.206 13.91a4.992 4.992 0 0 0-1.745-1.924c-.394-.287-.803-.524-1.229-.715L5 10.985a2.25 2.25 0 0 1-.585-2.023c.31-.617.915-1.054 1.558-1.127l.799-.089a5.002 5.002 0 0 1 4.71-2.903c.369.043.737.087 1.106.131L15 8.169a2.25 2.25 0 0 1 2.023.585c.617.31 1.054.915 1.127 1.558l.089.799a5.002 5.002 0 0 1-2.903 4.71c-.043.369-.087.737-.131 1.106l-1.996 4.99a2.25 2.25 0 0 1-2.023.585c-.617-.31-1.054-.915-1.127-1.558l-.089-.799a5.002 5.002 0 0 1-4.71-2.903c-.043-.369-.087-.737-.131-1.106l-1.996-4.99a2.25 2.25 0 0 1-2.023-.585c-.617-.31-1.054-.915-1.127-1.558l-.089-.799a5.002 5.002 0 0 1-2.903-4.71z" />
-                </svg>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">PrismAI</h1>
-            </div>
-
-            <button id="new-chat-btn" class="w-full p-3 rounded-xl sidebar-button text-white font-semibold hover:shadow-lg active:scale-95 transition-all duration-200" aria-label="Start new chat">
-                + New Chat
-            </button>
-
-            <button id="export-chat-btn" class="w-full p-3 rounded-xl sidebar-button text-white font-semibold hover:shadow-lg active:scale-95 transition-all duration-200" aria-label="Export current chat">
-                Export Chat
-            </button>
-
-            <div class="flex border-b border-white/10 pt-4" role="tablist" aria-label="Sidebar content">
-                <button id="chat-history-tab" class="sidebar-tab active-tab" aria-label="Show chat history">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.068.157 2.148.279 3.238.364.491.03 1.002.043 1.513.043h.001c.512 0 1.022-.013 1.513-.043.593-.041 1.19-.08 1.78-.128 1.138-.093 2.293-.209 3.423-.372.33-.049.66-.1.99-.153.33-.053.66-.11.99-.172.33-.06.66-.126 1.02-.2.434-.09 1.06-.213 1.73-.364 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.994-2.707-3.227A48.214 48.214 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" /></svg>
-                    <span>Chats</span>
+<body class="antialiased overflow-hidden">
+    
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <div class="nav-left">
+                <button id="sidebar-toggle" class="icon-btn" aria-label="Toggle sidebar">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
                 </button>
-                <button id="gallery-tab" class="sidebar-tab" aria-label="Show image gallery">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm1.5-6a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg>
-                    <span>Gallery</span>
-                </button>
-            </div>
-
-            <div id="chat-history-list-container" class="flex-1 overflow-y-auto pt-4">
-                <div id="chat-history-list" class="space-y-3">
-                    <button class="w-full p-3 rounded-xl text-left text-gray-700 dark:text-gray-300 font-medium hover:bg-white/20 transition-all duration-200 active:scale-95 flex items-center space-x-2 chat-history-item" data-chat-id="new-chat-placeholder" aria-label="Select new chat">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.644 1.59a.75.75 0 0 1 .712 0l9.75 5.25a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.712 0l-9.75-5.25a.75.75 0 0 1 0-1.32l9.75-5.25Z" />
+                            <path d="m3.265 10.602 7.668 4.129a2.25 2.25 0 0 0 2.134 0l7.668-4.13 1.37.738a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.71 0l-9.75-5.25a.75.75 0 0 1 0-1.32l1.37-.738Z" />
+                            <path d="m10.933 19.231-7.668-4.13-1.37.739a.75.75 0 0 0 0 1.32l9.75 5.25c.221.12.49.12.71 0l9.75-5.25a.75.75 0 0 0 0-1.32l-1.37-.738-7.668 4.13a2.25 2.25 0 0 1-2.134-.001Z" />
                         </svg>
-                        <span class="truncate">New Chat</span>
-                    </button>
+                    </div>
+                    <span class="logo-text">PrismAI</span>
+                </div>
+            </div>
+            
+            <div class="nav-center">
+                <button id="new-chat-btn-top" class="btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    New Chat
+                </button>
+            </div>
+
+            <div class="nav-right">
+                <button id="dark-mode-toggle" class="icon-btn" aria-label="Toggle dark mode">
+                    <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                    </svg>
+                    <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 hidden">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                    </svg>
+                </button>
+                <button id="user-menu-btn" class="user-avatar" aria-label="User menu">
+                    <img src="https://placehold.co/32x32" alt="User" />
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h2>Conversations</h2>
+                <button id="sidebar-close" class="icon-btn-sm" aria-label="Close sidebar">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="sidebar-tabs">
+                <button class="sidebar-tab active" data-tab="chats">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
+                    </svg>
+                    Chats
+                </button>
+                <button class="sidebar-tab" data-tab="gallery">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                    </svg>
+                    Gallery
+                </button>
+            </div>
+
+            <div class="sidebar-content">
+                <div id="chat-history-panel" class="tab-panel active">
+                    <div id="chat-history-list" class="chat-list">
+                        <!-- Chat items will be inserted here -->
+                    </div>
+                </div>
+
+                <div id="gallery-panel" class="tab-panel">
+                    <div id="image-gallery-grid" class="gallery-grid">
+                        <!-- Gallery items will be inserted here -->
+                    </div>
+                    <p id="image-gallery-placeholder" class="placeholder-text">
+                        Generate images with <code>/image [prompt]</code>
+                    </p>
                 </div>
             </div>
 
-            <div id="image-gallery-panel" role="tabpanel" aria-labelledby="gallery-tab" class="hidden flex-1 overflow-y-auto pt-4">
-                <div id="image-gallery-grid" class="grid grid-cols-2 gap-2">
-                    </div>
-                <p id="image-gallery-placeholder" class="text-gray-500 text-center text-sm hidden">Generate images with `/image [prompt]` to see them here.</p>
-            </div>
-
-            <div class="space-y-3 pt-4 border-t border-white/10">
-                <label for="model-selector" class="text-sm font-medium text-gray-700 dark:text-gray-200">Select Model</label>
-                <select id="model-selector" class="w-full p-3 rounded-xl border-none bg-white/20 dark:bg-gray-800/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 claymorphic-input" aria-label="Select AI model">
+            <div class="sidebar-footer">
+                <select id="model-selector" class="model-select" aria-label="Select AI model">
                     <option value="" disabled selected>Loading models...</option>
                 </select>
-                <button id="settings-btn" class="w-full p-3 rounded-xl text-gray-700 dark:text-gray-300 font-medium hover:bg-white/20 transition-all duration-200 active:scale-95 flex items-center justify-center space-x-2" aria-label="Open settings">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <button id="export-chat-btn" class="btn-secondary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                     </svg>
-                    <span>Settings</span>
+                    Export
                 </button>
             </div>
-        </div>
+        </aside>
 
-        <div class="mt-8 relative">
-            <div id="profile-menu" role="menu" aria-labelledby="profile-menu-btn" class="absolute bottom-full left-0 right-0 mb-2 w-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-md rounded-xl shadow-lg border border-white/10 overflow-hidden hidden">
-                <button id="change-name-btn" role="menuitem" class="w-full text-left px-4 py-3 text-sm text-gray-800 dark:text-gray-200 hover:bg-white/20 dark:hover:bg-gray-700/30 transition-colors">Change Name</button>
-                <button id="keyboard-shortcuts-btn" role="menuitem" class="w-full text-left px-4 py-3 text-sm text-gray-800 dark:text-gray-200 hover:bg-white/20 dark:hover:bg-gray-700/30 transition-colors">Keyboard Shortcuts</button>
-            </div>
-
-            <button id="profile-menu-btn" aria-haspopup="true" aria-expanded="false" aria-controls="profile-menu" class="flex w-full items-center space-x-3 p-4 hover:bg-blue-500/10 rounded-xl transition-all duration-200 cursor-pointer active:scale-95">
-                <img src="https://placehold.co/40x40" alt="Profile" class="w-12 h-12 rounded-full border-2 border-blue-400/30 shadow">
-                <div>
-                    <div id="user-name" class="font-semibold text-gray-900 dark:text-white">Stranger</div>
-                    <div id="user-tier" class="text-sm text-gray-500 dark:text-gray-400">Free</div>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-auto text-gray-400"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
-            </button>
-        </div>
-    </aside>
-
-    <main class="flex-1 flex flex-col relative p-0">
-        <button id="mobile-menu-btn" class="lg:hidden absolute top-8 left-4 z-50 p-3 rounded-full bg-white/20 dark:bg-gray-700/20 text-gray-700 dark:text-gray-200 shadow hover:bg-white/30 dark:hover:bg-gray-600/30 transition-all duration-200" aria-label="Toggle sidebar">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
-        </button>
-
-        <div class="flex-1 flex flex-col">
-            <div id="chat-container" class="flex-1 relative w-full m-6 glass-primary overflow-hidden">
-                <div class="flex flex-col h-full">
-                    <div id="error-notification" class="hidden p-4 bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl mx-4 mt-4 text-center relative flex items-center justify-between">
-                        <span id="error-message"></span>
-                        <button id="close-error" class="ml-2 text-red-600 dark:text-red-400 hover:bg-red-500/20 p-1 rounded-full transition-all" aria-label="Close error message">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        <!-- Chat Area -->
+        <main class="chat-area">
+            
+            <!-- Welcome Screen -->
+            <div id="welcome-screen" class="welcome-screen">
+                <div class="welcome-content">
+                    <div class="welcome-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.644 1.59a.75.75 0 0 1 .712 0l9.75 5.25a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.712 0l-9.75-5.25a.75.75 0 0 1 0-1.32l9.75-5.25Z" />
+                            <path d="m3.265 10.602 7.668 4.129a2.25 2.25 0 0 0 2.134 0l7.668-4.13 1.37.738a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.71 0l-9.75-5.25a.75.75 0 0 1 0-1.32l1.37-.738Z" />
+                            <path d="m10.933 19.231-7.668-4.13-1.37.739a.75.75 0 0 0 0 1.32l9.75 5.25c.221.12.49.12.71 0l9.75-5.25a.75.75 0 0 0 0-1.32l-1.37-.738-7.668 4.13a2.25 2.25 0 0 1-2.134-.001Z" />
+                        </svg>
+                    </div>
+                    <h1 id="welcome-title">Hello, <span id="user-name-display">Stranger</span>!</h1>
+                    <p class="welcome-subtitle">How can I assist you today?</p>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" data-prompt="Summarize">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                             </svg>
+                            <span>Summarize</span>
+                        </button>
+                        <button class="quick-action-btn" data-prompt="Explain">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+                            </svg>
+                            <span>Explain</span>
+                        </button>
+                        <button class="quick-action-btn" data-prompt="Write code">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
+                            </svg>
+                            <span>Write Code</span>
+                        </button>
+                        <button class="quick-action-btn" data-prompt="Generate image">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                            </svg>
+                            <span>Create Image</span>
                         </button>
                     </div>
-                    <div id="welcome-message" class="flex flex-col items-center justify-center text-center p-10 space-y-6 text-gray-500 dark:text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-24 h-24 text-blue-400">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5a6 6 0 1 0-12 0v1.5a6 6 0 0 0 6 6Z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div id="chat-messages" class="chat-messages hidden">
+                <!-- Messages will be inserted here -->
+            </div>
+
+            <!-- Error Notification -->
+            <div id="error-notification" class="error-notification hidden">
+                <span id="error-message"></span>
+                <button id="close-error" class="error-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-wrapper">
+                <div id="offline-indicator" class="offline-indicator hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                    You're offline. Messages will not be sent.
+                </div>
+                
+                <div id="prompt-suggestions" class="prompt-suggestions">
+                    <!-- Prompt suggestion chips will be inserted here -->
+                </div>
+
+                <form id="chat-form" class="chat-input-form">
+                    <button type="button" id="voice-input-btn" class="input-action-btn" aria-label="Voice input">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
                         </svg>
-                        <h2 id="welcome-user-name" class="text-3xl font-bold text-gray-800 dark:text-white">Hello there, Stranger!</h2>
-                        <p class="text-lg">What can I help you with today? Try typing something in the box below.</p>
-                    </div>
-
-                    <div id="chat-history" class="flex-1 overflow-y-auto p-8 space-y-6 hidden" role="log" aria-live="polite">
-                        </div>
-
-                    <div class="chat-input-wrapper p-6 bg-transparent border-t border-white/10 dark:border-black/10">
-                        <div id="offline-indicator" class="hidden text-center text-red-500 text-sm mb-2">
-                            Offline. Messages will not be sent.
-                        </div>
-                        <div id="prompt-templates-bar" class="flex flex-wrap gap-2 pb-4">
-                            </div>
-                        <form id="chat-form" class="flex items-end space-x-2" role="form" aria-label="Chat input form">
-                            <button type="button" id="voice-input-btn" class="p-4 rounded-3xl bg-white/20 dark:bg-gray-700/30 text-gray-700 dark:text-gray-300 hover:bg-white/30 dark:hover:bg-gray-600/40 transition-all duration-200 claymorphic-button" aria-label="Voice input" title="Voice input">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
-                                </svg>
-                            </button>
-                            <textarea id="chat-input" placeholder="Message PrismAI ✨..." rows="1" class="flex-1 p-4 rounded-3xl border-none bg-white/20 dark:bg-gray-700/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 resize-none claymorphic-input" aria-label="Enter your message"></textarea>
-                            <button type="submit" class="p-4 rounded-3xl bg-gradient-to-r from-blue-500 to-blue-400 text-white shadow-lg hover:from-blue-600 hover:to-blue-500 send-button transition-all duration-200" aria-label="Send message">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.769 59.769 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                                </svg>
-                            </button>
-                        </form>
-                    </div>
-                </div>
+                    </button>
+                    
+                    <textarea 
+                        id="chat-input" 
+                        placeholder="Ask me anything..." 
+                        rows="1"
+                        class="chat-input"
+                        aria-label="Message input"></textarea>
+                    
+                    <button type="submit" class="send-btn" aria-label="Send message">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                            <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+                        </svg>
+                    </button>
+                </form>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 
-    <div id="tutorial-overlay" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 items-center justify-center transition-opacity duration-500">
-        <div class="bg-white dark:bg-gray-800 p-10 rounded-2xl shadow-2xl max-w-lg w-full text-center relative glass-elevated">
-            <button id="tutorial-close-btn" class="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors" aria-label="Close tutorial">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    <!-- Modals -->
+    <div id="tutorial-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <button id="tutorial-close" class="modal-close">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
             </button>
-            <h2 class="text-3xl font-bold mb-6 text-blue-600 dark:text-blue-400">Welcome to PrismAI!</h2>
-            <p class="text-lg mb-6 text-gray-700 dark:text-gray-300">Let's get you started with a quick tour:</p>
-
-            <div id="tutorial-steps" class="space-y-6 text-left">
-                </div>
-
-            <button id="tutorial-done-btn" class="mt-8 px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-400 text-white font-semibold rounded-xl shadow-lg hover:from-blue-600 hover:to-blue-500 transition-all duration-200 active:scale-95" aria-label="Complete tutorial">Got It!</button>
+            <h2 class="modal-title">Welcome to PrismAI!</h2>
+            <p class="modal-description">Let's get you started with a quick tour:</p>
+            <div id="tutorial-steps" class="tutorial-steps"></div>
+            <button id="tutorial-done" class="btn-primary btn-lg">Got it, thanks!</button>
         </div>
     </div>
 
-    <!-- Keyboard Shortcuts Modal -->
-    <div id="shortcuts-modal" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm z-50 items-center justify-center hidden transition-opacity duration-500">
-        <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-md w-full relative glass-elevated">
-            <button id="shortcuts-close-btn" class="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors" aria-label="Close shortcuts">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    <div id="shortcuts-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button id="shortcuts-close" class="modal-close">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
             </button>
-            <h2 class="text-2xl font-bold mb-6 text-blue-600 dark:text-blue-400">Keyboard Shortcuts</h2>
-            <div class="space-y-3 text-sm">
-                <div class="flex justify-between items-center p-2 rounded-lg hover:bg-white/10">
-                    <span class="text-gray-700 dark:text-gray-300">New Chat</span>
-                    <kbd class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">Ctrl+K</kbd>
+            <h2 class="modal-title">Keyboard Shortcuts</h2>
+            <div class="shortcuts-list">
+                <div class="shortcut-item">
+                    <span>New Chat</span>
+                    <kbd>Ctrl+K</kbd>
                 </div>
-                <div class="flex justify-between items-center p-2 rounded-lg hover:bg-white/10">
-                    <span class="text-gray-700 dark:text-gray-300">Focus Input</span>
-                    <kbd class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">Ctrl+/</kbd>
+                <div class="shortcut-item">
+                    <span>Focus Input</span>
+                    <kbd>Ctrl+/</kbd>
                 </div>
-                <div class="flex justify-between items-center p-2 rounded-lg hover:bg-white/10">
-                    <span class="text-gray-700 dark:text-gray-300">Toggle Dark Mode</span>
-                    <kbd class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">Ctrl+D</kbd>
+                <div class="shortcut-item">
+                    <span>Toggle Dark Mode</span>
+                    <kbd>Ctrl+D</kbd>
                 </div>
-                <div class="flex justify-between items-center p-2 rounded-lg hover:bg-white/10">
-                    <span class="text-gray-700 dark:text-gray-300">Voice Input</span>
-                    <kbd class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">Ctrl+M</kbd>
+                <div class="shortcut-item">
+                    <span>Voice Input</span>
+                    <kbd>Ctrl+M</kbd>
                 </div>
-                <div class="flex justify-between items-center p-2 rounded-lg hover:bg-white/10">
-                    <span class="text-gray-700 dark:text-gray-300">Export Chat</span>
-                    <kbd class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">Ctrl+E</kbd>
+                <div class="shortcut-item">
+                    <span>Export Chat</span>
+                    <kbd>Ctrl+E</kbd>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <script src="script.js" defer></script>
 </body>
 </html>
