@@ -67,6 +67,10 @@ const dom = {
     errorMessage: document.getElementById('error-message'),
     closeErrorBtn: document.getElementById('close-error'),
     voiceInputBtn: document.getElementById('voice-input-btn'),
+    settingsBtn: document.getElementById('settings-btn'),
+    keyboardShortcutsBtn: document.getElementById('keyboard-shortcuts-btn'),
+    shortcutsModal: document.getElementById('shortcuts-modal'),
+    shortcutsCloseBtn: document.getElementById('shortcuts-close-btn'),
 };
 
 // ---------- State ----------
@@ -199,9 +203,29 @@ function renderImageGallery() {
     dom.imageGalleryPlaceholder.classList.add('hidden');
     gallery.forEach(item => {
         const imgWrapper = document.createElement('div');
-        imgWrapper.classList.add('gallery-image');
+        imgWrapper.classList.add('gallery-image', 'group', 'relative');
         imgWrapper.title = item.prompt;
-        imgWrapper.innerHTML = `<img src=\"${escapeHTML(item.url)}\" alt=\"${escapeHTML(item.prompt)}\" loading=\"lazy\">`;
+        
+        const img = document.createElement('img');
+        img.src = item.url;
+        img.alt = item.prompt;
+        img.loading = 'lazy';
+        
+        const downloadBtn = document.createElement('button');
+        downloadBtn.className = 'absolute bottom-2 right-2 p-2 rounded-full bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 opacity-0 group-hover:opacity-100 transition-all hover:scale-110';
+        downloadBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>`;
+        downloadBtn.onclick = (e) => {
+            e.stopPropagation();
+            const a = document.createElement('a');
+            a.href = item.url;
+            a.download = `PrismAI_Image_${item.id}.png`;
+            a.target = '_blank';
+            a.click();
+            showSuccessNotification('Downloading image...');
+        };
+        
+        imgWrapper.appendChild(img);
+        imgWrapper.appendChild(downloadBtn);
         imgWrapper.onclick = () => window.open(item.url, '_blank');
         dom.imageGalleryGrid.appendChild(imgWrapper);
     });
@@ -1223,6 +1247,61 @@ function injectPromptTemplates() {
     });
 }
 
+// ---------- Keyboard Shortcuts ----------
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+        // Check for Ctrl/Cmd key combinations
+        if (e.ctrlKey || e.metaKey) {
+            switch(e.key.toLowerCase()) {
+                case 'k':
+                    e.preventDefault();
+                    selectChat(null);
+                    break;
+                case '/':
+                    e.preventDefault();
+                    dom.chatInput.focus();
+                    break;
+                case 'd':
+                    e.preventDefault();
+                    dom.darkModeToggle.click();
+                    break;
+                case 'm':
+                    e.preventDefault();
+                    if (dom.voiceInputBtn) dom.voiceInputBtn.click();
+                    break;
+                case 'e':
+                    e.preventDefault();
+                    exportChat();
+                    break;
+            }
+        }
+        
+        // ESC to close modals
+        if (e.key === 'Escape') {
+            if (dom.shortcutsModal && !dom.shortcutsModal.classList.contains('hidden')) {
+                dom.shortcutsModal.classList.add('hidden');
+            }
+            if (dom.profileMenu && !dom.profileMenu.classList.contains('hidden')) {
+                dom.profileMenu.classList.add('hidden');
+            }
+        }
+    });
+}
+
+function showShortcutsModal() {
+    if (dom.shortcutsModal) {
+        dom.shortcutsModal.classList.remove('hidden');
+        dom.shortcutsModal.style.display = 'flex';
+    }
+}
+
+function hideShortcutsModal() {
+    if (dom.shortcutsModal) {
+        dom.shortcutsModal.classList.add('hidden');
+        dom.shortcutsModal.style.display = 'none';
+    }
+}
+
 // ---------- Offline Handling ----------
 function updateOfflineStatus() {
     if (isOffline()) {
@@ -1310,6 +1389,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dom.voiceInputBtn) {
         dom.voiceInputBtn.addEventListener('click', toggleSpeechRecognition);
     }
+
+    // Settings and Shortcuts
+    if (dom.settingsBtn) {
+        dom.settingsBtn.addEventListener('click', () => {
+            showSuccessNotification('Settings panel coming soon!');
+        });
+    }
+    if (dom.keyboardShortcutsBtn) {
+        dom.keyboardShortcutsBtn.addEventListener('click', () => {
+            dom.profileMenu.classList.add('hidden');
+            showShortcutsModal();
+        });
+    }
+    if (dom.shortcutsCloseBtn) {
+        dom.shortcutsCloseBtn.addEventListener('click', hideShortcutsModal);
+    }
+    
+    // Setup Keyboard Shortcuts
+    setupKeyboardShortcuts();
 
     // Tutorial
     const hasSeenTutorial = localStorage.getItem('hasSeenPrismTutorial');
