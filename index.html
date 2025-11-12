@@ -27,7 +27,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="style_new.css">
+    <link rel="stylesheet" href="style.css">
 
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -41,7 +41,7 @@
     <nav class="top-nav">
         <div class="nav-content">
             <div class="nav-left">
-                <button id="sidebar-toggle" class="icon-btn" aria-label="Toggle sidebar">
+                <button id="mobile-menu-btn" class="icon-btn" aria-label="Toggle sidebar">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                     </svg>
@@ -49,9 +49,7 @@
                 <div class="logo">
                     <div class="logo-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M11.644 1.59a.75.75 0 0 1 .712 0l9.75 5.25a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.712 0l-9.75-5.25a.75.75 0 0 1 0-1.32l9.75-5.25Z" />
-                            <path d="m3.265 10.602 7.668 4.129a2.25 2.25 0 0 0 2.134 0l7.668-4.13 1.37.738a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.71 0l-9.75-5.25a.75.75 0 0 1 0-1.32l1.37-.738Z" />
-                            <path d="m10.933 19.231-7.668-4.13-1.37.739a.75.75 0 0 0 0 1.32l9.75 5.25c.221.12.49.12.71 0l9.75-5.25a.75.75 0 0 0 0-1.32l-1.37-.738-7.668 4.13a2.25 2.25 0 0 1-2.134-.001Z" />
+                            <path fill-rule="evenodd" d="M9 4.5a.75.75 0 0 1 .721.544l.813 2.846a3.75 3.75 0 0 0 2.576 2.576l2.846.813a.75.75 0 0 1 0 1.442l-2.846.813a3.75 3.75 0 0 0-2.576 2.576l-.813 2.846a.75.75 0 0 1-1.442 0l-.813-2.846a3.75 3.75 0 0 0-2.576-2.576l-2.846-.813a.75.75 0 0 1 0-1.442l2.846-.813A3.75 3.75 0 0 0 7.466 7.89l.813-2.846A.75.75 0 0 1 9 4.5ZM18 1.5a.75.75 0 0 1 .728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 0 1 0 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 0 1-1.456 0l-.258-1.036a2.625 2.625 0 0 0-1.91-1.91l-1.036-.258a.75.75 0 0 1 0-1.456l1.036-.258a2.625 2.625 0 0 0 1.91-1.91l.258-1.036A.75.75 0 0 1 18 1.5ZM16.5 15a.75.75 0 0 1 .712.513l.394 1.183c.15.447.5.799.948.948l1.183.395a.75.75 0 0 1 0 1.422l-1.183.395c-.447.15-.799.5-.948.948l-.395 1.183a.75.75 0 0 1-1.422 0l-.395-1.183a1.5 1.5 0 0 0-.948-.948l-1.183-.395a.75.75 0 0 1 0-1.422l1.183-.395c.447-.15.799-.5.948-.948l.395-1.183A.75.75 0 0 1 16.5 15Z" clip-rule="evenodd" />
                         </svg>
                     </div>
                     <span class="logo-text">PrismAI</span>
@@ -59,7 +57,7 @@
             </div>
             
             <div class="nav-center">
-                <button id="new-chat-btn-top" class="btn-primary">
+                <button id="new-chat-btn" class="btn-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
@@ -76,9 +74,16 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
                     </svg>
                 </button>
-                <button id="user-menu-btn" class="user-avatar" aria-label="User menu">
+                <button id="profile-menu-btn" class="user-avatar" aria-label="User menu">
                     <img src="https://placehold.co/32x32" alt="User" />
                 </button>
+                <!-- Hidden profile menu for compatibility -->
+                <div id="profile-menu" style="display: none;">
+                    <button id="change-name-btn"></button>
+                    <button id="keyboard-shortcuts-btn"></button>
+                    <span id="user-name" style="display: none;">Stranger</span>
+                </div>
+                <button id="settings-btn" style="display: none;"></button>
             </div>
         </div>
     </nav>
@@ -98,13 +103,13 @@
             </div>
 
             <div class="sidebar-tabs">
-                <button class="sidebar-tab active" data-tab="chats">
+                <button id="chat-history-tab" class="sidebar-tab active" data-tab="chats">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
                     </svg>
                     Chats
                 </button>
-                <button class="sidebar-tab" data-tab="gallery">
+                <button id="gallery-tab" class="sidebar-tab" data-tab="gallery">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                     </svg>
@@ -113,13 +118,13 @@
             </div>
 
             <div class="sidebar-content">
-                <div id="chat-history-panel" class="tab-panel active">
+                <div id="chat-history-list-container" class="tab-panel active">
                     <div id="chat-history-list" class="chat-list">
                         <!-- Chat items will be inserted here -->
                     </div>
                 </div>
 
-                <div id="gallery-panel" class="tab-panel">
+                <div id="image-gallery-panel" class="tab-panel">
                     <div id="image-gallery-grid" class="gallery-grid">
                         <!-- Gallery items will be inserted here -->
                     </div>
@@ -147,15 +152,13 @@
             
             <!-- Welcome Screen -->
             <div id="welcome-screen" class="welcome-screen">
-                <div class="welcome-content">
+                <div id="welcome-message" class="welcome-content">
                     <div class="welcome-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M11.644 1.59a.75.75 0 0 1 .712 0l9.75 5.25a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.712 0l-9.75-5.25a.75.75 0 0 1 0-1.32l9.75-5.25Z" />
-                            <path d="m3.265 10.602 7.668 4.129a2.25 2.25 0 0 0 2.134 0l7.668-4.13 1.37.738a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.71 0l-9.75-5.25a.75.75 0 0 1 0-1.32l1.37-.738Z" />
-                            <path d="m10.933 19.231-7.668-4.13-1.37.739a.75.75 0 0 0 0 1.32l9.75 5.25c.221.12.49.12.71 0l9.75-5.25a.75.75 0 0 0 0-1.32l-1.37-.738-7.668 4.13a2.25 2.25 0 0 1-2.134-.001Z" />
+                            <path fill-rule="evenodd" d="M9 4.5a.75.75 0 0 1 .721.544l.813 2.846a3.75 3.75 0 0 0 2.576 2.576l2.846.813a.75.75 0 0 1 0 1.442l-2.846.813a3.75 3.75 0 0 0-2.576 2.576l-.813 2.846a.75.75 0 0 1-1.442 0l-.813-2.846a3.75 3.75 0 0 0-2.576-2.576l-2.846-.813a.75.75 0 0 1 0-1.442l2.846-.813A3.75 3.75 0 0 0 7.466 7.89l.813-2.846A.75.75 0 0 1 9 4.5ZM18 1.5a.75.75 0 0 1 .728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 0 1 0 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 0 1-1.456 0l-.258-1.036a2.625 2.625 0 0 0-1.91-1.91l-1.036-.258a.75.75 0 0 1 0-1.456l1.036-.258a2.625 2.625 0 0 0 1.91-1.91l.258-1.036A.75.75 0 0 1 18 1.5ZM16.5 15a.75.75 0 0 1 .712.513l.394 1.183c.15.447.5.799.948.948l1.183.395a.75.75 0 0 1 0 1.422l-1.183.395c-.447.15-.799.5-.948.948l-.395 1.183a.75.75 0 0 1-1.422 0l-.395-1.183a1.5 1.5 0 0 0-.948-.948l-1.183-.395a.75.75 0 0 1 0-1.422l1.183-.395c.447-.15.799-.5.948-.948l.395-1.183A.75.75 0 0 1 16.5 15Z" clip-rule="evenodd" />
                         </svg>
                     </div>
-                    <h1 id="welcome-title">Hello, <span id="user-name-display">Stranger</span>!</h1>
+                    <h1 id="welcome-title">Hello, <span id="user-name-display"><span id="welcome-user-name">Stranger</span></span>!</h1>
                     <p class="welcome-subtitle">How can I assist you today?</p>
                     
                     <div class="quick-actions">
@@ -188,7 +191,7 @@
             </div>
 
             <!-- Chat Messages -->
-            <div id="chat-messages" class="chat-messages hidden">
+            <div id="chat-history" class="chat-messages hidden">
                 <!-- Messages will be inserted here -->
             </div>
 
@@ -211,7 +214,7 @@
                     You're offline. Messages will not be sent.
                 </div>
                 
-                <div id="prompt-suggestions" class="prompt-suggestions">
+                <div id="prompt-templates-bar" class="prompt-suggestions">
                     <!-- Prompt suggestion chips will be inserted here -->
                 </div>
 
@@ -242,7 +245,7 @@
     <!-- Modals -->
     <div id="tutorial-overlay" class="modal-overlay">
         <div class="modal-content">
-            <button id="tutorial-close" class="modal-close">
+            <button id="tutorial-close-btn" class="modal-close">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
@@ -250,13 +253,13 @@
             <h2 class="modal-title">Welcome to PrismAI!</h2>
             <p class="modal-description">Let's get you started with a quick tour:</p>
             <div id="tutorial-steps" class="tutorial-steps"></div>
-            <button id="tutorial-done" class="btn-primary btn-lg">Got it, thanks!</button>
+            <button id="tutorial-done-btn" class="btn-primary btn-lg">Got it, thanks!</button>
         </div>
     </div>
 
     <div id="shortcuts-modal" class="modal-overlay hidden">
         <div class="modal-content">
-            <button id="shortcuts-close" class="modal-close">
+            <button id="shortcuts-close-btn" class="modal-close">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
