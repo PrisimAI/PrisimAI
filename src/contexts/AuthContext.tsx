@@ -25,6 +25,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
+    }).catch((error) => {
+      console.error('Error getting session:', error)
+      setLoading(false)
     })
 
     // Listen for auth changes
@@ -36,7 +39,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
     })
 
-    return () => subscription.unsubscribe()
+    // Clean URL hash after a brief delay to allow Supabase to process OAuth tokens
+    // This prevents sensitive tokens from being exposed in the URL
+    const cleanupTimeout = setTimeout(() => {
+      if (window.location.hash && window.location.hash.includes('access_token')) {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search)
+      }
+    }, 100) // 100ms delay to ensure Supabase has processed the hash
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(cleanupTimeout)
+    }
   }, [])
 
   const signUp = async (email: string, password: string) => {
