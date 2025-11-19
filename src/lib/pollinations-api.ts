@@ -19,31 +19,67 @@ export interface ImageModel {
 }
 
 export async function getTextModels(): Promise<TextModel[]> {
-  const response = await fetch(`${BASE_URL}/generate/v1/models`, {
-    headers: {
-      Authorization: `Bearer ${API_KEY}`,
-    },
-  })
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch text models')
+  try {
+    const response = await fetch(`${BASE_URL}/v1/models`, {
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+      },
+    })
+    
+    if (!response.ok) {
+      console.warn('API call failed, using fallback models')
+      return [
+        { name: 'openai', description: 'OpenAI GPT' },
+        { name: 'mistral', description: 'Mistral AI' },
+        { name: 'claude', description: 'Anthropic Claude' },
+        { name: 'llama', description: 'Meta Llama' },
+      ]
+    }
+    
+    const data = await response.json()
+    return Array.isArray(data) ? data : data.data || []
+  } catch (error) {
+    console.error('Error fetching text models:', error)
+    return [
+      { name: 'openai', description: 'OpenAI GPT' },
+      { name: 'mistral', description: 'Mistral AI' },
+      { name: 'claude', description: 'Anthropic Claude' },
+      { name: 'llama', description: 'Meta Llama' },
+    ]
   }
-  
-  return response.json()
 }
 
 export async function getImageModels(): Promise<ImageModel[]> {
-  const response = await fetch(`${BASE_URL}/generate/image/models`, {
-    headers: {
-      Authorization: `Bearer ${API_KEY}`,
-    },
-  })
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch image models')
+  try {
+    const response = await fetch(`${BASE_URL}/image/models`, {
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+      },
+    })
+    
+    if (!response.ok) {
+      console.warn('API call failed, using fallback models')
+      return [
+        { name: 'flux', description: 'Flux' },
+        { name: 'flux-realism', description: 'Flux Realism' },
+        { name: 'flux-anime', description: 'Flux Anime' },
+        { name: 'flux-3d', description: 'Flux 3D' },
+        { name: 'turbo', description: 'Turbo' },
+      ]
+    }
+    
+    const data = await response.json()
+    return Array.isArray(data) ? data : data.data || []
+  } catch (error) {
+    console.error('Error fetching image models:', error)
+    return [
+      { name: 'flux', description: 'Flux' },
+      { name: 'flux-realism', description: 'Flux Realism' },
+      { name: 'flux-anime', description: 'Flux Anime' },
+      { name: 'flux-3d', description: 'Flux 3D' },
+      { name: 'turbo', description: 'Turbo' },
+    ]
   }
-  
-  return response.json()
 }
 
 export async function generateText(
@@ -51,7 +87,7 @@ export async function generateText(
   model: string = 'openai',
   onChunk?: (chunk: string) => void
 ): Promise<string> {
-  const response = await fetch(`${BASE_URL}/generate/v1/chat/completions`, {
+  const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -108,7 +144,7 @@ export async function generateImage(
   model: string = 'flux'
 ): Promise<string> {
   const encodedPrompt = encodeURIComponent(prompt)
-  const url = `${BASE_URL}/generate/image/${encodedPrompt}?model=${model}`
+  const url = `${BASE_URL}/image/${encodedPrompt}?model=${model}`
   
   const response = await fetch(url, {
     headers: {

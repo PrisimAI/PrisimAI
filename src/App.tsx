@@ -36,10 +36,11 @@ function App() {
 
   useEffect(() => {
     if (pendingMessage && currentConversationId) {
+      const messageToSend = pendingMessage
       setPendingMessage(null)
-      handleSendMessage(pendingMessage)
+      handleSendMessage(messageToSend)
     }
-  }, [currentConversationId, pendingMessage])
+  }, [currentConversationId])
 
   const createNewConversation = () => {
     const newConversation: Conversation = {
