@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useKV } from '@github/spark/hooks'
+import { useLocalStorage } from './hooks/use-local-storage'
 import { Toaster, toast } from 'sonner'
 import { Sidebar } from './components/Sidebar'
 import { ChatMessage } from './components/ChatMessage'
@@ -13,7 +13,7 @@ import { generateText, generateImage, type Message } from './lib/pollinations-ap
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode } from './lib/types'
 
 function App() {
-  const [conversations, setConversations] = useKV<Conversation[]>('conversations', [])
+  const [conversations, setConversations] = useLocalStorage<Conversation[]>('conversations', [])
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const [mode, setMode] = useState<AppMode>('chat')
   const [textModel, setTextModel] = useState('openai')
