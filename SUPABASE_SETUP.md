@@ -70,6 +70,39 @@ Add the same two variables:
    - **Magic Link** (passwordless email login)
    - **OAuth providers** (Google, GitHub, etc.)
 
+### Setting Up GitHub OAuth
+
+To enable GitHub sign-in:
+
+1. **Create a GitHub OAuth App**:
+   - Go to [GitHub Developer Settings](https://github.com/settings/developers)
+   - Click **OAuth Apps** → **New OAuth App**
+   - Fill in the application details:
+     - **Application name**: PrisimAI (or your preferred name)
+     - **Homepage URL**: `http://localhost:5000` (for development) or your production URL
+     - **Authorization callback URL**: Get this from your Supabase dashboard (see next step)
+   - Click **Register application**
+   - Copy the **Client ID**
+   - Click **Generate a new client secret** and copy the **Client Secret**
+
+2. **Configure GitHub Provider in Supabase**:
+   - Go to your Supabase dashboard → **Authentication** → **Providers**
+   - Find **GitHub** in the list and click to expand
+   - Toggle **Enable Sign in with GitHub** to ON
+   - Copy the **Callback URL (for OAuth)** - this is what you'll use in step 1 above
+   - Paste your GitHub **Client ID** and **Client Secret**
+   - Click **Save**
+
+3. **Update GitHub OAuth App callback URL**:
+   - Go back to your GitHub OAuth App settings
+   - Update the **Authorization callback URL** with the URL from Supabase (format: `https://your-project.supabase.co/auth/v1/callback`)
+   - Click **Update application**
+
+**For Production:**
+- Create a separate GitHub OAuth App for production
+- Use your production URL as the Homepage URL
+- Use the production Supabase callback URL
+
 ### Email Templates (Optional)
 
 You can customize the email templates for:

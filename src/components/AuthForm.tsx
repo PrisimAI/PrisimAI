@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { GithubLogo } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 interface AuthFormProps {
@@ -12,10 +14,11 @@ interface AuthFormProps {
 }
 
 export function AuthForm({ onToggleMode, mode }: AuthFormProps) {
-  const { signIn, signUp } = useAuth()
+  const { signIn, signUp, signInWithGitHub } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [githubLoading, setGithubLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -58,6 +61,22 @@ export function AuthForm({ onToggleMode, mode }: AuthFormProps) {
     }
   }
 
+  const handleGitHubSignIn = async () => {
+    setGithubLoading(true)
+    try {
+      const { error } = await signInWithGitHub()
+      if (error) {
+        toast.error(error.message)
+        setGithubLoading(false)
+      }
+      // Don't set loading to false here as we're redirecting
+    } catch (error) {
+      toast.error('An unexpected error occurred')
+      console.error(error)
+      setGithubLoading(false)
+    }
+  }
+
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
@@ -70,6 +89,26 @@ export function AuthForm({ onToggleMode, mode }: AuthFormProps) {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={handleGitHubSignIn}
+            disabled={loading || githubLoading}
+          >
+            <GithubLogo size={18} className="mr-2" />
+            {githubLoading ? 'Redirecting...' : `Continue with GitHub`}
+          </Button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <Separator className="w-full" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">Or continue with email</span>
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
