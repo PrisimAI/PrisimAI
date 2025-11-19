@@ -6,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 import { getTextModels, getImageModels, type TextModel, type ImageModel } from '@/lib/pollinations-api'
 import type { AppMode } from '@/lib/types'
 
@@ -18,7 +19,7 @@ interface ModelSelectorProps {
 export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelectorProps) {
   const [textModels, setTextModels] = useState<TextModel[]>([])
   const [imageModels, setImageModels] = useState<ImageModel[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function loadModels() {
@@ -49,18 +50,32 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
   const models = mode === 'chat' ? textModels : imageModels
   const displayModels = Array.isArray(models) ? models.slice(0, 10) : []
 
+  if (loading) {
+    return (
+      <div className="border-b bg-background px-6 py-3">
+        <Skeleton className="h-9 w-[200px]" />
+      </div>
+    )
+  }
+
   return (
     <div className="border-b bg-background px-6 py-3">
-      <Select value={selectedModel} onValueChange={onModelChange} disabled={loading}>
+      <Select value={selectedModel} onValueChange={onModelChange}>
         <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder={loading ? 'Loading models...' : 'Select model'} />
+          <SelectValue placeholder="Select model" />
         </SelectTrigger>
         <SelectContent>
-          {displayModels.map((model) => (
-            <SelectItem key={model.name} value={model.name}>
-              {model.name}
+          {displayModels.length > 0 ? (
+            displayModels.map((model) => (
+              <SelectItem key={model.name} value={model.name}>
+                {model.description || model.name}
+              </SelectItem>
+            ))
+          ) : (
+            <SelectItem value="default" disabled>
+              No models available
             </SelectItem>
-          ))}
+          )}
         </SelectContent>
       </Select>
     </div>

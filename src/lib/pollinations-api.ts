@@ -18,6 +18,13 @@ export interface ImageModel {
   aliases?: string[]
 }
 
+const FALLBACK_TEXT_MODELS: TextModel[] = [
+  { name: 'openai', description: 'OpenAI GPT' },
+  { name: 'mistral', description: 'Mistral AI' },
+  { name: 'claude', description: 'Anthropic Claude' },
+  { name: 'llama', description: 'Meta Llama' },
+]
+
 export async function getTextModels(): Promise<TextModel[]> {
   try {
     const response = await fetch(`${BASE_URL}/v1/models`, {
@@ -28,26 +35,26 @@ export async function getTextModels(): Promise<TextModel[]> {
     
     if (!response.ok) {
       console.warn('API call failed, using fallback models')
-      return [
-        { name: 'openai', description: 'OpenAI GPT' },
-        { name: 'mistral', description: 'Mistral AI' },
-        { name: 'claude', description: 'Anthropic Claude' },
-        { name: 'llama', description: 'Meta Llama' },
-      ]
+      return FALLBACK_TEXT_MODELS
     }
     
     const data = await response.json()
-    return Array.isArray(data) ? data : data.data || []
+    const models = Array.isArray(data) ? data : data.data || []
+    
+    return models.length > 0 ? models : FALLBACK_TEXT_MODELS
   } catch (error) {
     console.error('Error fetching text models:', error)
-    return [
-      { name: 'openai', description: 'OpenAI GPT' },
-      { name: 'mistral', description: 'Mistral AI' },
-      { name: 'claude', description: 'Anthropic Claude' },
-      { name: 'llama', description: 'Meta Llama' },
-    ]
+    return FALLBACK_TEXT_MODELS
   }
 }
+
+const FALLBACK_IMAGE_MODELS: ImageModel[] = [
+  { name: 'flux', description: 'Flux' },
+  { name: 'flux-realism', description: 'Flux Realism' },
+  { name: 'flux-anime', description: 'Flux Anime' },
+  { name: 'flux-3d', description: 'Flux 3D' },
+  { name: 'turbo', description: 'Turbo' },
+]
 
 export async function getImageModels(): Promise<ImageModel[]> {
   try {
@@ -59,26 +66,16 @@ export async function getImageModels(): Promise<ImageModel[]> {
     
     if (!response.ok) {
       console.warn('API call failed, using fallback models')
-      return [
-        { name: 'flux', description: 'Flux' },
-        { name: 'flux-realism', description: 'Flux Realism' },
-        { name: 'flux-anime', description: 'Flux Anime' },
-        { name: 'flux-3d', description: 'Flux 3D' },
-        { name: 'turbo', description: 'Turbo' },
-      ]
+      return FALLBACK_IMAGE_MODELS
     }
     
     const data = await response.json()
-    return Array.isArray(data) ? data : data.data || []
+    const models = Array.isArray(data) ? data : data.data || []
+    
+    return models.length > 0 ? models : FALLBACK_IMAGE_MODELS
   } catch (error) {
     console.error('Error fetching image models:', error)
-    return [
-      { name: 'flux', description: 'Flux' },
-      { name: 'flux-realism', description: 'Flux Realism' },
-      { name: 'flux-anime', description: 'Flux Anime' },
-      { name: 'flux-3d', description: 'Flux 3D' },
-      { name: 'turbo', description: 'Turbo' },
-    ]
+    return FALLBACK_IMAGE_MODELS
   }
 }
 
