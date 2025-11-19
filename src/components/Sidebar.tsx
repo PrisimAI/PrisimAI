@@ -4,6 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import type { Conversation, AppMode } from '@/lib/types'
+import { UserMenu } from '@/components/UserMenu'
 
 interface SidebarProps {
   conversations: Conversation[]
@@ -29,11 +30,14 @@ export function Sidebar({
 
   return (
     <div className="flex h-full w-64 flex-col border-r bg-card">
-      <div className="flex items-center gap-2 p-6">
-        <div className="prism-gradient rounded-lg p-2">
-          <Sparkle className="text-white" size={24} weight="fill" />
+      <div className="flex items-center justify-between gap-2 p-6">
+        <div className="flex items-center gap-2">
+          <div className="prism-gradient rounded-lg p-2">
+            <Sparkle className="text-white" size={24} weight="fill" />
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight">PrismAI</h1>
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight">PrismAI</h1>
+        <UserMenu />
       </div>
 
       <div className="px-3 pb-3">

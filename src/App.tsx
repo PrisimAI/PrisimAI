@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocalStorage } from './hooks/use-local-storage'
+import { useAuth } from './contexts/AuthContext'
 import { Toaster, toast } from 'sonner'
 import { Sidebar } from './components/Sidebar'
 import { ChatMessage } from './components/ChatMessage'
@@ -7,12 +8,14 @@ import { ChatInput } from './components/ChatInput'
 import { EmptyState } from './components/EmptyState'
 import { ImageGeneration } from './components/ImageGeneration'
 import { ModelSelector } from './components/ModelSelector'
+import { AuthPage } from './components/AuthPage'
 import { ScrollArea } from './components/ui/scroll-area'
 import { Skeleton } from './components/ui/skeleton'
 import { generateText, generateImage, type Message } from './lib/pollinations-api'
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode } from './lib/types'
 
 function App() {
+  const { user, loading: authLoading } = useAuth()
   const [conversations, setConversations] = useLocalStorage<Conversation[]>('conversations', [])
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const [mode, setMode] = useState<AppMode>('chat')
@@ -21,6 +24,28 @@ function App() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [pendingMessage, setPendingMessage] = useState<string | null>(null)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
+
+  // Show loading state while checking auth
+  if (authLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <Skeleton className="h-12 w-48 mx-auto" />
+          <Skeleton className="h-4 w-64 mx-auto" />
+        </div>
+      </div>
+    )
+  }
+
+  // Show auth page if not logged in
+  if (!user) {
+    return (
+      <>
+        <AuthPage />
+        <Toaster position="top-center" />
+      </>
+    )
+  }
 
   const conversationsList = conversations || []
   const currentConversation = conversationsList.find((c) => c.id === currentConversationId)
