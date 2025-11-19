@@ -72,8 +72,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGitHub = async () => {
     // Construct the redirect URL including the base path for GitHub Pages deployment
     // The base path is defined in vite.config.ts as '/PrisimAI/'
-    const baseUrl = import.meta.env.BASE_URL || '/'
-    const redirectUrl = `${window.location.origin}${baseUrl}`
+    // For production, use VITE_APP_URL if set (which already includes the base path)
+    // For local development, construct from window.location.origin + base path
+    const appUrl = import.meta.env.VITE_APP_URL
+    const redirectUrl = appUrl || `${window.location.origin}${import.meta.env.BASE_URL || '/'}`
     
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
