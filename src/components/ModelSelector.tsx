@@ -26,13 +26,18 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
       try {
         if (mode === 'chat') {
           const models = await getTextModels()
-          setTextModels(models)
+          setTextModels(Array.isArray(models) ? models : [])
         } else {
           const models = await getImageModels()
-          setImageModels(models)
+          setImageModels(Array.isArray(models) ? models : [])
         }
       } catch (error) {
         console.error('Failed to load models:', error)
+        if (mode === 'chat') {
+          setTextModels([])
+        } else {
+          setImageModels([])
+        }
       } finally {
         setLoading(false)
       }
@@ -42,7 +47,7 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
   }, [mode])
 
   const models = mode === 'chat' ? textModels : imageModels
-  const displayModels = models.slice(0, 10)
+  const displayModels = Array.isArray(models) ? models.slice(0, 10) : []
 
   return (
     <div className="border-b bg-background px-6 py-3">
