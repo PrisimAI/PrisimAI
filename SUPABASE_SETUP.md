@@ -29,6 +29,8 @@ You need a Supabase account. If you don't have one:
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url_here
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+# Leave VITE_APP_URL empty for local development
+VITE_APP_URL=
 ```
 
 3. **Replace the placeholder values** with your actual credentials from the Supabase dashboard
@@ -37,6 +39,8 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
 ```env
 VITE_SUPABASE_URL=https://abcdefghijklmnop.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFiY2RlZmdoaWprbG1ub3AiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTY5ODc2NTQzMiwiZXhwIjoyMDE0MzQxNDMyfQ.example_key_here
+# Leave VITE_APP_URL empty for local development (defaults to localhost)
+VITE_APP_URL=
 ```
 
 ### For Production/Deployment
@@ -50,6 +54,9 @@ If you're deploying to a hosting platform (Vercel, Netlify, etc.), add these env
 Add the same two variables:
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
+
+For GitHub Pages deployment, also add:
+- `VITE_APP_URL` = `https://PrisimAI.github.io/PrisimAI/` (note: this is automatically set in the GitHub Actions workflow)
 
 ## Security Notes
 
@@ -100,10 +107,10 @@ To enable GitHub sign-in:
 
 **For Production (GitHub Pages):**
 - Create a separate GitHub OAuth App for production
-- Use your production URL as the Homepage URL (e.g., `https://prisimai.github.io/PrisimAI/`)
-  - **Important**: Include the `/PrisimAI/` base path if deploying to GitHub Pages
+- Use your production URL as the Homepage URL: `https://PrisimAI.github.io/PrisimAI/`
+  - **Important**: The application will automatically use this URL for OAuth redirects when deployed to GitHub Pages
 - Use the production Supabase callback URL
-- The app automatically handles the base path configured in `vite.config.ts`
+- The GitHub Actions workflow automatically sets `VITE_APP_URL=https://PrisimAI.github.io/PrisimAI/` during deployment
 
 ### Email Templates (Optional)
 
@@ -183,9 +190,9 @@ create policy "Users can update their own profile"
 
 ### OAuth redirect errors (React error #310 or similar)
 - This can happen if the OAuth redirect URL doesn't match your app's deployment path
-- The app automatically handles the base path from `vite.config.ts` (`/PrisimAI/` for GitHub Pages)
-- For local development, this should work without changes
-- For production, ensure your GitHub OAuth App's Homepage URL includes the base path (e.g., `https://prisimai.github.io/PrisimAI/`)
+- For local development, the app uses `window.location.origin` (e.g., `http://localhost:5173`) with the base path from `vite.config.ts`
+- For production (GitHub Pages), the GitHub Actions workflow automatically sets `VITE_APP_URL=https://PrisimAI.github.io/PrisimAI/`
+- Ensure your GitHub OAuth App's Homepage URL matches: `https://PrisimAI.github.io/PrisimAI/`
 - After OAuth login, users should be redirected to the correct app URL with the base path
 
 ## Additional Resources
