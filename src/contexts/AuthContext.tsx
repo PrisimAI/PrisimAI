@@ -37,19 +37,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
-    })
-
-    // Clean URL hash after a brief delay to allow Supabase to process OAuth tokens
-    // This prevents sensitive tokens from being exposed in the URL
-    const cleanupTimeout = setTimeout(() => {
+      
+      // Clean URL hash after auth state changes (e.g., after OAuth login)
+      // This prevents sensitive tokens from being exposed in the URL
       if (window.location.hash && window.location.hash.includes('access_token')) {
-        window.history.replaceState(null, '', window.location.pathname + window.location.search)
+        // Use a small delay to ensure Supabase has fully processed the tokens
+        setTimeout(() => {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search)
+        }, 100)
       }
-    }, 100) // 100ms delay to ensure Supabase has processed the hash
+    })
 
     return () => {
       subscription.unsubscribe()
-      clearTimeout(cleanupTimeout)
     }
   }, [])
 
