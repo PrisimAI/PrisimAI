@@ -1,5 +1,5 @@
 const API_KEY = 'plln_sk_niDbx9acZfiWE3tdVmrXKyk0wh5GnGdM'
-const BASE_URL = 'https://enter.pollinations.ai/api'
+const BASE_URL = 'https://enter.pollinations.ai/api/generate/v1'
 
 export interface Message {
   role: 'system' | 'user' | 'assistant'
