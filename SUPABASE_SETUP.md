@@ -56,7 +56,7 @@ Add the same two variables:
 - `VITE_SUPABASE_ANON_KEY`
 
 For GitHub Pages deployment, also add:
-- `VITE_APP_URL` = `https://PrisimAI.github.io/PrisimAI` (note: this is automatically set in the GitHub Actions workflow)
+- `VITE_APP_URL` = `https://PrisimAI.github.io/PrisimAI/` (note: this is automatically set in the GitHub Actions workflow)
 
 ## Security Notes
 
@@ -107,10 +107,10 @@ To enable GitHub sign-in:
 
 **For Production (GitHub Pages):**
 - Create a separate GitHub OAuth App for production
-- Use your production URL as the Homepage URL: `https://PrisimAI.github.io/PrisimAI`
+- Use your production URL as the Homepage URL: `https://PrisimAI.github.io/PrisimAI/`
   - **Important**: The application will automatically use this URL for OAuth redirects when deployed to GitHub Pages
 - Use the production Supabase callback URL
-- The GitHub Actions workflow automatically sets `VITE_APP_URL=https://PrisimAI.github.io/PrisimAI` during deployment
+- The GitHub Actions workflow automatically sets `VITE_APP_URL=https://PrisimAI.github.io/PrisimAI/` during deployment
 
 ### Email Templates (Optional)
 
@@ -191,8 +191,8 @@ create policy "Users can update their own profile"
 ### OAuth redirect errors (React error #310 or similar)
 - This can happen if the OAuth redirect URL doesn't match your app's deployment path
 - For local development, the app uses `window.location.origin` (e.g., `http://localhost:5173`) with the base path from `vite.config.ts`
-- For production (GitHub Pages), the GitHub Actions workflow automatically sets `VITE_APP_URL=https://PrisimAI.github.io/PrisimAI`
-- Ensure your GitHub OAuth App's Homepage URL matches: `https://PrisimAI.github.io/PrisimAI`
+- For production (GitHub Pages), the GitHub Actions workflow automatically sets `VITE_APP_URL=https://PrisimAI.github.io/PrisimAI/`
+- Ensure your GitHub OAuth App's Homepage URL matches: `https://PrisimAI.github.io/PrisimAI/`
 - After OAuth login, users should be redirected to the correct app URL with the base path
 
 ## Additional Resources

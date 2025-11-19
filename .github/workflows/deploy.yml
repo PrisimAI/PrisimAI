@@ -33,7 +33,7 @@ jobs:
 
       - name: Build
         env:
-          VITE_APP_URL: https://PrisimAI.github.io/PrisimAI
+          VITE_APP_URL: https://PrisimAI.github.io/PrisimAI/
         run: npm run build
 
       - name: Upload artifact
