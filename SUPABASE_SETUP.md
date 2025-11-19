@@ -98,10 +98,12 @@ To enable GitHub sign-in:
    - Update the **Authorization callback URL** with the URL from Supabase (format: `https://your-project.supabase.co/auth/v1/callback`)
    - Click **Update application**
 
-**For Production:**
+**For Production (GitHub Pages):**
 - Create a separate GitHub OAuth App for production
-- Use your production URL as the Homepage URL
+- Use your production URL as the Homepage URL (e.g., `https://prisimai.github.io/PrisimAI/`)
+  - **Important**: Include the `/PrisimAI/` base path if deploying to GitHub Pages
 - Use the production Supabase callback URL
+- The app automatically handles the base path configured in `vite.config.ts`
 
 ### Email Templates (Optional)
 
@@ -178,6 +180,13 @@ create policy "Users can update their own profile"
 - Make sure your `.env` file is in the root directory
 - Variable names must start with `VITE_` to be accessible in Vite applications
 - Restart the development server after changing `.env`
+
+### OAuth redirect errors (React error #310 or similar)
+- This can happen if the OAuth redirect URL doesn't match your app's deployment path
+- The app automatically handles the base path from `vite.config.ts` (`/PrisimAI/` for GitHub Pages)
+- For local development, this should work without changes
+- For production, ensure your GitHub OAuth App's Homepage URL includes the base path (e.g., `https://prisimai.github.io/PrisimAI/`)
+- After OAuth login, users should be redirected to the correct app URL with the base path
 
 ## Additional Resources
 
