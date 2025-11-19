@@ -20,6 +20,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Clean URL hash if it contains authentication tokens
+    // This prevents sensitive tokens from being exposed in the URL
+    if (window.location.hash && window.location.hash.includes('access_token')) {
+      // Replace the current history entry to remove the hash
+      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
