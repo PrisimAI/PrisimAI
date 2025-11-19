@@ -19,6 +19,7 @@ function App() {
   const [textModel, setTextModel] = useState('openai')
   const [imageModel, setImageModel] = useState('flux')
   const [isGenerating, setIsGenerating] = useState(false)
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
   const conversationsList = conversations || []
@@ -32,6 +33,13 @@ function App() {
       }
     }
   }, [currentConversation?.messages])
+
+  useEffect(() => {
+    if (pendingMessage && currentConversationId) {
+      setPendingMessage(null)
+      handleSendMessage(pendingMessage)
+    }
+  }, [currentConversationId, pendingMessage])
 
   const createNewConversation = () => {
     const newConversation: Conversation = {
@@ -83,9 +91,11 @@ function App() {
   const handleSendMessage = async (content: string) => {
     if (!currentConversationId) {
       createNewConversation()
-      setTimeout(() => handleSendMessage(content), 100)
+      setPendingMessage(content)
       return
     }
+
+    if (isGenerating) return
 
     const conversation = conversationsList.find((c) => c.id === currentConversationId)
     if (!conversation) return
@@ -192,7 +202,7 @@ function App() {
   const handleExampleClick = (prompt: string) => {
     if (!currentConversationId) {
       createNewConversation()
-      setTimeout(() => handleSendMessage(prompt), 100)
+      setPendingMessage(prompt)
     } else {
       handleSendMessage(prompt)
     }
