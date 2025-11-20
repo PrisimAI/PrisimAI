@@ -39,7 +39,7 @@ A modern, minimalist AI platform that enables users to interact with advanced la
    npm run dev
    ```
 
-5. Open your browser and navigate to the local development URL (typically `http://localhost:5000`)
+5. Open your browser and navigate to the local development URL (typically `http://localhost:5173/PrisimAI/`)
 
 ## 📚 Documentation
 
@@ -54,4 +54,4 @@ A modern, minimalist AI platform that enables users to interact with advanced la
 
 ## 📄 License
 
-The Spark Template files and resources from GitHub are licensed under the terms of the MIT license, Copyright GitHub, Inc.
+This project is licensed under the MIT License.
