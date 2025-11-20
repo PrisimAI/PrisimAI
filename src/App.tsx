@@ -259,8 +259,12 @@ function App() {
     )
   }
 
-  // Show auth page if not logged in
-  if (!user) {
+  // Development mode: bypass auth for testing
+  const isDevelopment = import.meta.env.DEV
+  const bypassAuth = isDevelopment && !user
+
+  // Show auth page if not logged in (unless in dev mode bypass)
+  if (!user && !bypassAuth) {
     return (
       <>
         <AuthPage />
@@ -282,13 +286,11 @@ function App() {
       />
 
       <div className="flex flex-1 flex-col">
-        {currentConversation && (
-          <ModelSelector
-            mode={mode}
-            selectedModel={mode === 'chat' ? textModel : imageModel}
-            onModelChange={mode === 'chat' ? setTextModel : setImageModel}
-          />
-        )}
+        <ModelSelector
+          mode={mode}
+          selectedModel={mode === 'chat' ? textModel : imageModel}
+          onModelChange={mode === 'chat' ? setTextModel : setImageModel}
+        />
 
         <div className="flex-1 overflow-hidden">
           {showEmpty ? (

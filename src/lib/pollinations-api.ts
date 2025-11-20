@@ -36,6 +36,7 @@ export interface TextModel {
   name: string
   description: string
   aliases?: string[]
+  tools?: boolean
 }
 
 export interface ImageModel {
@@ -45,10 +46,10 @@ export interface ImageModel {
 }
 
 const FALLBACK_TEXT_MODELS: TextModel[] = [
-  { name: 'openai', description: 'OpenAI GPT' },
-  { name: 'mistral', description: 'Mistral AI' },
-  { name: 'claude', description: 'Anthropic Claude' },
-  { name: 'llama', description: 'Meta Llama' },
+  { name: 'openai', description: 'OpenAI GPT-4', tools: true },
+  { name: 'mistral', description: 'Mistral Large', tools: true },
+  { name: 'claude', description: 'Anthropic Claude', tools: true },
+  { name: 'llama', description: 'Meta Llama 3', tools: false },
 ]
 
 export async function getTextModels(): Promise<TextModel[]> {
@@ -65,9 +66,18 @@ export async function getTextModels(): Promise<TextModel[]> {
     }
     
     const data = await response.json()
-    const models = Array.isArray(data) ? data : data.data || []
+    let models = Array.isArray(data) ? data : data.data || []
     
-    return models.length > 0 ? models : FALLBACK_TEXT_MODELS
+    // Filter out invalid models and ensure they have required properties
+    models = models.filter((m: any) => m && m.name && m.description)
+    
+    // If no valid models, use fallback
+    if (models.length === 0) {
+      console.warn('No valid models returned, using fallback models')
+      return FALLBACK_TEXT_MODELS
+    }
+    
+    return models
   } catch (error) {
     console.error('Error fetching text models:', error)
     return FALLBACK_TEXT_MODELS
@@ -96,9 +106,18 @@ export async function getImageModels(): Promise<ImageModel[]> {
     }
     
     const data = await response.json()
-    const models = Array.isArray(data) ? data : data.data || []
+    let models = Array.isArray(data) ? data : data.data || []
     
-    return models.length > 0 ? models : FALLBACK_IMAGE_MODELS
+    // Filter out invalid models and ensure they have required properties
+    models = models.filter((m: any) => m && m.name && m.description)
+    
+    // If no valid models, use fallback
+    if (models.length === 0) {
+      console.warn('No valid models returned, using fallback models')
+      return FALLBACK_IMAGE_MODELS
+    }
+    
+    return models
   } catch (error) {
     console.error('Error fetching image models:', error)
     return FALLBACK_IMAGE_MODELS
@@ -131,7 +150,7 @@ export async function generateText(
     requestBody.max_tokens = options.max_tokens
   }
 
-  const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
+  const response = await fetch(`${BASE_URL}/v1/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

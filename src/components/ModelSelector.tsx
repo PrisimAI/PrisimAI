@@ -79,7 +79,7 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
                 <div className="flex items-center justify-between gap-2 w-full">
                   <span>{model.description || model.name}</span>
                   {(model as any).tools && (
-                    <Badge variant="secondary" className="ml-2 text-xs">Tools</Badge>
+                    <Badge variant="secondary" className="ml-2 text-xs shrink-0">Tools</Badge>
                   )}
                 </div>
               </SelectItem>
