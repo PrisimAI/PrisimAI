@@ -61,7 +61,7 @@ export function ChatInput({ onSend, disabled, placeholder = 'Ask anything' }: Ch
           </div>
         </div>
         <p className="mt-2 text-center text-xs text-muted-foreground">
-          PrismAI can make mistakes. Consider checking important information.
+          PrisimAI can make mistakes. Consider checking important information.
         </p>
       </div>
     </div>

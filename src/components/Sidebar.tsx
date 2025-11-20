@@ -35,7 +35,7 @@ export function Sidebar({
           <div className="prism-gradient rounded-lg p-2">
             <Sparkle className="text-white" size={24} weight="fill" />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight">PrismAI</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">PrisimAI</h1>
         </div>
         <UserMenu />
       </div>

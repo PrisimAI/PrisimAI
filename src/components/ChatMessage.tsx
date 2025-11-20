@@ -40,7 +40,7 @@ export function ChatMessage({ message, onRegenerate }: ChatMessageProps) {
         </AvatarFallback>
       </Avatar>
       <div className="flex-1 space-y-2 overflow-hidden">
-        <p className="text-sm font-medium">{isUser ? 'You' : 'PrismAI'}</p>
+        <p className="text-sm font-medium">{isUser ? 'You' : 'PrisimAI'}</p>
         <div className={cn('prose prose-sm dark:prose-invert max-w-none', message.isStreaming && 'streaming-cursor')}>
           {!isUser && !message.isStreaming ? (
             <div dangerouslySetInnerHTML={{ __html: formattedContent }} />
