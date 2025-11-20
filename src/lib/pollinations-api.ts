@@ -150,7 +150,7 @@ export async function generateText(
     requestBody.max_tokens = options.max_tokens
   }
 
-  const response = await fetch(`${BASE_URL}/v1/completions`, {
+  const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
