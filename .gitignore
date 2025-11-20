@@ -36,3 +36,4 @@ screenshots/
 *.png
 *.jpg
 *.jpeg
+tmp/
