@@ -1,8 +1,9 @@
 const API_KEY = 'plln_sk_niDbx9acZfiWE3tdVmrXKyk0wh5GnGdM'
 const BASE_URL = 'https://enter.pollinations.ai/api/generate'
 
-// Development/Mock mode - enables fallback responses when API is unavailable
-const ENABLE_MOCK_MODE = import.meta.env.DEV || import.meta.env.VITE_ENABLE_MOCK_API === 'true'
+// Force mock mode only if explicitly enabled via environment variable
+// By default, always try the real API first, and fall back to mock on error
+const FORCE_MOCK_MODE = import.meta.env.VITE_ENABLE_MOCK_API === 'true'
 
 export interface Message {
   role: 'system' | 'user' | 'assistant'
@@ -56,9 +57,9 @@ const FALLBACK_TEXT_MODELS: TextModel[] = [
 ]
 
 export async function getTextModels(): Promise<TextModel[]> {
-  // In mock mode or if API is blocked, return fallback models immediately
-  if (ENABLE_MOCK_MODE) {
-    console.info('Using mock/fallback text models')
+  // Only skip real API if force mock mode is enabled
+  if (FORCE_MOCK_MODE) {
+    console.info('Force mock mode enabled, using fallback text models')
     return FALLBACK_TEXT_MODELS
   }
 
@@ -102,9 +103,9 @@ const FALLBACK_IMAGE_MODELS: ImageModel[] = [
 ]
 
 export async function getImageModels(): Promise<ImageModel[]> {
-  // In mock mode or if API is blocked, return fallback models immediately
-  if (ENABLE_MOCK_MODE) {
-    console.info('Using mock/fallback image models')
+  // Only skip real API if force mock mode is enabled
+  if (FORCE_MOCK_MODE) {
+    console.info('Force mock mode enabled, using fallback image models')
     return FALLBACK_IMAGE_MODELS
   }
 
@@ -145,9 +146,8 @@ export async function generateText(
   onChunk?: (chunk: string) => void,
   options?: GenerateTextOptions
 ): Promise<string> {
-  // Mock mode: Simulate AI response when API is unavailable
-  if (ENABLE_MOCK_MODE) {
-    console.info('Using mock text generation')
+  // Helper function for mock response
+  const getMockResponse = async () => {
     const lastUserMessage = messages.filter(m => m.role === 'user').pop()
     const userContent = lastUserMessage?.content || ''
     
@@ -167,6 +167,13 @@ export async function generateText(
     return mockResponse
   }
 
+  // Only use mock mode if explicitly forced
+  if (FORCE_MOCK_MODE) {
+    console.info('Force mock mode enabled, using mock text generation')
+    return getMockResponse()
+  }
+
+  // Try real API first
   const requestBody: any = {
     model,
     messages,
@@ -187,61 +194,65 @@ export async function generateText(
     requestBody.max_tokens = options.max_tokens
   }
 
-  const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${API_KEY}`,
-    },
-    body: JSON.stringify(requestBody),
-  })
+  try {
+    const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${API_KEY}`,
+      },
+      body: JSON.stringify(requestBody),
+    })
 
-  if (!response.ok) {
-    throw new Error('Failed to generate text')
-  }
+    if (!response.ok) {
+      console.warn('API call failed, falling back to mock response')
+      return getMockResponse()
+    }
 
-  if (onChunk && response.body) {
-    const reader = response.body.getReader()
-    const decoder = new TextDecoder()
-    let fullText = ''
+    if (onChunk && response.body) {
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let fullText = ''
 
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
 
-      const chunk = decoder.decode(value, { stream: true })
-      const lines = chunk.split('\n')
+        const chunk = decoder.decode(value, { stream: true })
+        const lines = chunk.split('\n')
 
-      for (const line of lines) {
-        if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-          try {
-            const data = JSON.parse(line.slice(6))
-            const content = data.choices?.[0]?.delta?.content || ''
-            if (content) {
-              fullText += content
-              onChunk(content)
+        for (const line of lines) {
+          if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+            try {
+              const data = JSON.parse(line.slice(6))
+              const content = data.choices?.[0]?.delta?.content || ''
+              if (content) {
+                fullText += content
+                onChunk(content)
+              }
+            } catch (e) {
+              continue
             }
-          } catch (e) {
-            continue
           }
         }
       }
+
+      return fullText
     }
 
-    return fullText
+    const data = await response.json()
+    return data.choices[0].message.content
+  } catch (error) {
+    console.error('Error generating text, falling back to mock:', error)
+    return getMockResponse()
   }
-
-  const data = await response.json()
-  return data.choices[0].message.content
 }
-
 export async function generateImage(
   prompt: string,
   model: string = 'flux'
 ): Promise<string> {
-  // Mock mode: Return a placeholder image when API is unavailable
-  if (ENABLE_MOCK_MODE) {
-    console.info('Using mock image generation')
+  // Helper function for mock image
+  const getMockImage = () => {
     // Escape prompt to prevent XSS in SVG
     const escapedPrompt = prompt
       .replace(/&/g, '&amp;')
@@ -266,19 +277,32 @@ export async function generateImage(
     return URL.createObjectURL(blob)
   }
 
-  const encodedPrompt = encodeURIComponent(prompt)
-  const url = `${BASE_URL}/image/${encodedPrompt}?model=${model}`
-  
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${API_KEY}`,
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error('Failed to generate image')
+  // Only use mock mode if explicitly forced
+  if (FORCE_MOCK_MODE) {
+    console.info('Force mock mode enabled, using mock image generation')
+    return getMockImage()
   }
 
-  const blob = await response.blob()
-  return URL.createObjectURL(blob)
+  // Try real API first
+  try {
+    const encodedPrompt = encodeURIComponent(prompt)
+    const url = `${BASE_URL}/image/${encodedPrompt}?model=${model}`
+    
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+      },
+    })
+
+    if (!response.ok) {
+      console.warn('API call failed, falling back to mock image')
+      return getMockImage()
+    }
+
+    const blob = await response.blob()
+    return URL.createObjectURL(blob)
+  } catch (error) {
+    console.error('Error generating image, falling back to mock:', error)
+    return getMockImage()
+  }
 }
