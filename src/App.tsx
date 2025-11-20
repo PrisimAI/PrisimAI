@@ -94,10 +94,24 @@ function App() {
 
     if (isGenerating) return
 
-    const conversation = conversationsList.find((c) => c.id === currentConversationId)
-    if (!conversation) return
+    // Get the current conversation messages before adding new ones
+    let conversationMessages: ChatMessageType[] = []
+    let conversationExists = false
+    setConversations((current = []) => {
+      const conversation = current.find((c) => c.id === currentConversationId)
+      if (conversation) {
+        conversationMessages = conversation.messages
+        conversationExists = true
+      }
+      return current
+    })
 
-    if (conversation.messages.length === 0) {
+    if (!conversationExists) {
+      console.warn('Conversation not found:', currentConversationId)
+      return
+    }
+
+    if (conversationMessages.length === 0) {
       updateConversationTitle(currentConversationId, content)
     }
 
@@ -123,8 +137,9 @@ function App() {
       setIsGenerating(true)
 
       try {
+        // Build message history from the conversation messages before we added the new ones
         const messages: Message[] = [
-          ...conversation.messages.map((m) => ({
+          ...conversationMessages.map((m) => ({
             role: m.role as 'user' | 'assistant',
             content: m.content,
           })),
@@ -185,13 +200,16 @@ function App() {
         setIsGenerating(false)
       }
     }
-  }, [currentConversationId, isGenerating, conversationsList, mode, textModel, imageModel, createNewConversation, setConversations, updateConversationTitle, addMessage, updateLastMessage])
+  }, [currentConversationId, isGenerating, mode, textModel, imageModel, createNewConversation, setConversations, updateConversationTitle, addMessage, updateLastMessage])
 
   useEffect(() => {
     if (pendingMessage && currentConversationId) {
       const messageToSend = pendingMessage
       setPendingMessage(null)
-      handleSendMessage(messageToSend)
+      // Small delay to ensure conversation state has updated
+      setTimeout(() => {
+        handleSendMessage(messageToSend)
+      }, 0)
     }
   }, [currentConversationId, pendingMessage, handleSendMessage])
 

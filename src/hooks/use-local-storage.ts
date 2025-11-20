@@ -24,18 +24,20 @@ export function useLocalStorage<T>(
     }
   }, [key, storedValue])
 
-  // Wrapper function to match useKV's API
+  // Wrapper function to match useState's API
   const setValue = useCallback(
     (value: T | ((val: T) => T)) => {
       try {
-        // Allow value to be a function so we have same API as useState
-        const valueToStore = value instanceof Function ? value(storedValue) : value
-        setStoredValue(valueToStore)
+        // Use functional state update to ensure we get the latest value
+        setStoredValue((currentValue) => {
+          const valueToStore = value instanceof Function ? value(currentValue) : value
+          return valueToStore
+        })
       } catch (error) {
         console.error(`Error setting localStorage key "${key}":`, error)
       }
     },
-    [key, storedValue]
+    [key]
   )
 
   return [storedValue, setValue]
