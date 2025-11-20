@@ -4,6 +4,32 @@ const BASE_URL = 'https://enter.pollinations.ai/api/generate'
 export interface Message {
   role: 'system' | 'user' | 'assistant'
   content: string
+  tool_calls?: ToolCall[]
+}
+
+export interface ToolCall {
+  id: string
+  type: 'function'
+  function: {
+    name: string
+    arguments: string
+  }
+}
+
+export interface Tool {
+  type: 'function'
+  function: {
+    name: string
+    description: string
+    parameters: Record<string, any>
+  }
+}
+
+export interface GenerateTextOptions {
+  tools?: Tool[]
+  tool_choice?: 'auto' | 'none' | { type: 'function'; function: { name: string } }
+  temperature?: number
+  max_tokens?: number
 }
 
 export interface TextModel {
@@ -82,19 +108,36 @@ export async function getImageModels(): Promise<ImageModel[]> {
 export async function generateText(
   messages: Message[],
   model: string = 'openai',
-  onChunk?: (chunk: string) => void
+  onChunk?: (chunk: string) => void,
+  options?: GenerateTextOptions
 ): Promise<string> {
+  const requestBody: any = {
+    model,
+    messages,
+    stream: !!onChunk,
+  }
+
+  // Add optional parameters
+  if (options?.tools && options.tools.length > 0) {
+    requestBody.tools = options.tools
+    requestBody.tool_choice = options.tool_choice || 'auto'
+  }
+  
+  if (options?.temperature !== undefined) {
+    requestBody.temperature = options.temperature
+  }
+  
+  if (options?.max_tokens !== undefined) {
+    requestBody.max_tokens = options.max_tokens
+  }
+
   const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${API_KEY}`,
     },
-    body: JSON.stringify({
-      model,
-      messages,
-      stream: !!onChunk,
-    }),
+    body: JSON.stringify(requestBody),
   })
 
   if (!response.ok) {

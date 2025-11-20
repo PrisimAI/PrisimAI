@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useLocalStorage } from './hooks/use-local-storage'
 import { useAuth } from './contexts/AuthContext'
 import { Toaster, toast } from 'sonner'
@@ -12,6 +12,7 @@ import { AuthPage } from './components/AuthPage'
 import { ScrollArea } from './components/ui/scroll-area'
 import { Skeleton } from './components/ui/skeleton'
 import { generateText, generateImage, type Message } from './lib/pollinations-api'
+import { AI_TOOLS } from './lib/ai-tools'
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode } from './lib/types'
 
 function App() {
@@ -37,15 +38,7 @@ function App() {
     }
   }, [currentConversation?.messages])
 
-  useEffect(() => {
-    if (pendingMessage && currentConversationId) {
-      const messageToSend = pendingMessage
-      setPendingMessage(null)
-      handleSendMessage(messageToSend)
-    }
-  }, [currentConversationId])
-
-  const createNewConversation = () => {
+  const createNewConversation = useCallback(() => {
     const newConversation: Conversation = {
       id: `conv_${Date.now()}`,
       title: mode === 'chat' ? 'New Chat' : 'New Image Generation',
@@ -57,18 +50,18 @@ function App() {
 
     setConversations((current = []) => [newConversation, ...current])
     setCurrentConversationId(newConversation.id)
-  }
+  }, [mode, setConversations])
 
-  const updateConversationTitle = (conversationId: string, firstMessage: string) => {
+  const updateConversationTitle = useCallback((conversationId: string, firstMessage: string) => {
     const title = firstMessage.slice(0, 50) + (firstMessage.length > 50 ? '...' : '')
     setConversations((current = []) =>
       current.map((c) =>
         c.id === conversationId ? { ...c, title, updatedAt: Date.now() } : c
       )
     )
-  }
+  }, [setConversations])
 
-  const addMessage = (conversationId: string, message: ChatMessageType) => {
+  const addMessage = useCallback((conversationId: string, message: ChatMessageType) => {
     setConversations((current = []) =>
       current.map((c) =>
         c.id === conversationId
@@ -76,9 +69,9 @@ function App() {
           : c
       )
     )
-  }
+  }, [setConversations])
 
-  const updateLastMessage = (conversationId: string, content: string, isStreaming: boolean = false) => {
+  const updateLastMessage = useCallback((conversationId: string, content: string, isStreaming: boolean = false) => {
     setConversations((current = []) =>
       current.map((c) => {
         if (c.id !== conversationId) return c
@@ -90,9 +83,9 @@ function App() {
         return { ...c, messages }
       })
     )
-  }
+  }, [setConversations])
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = useCallback(async (content: string) => {
     if (!currentConversationId) {
       createNewConversation()
       setPendingMessage(content)
@@ -145,6 +138,9 @@ function App() {
             true
           )
           assistantMessage.content += chunk
+        }, {
+          tools: AI_TOOLS,
+          tool_choice: 'auto',
         })
 
         updateLastMessage(currentConversationId, assistantMessage.content, false)
@@ -189,7 +185,15 @@ function App() {
         setIsGenerating(false)
       }
     }
-  }
+  }, [currentConversationId, isGenerating, conversationsList, mode, textModel, imageModel, createNewConversation, setConversations, updateConversationTitle, addMessage, updateLastMessage])
+
+  useEffect(() => {
+    if (pendingMessage && currentConversationId) {
+      const messageToSend = pendingMessage
+      setPendingMessage(null)
+      handleSendMessage(messageToSend)
+    }
+  }, [currentConversationId, pendingMessage, handleSendMessage])
 
   const handleDeleteConversation = (id: string) => {
     setConversations((current = []) => current.filter((c) => c.id !== id))
@@ -211,6 +215,19 @@ function App() {
       handleSendMessage(prompt)
     }
   }
+
+  const handleRegenerateMessage = useCallback((messageIndex: number) => {
+    if (!currentConversation) return
+    
+    // Find the user message that corresponds to this assistant message
+    // Look backwards from the current message
+    for (let i = messageIndex - 1; i >= 0; i--) {
+      if (currentConversation.messages[i].role === 'user') {
+        handleSendMessage(currentConversation.messages[i].content)
+        break
+      }
+    }
+  }, [currentConversation, handleSendMessage])
 
   const handleRegenerate = (prompt: string) => {
     handleSendMessage(prompt)
@@ -279,8 +296,12 @@ function App() {
           ) : mode === 'chat' ? (
             <ScrollArea ref={scrollAreaRef} className="h-full">
               <div className="mx-auto max-w-3xl">
-                {currentConversation.messages.map((message) => (
-                  <ChatMessage key={message.id} message={message} />
+                {currentConversation.messages.map((message, index) => (
+                  <ChatMessage 
+                    key={message.id} 
+                    message={message}
+                    onRegenerate={message.role === 'assistant' ? () => handleRegenerateMessage(index) : undefined}
+                  />
                 ))}
                 {isGenerating && currentConversation.messages[currentConversation.messages.length - 1]?.role === 'user' && (
                   <div className="flex gap-4 bg-muted/50 px-6 py-4">
