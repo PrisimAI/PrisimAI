@@ -25,28 +25,6 @@ function App() {
   const [pendingMessage, setPendingMessage] = useState<string | null>(null)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
-  // Show loading state while checking auth
-  if (authLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <Skeleton className="h-12 w-48 mx-auto" />
-          <Skeleton className="h-4 w-64 mx-auto" />
-        </div>
-      </div>
-    )
-  }
-
-  // Show auth page if not logged in
-  if (!user) {
-    return (
-      <>
-        <AuthPage />
-        <Toaster position="top-center" />
-      </>
-    )
-  }
-
   const conversationsList = conversations || []
   const currentConversation = conversationsList.find((c) => c.id === currentConversationId)
 
@@ -251,6 +229,28 @@ function App() {
       .filter((img): img is GeneratedImage => img !== null) || []
 
   const showEmpty = !currentConversation || currentConversation.messages.length === 0
+
+  // Show loading state while checking auth
+  if (authLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <Skeleton className="h-12 w-48 mx-auto" />
+          <Skeleton className="h-4 w-64 mx-auto" />
+        </div>
+      </div>
+    )
+  }
+
+  // Show auth page if not logged in
+  if (!user) {
+    return (
+      <>
+        <AuthPage />
+        <Toaster position="top-center" />
+      </>
+    )
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
