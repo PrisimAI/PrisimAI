@@ -8,14 +8,14 @@ A modern, minimalist AI platform that enables users to interact with advanced la
 - **Image Generation**: Generate images from text descriptions using AI models
 - **Conversation History**: Persistent storage of chat conversations with ability to view and continue previous sessions
 - **Model Selection**: Choose between different AI models for text and image generation
-- **🔐 User Authentication**: Secure account creation and login powered by Supabase
+- **🔐 User Authentication**: Secure account creation and login powered by Firebase
 
 ## 🛠️ Setup
 
 ### Prerequisites
 
 - Node.js (v18 or higher recommended)
-- A Supabase account (for authentication features)
+- A Firebase account (for authentication features)
 
 ### Installation
 
@@ -30,10 +30,9 @@ A modern, minimalist AI platform that enables users to interact with advanced la
    npm install
    ```
 
-3. Configure Supabase authentication:
-   - Copy `.env.example` to `.env`
-   - Follow the detailed instructions in [`SUPABASE_SETUP.md`](./SUPABASE_SETUP.md)
-   - Add your Supabase credentials to `.env`
+3. Configure Firebase authentication:
+   - Follow the detailed instructions in [`FIREBASE_CREDENTIAL_LOCATIONS.md`](./FIREBASE_CREDENTIAL_LOCATIONS.md)
+   - Add your Firebase credentials directly to `/src/lib/firebase.ts`
 
 4. Start the development server:
    ```bash
@@ -44,7 +43,7 @@ A modern, minimalist AI platform that enables users to interact with advanced la
 
 ## 📚 Documentation
 
-- **[Supabase Setup Guide](./SUPABASE_SETUP.md)**: Complete guide for setting up authentication
+- **[Firebase Setup Guide](./FIREBASE_CREDENTIAL_LOCATIONS.md)**: Complete guide for setting up authentication with Firebase
 - **[Product Requirements](./PRD.md)**: Detailed product requirements and design direction
 
 ## 🏗️ Development

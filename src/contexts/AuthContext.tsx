@@ -1,10 +1,22 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { User, Session, AuthError } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
+import { 
+  User, 
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  AuthError as FirebaseAuthError
+} from 'firebase/auth'
+import { auth, githubProvider } from '../lib/firebase'
+
+interface AuthError {
+  message: string
+  code?: string
+}
 
 interface AuthContextType {
   user: User | null
-  session: Session | null
   loading: boolean
   signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
@@ -16,82 +28,69 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    }).catch((error) => {
-      console.error('Error getting session:', error)
+    // Listen for auth state changes
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user)
       setLoading(false)
     })
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-      
-      // Clean URL hash after auth state changes (e.g., after OAuth login)
-      // This prevents sensitive tokens from being exposed in the URL
-      if (window.location.hash && window.location.hash.includes('access_token')) {
-        // Use a small delay to ensure Supabase has fully processed the tokens
-        setTimeout(() => {
-          window.history.replaceState(null, '', window.location.pathname + window.location.search)
-        }, 100)
-      }
-    })
-
-    return () => {
-      subscription.unsubscribe()
-    }
+    return () => unsubscribe()
   }, [])
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
-    return { error }
+    try {
+      await createUserWithEmailAndPassword(auth, email, password)
+      return { error: null }
+    } catch (error) {
+      const firebaseError = error as FirebaseAuthError
+      return { 
+        error: { 
+          message: firebaseError.message,
+          code: firebaseError.code
+        } 
+      }
+    }
   }
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    return { error }
+    try {
+      await signInWithEmailAndPassword(auth, email, password)
+      return { error: null }
+    } catch (error) {
+      const firebaseError = error as FirebaseAuthError
+      return { 
+        error: { 
+          message: firebaseError.message,
+          code: firebaseError.code
+        } 
+      }
+    }
   }
 
   const signInWithGitHub = async () => {
-    // Construct the redirect URL including the base path for GitHub Pages deployment
-    // The base path is defined in vite.config.ts as '/PrisimAI/'
-    // For production, use VITE_APP_URL if set (which already includes the base path)
-    // For local development, construct from window.location.origin + base path
-    const appUrl = import.meta.env.VITE_APP_URL
-    const redirectUrl = appUrl || `${window.location.origin}${import.meta.env.BASE_URL || '/'}`
-    
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: {
-        redirectTo: redirectUrl,
-      },
-    })
-    return { error }
+    try {
+      await signInWithPopup(auth, githubProvider)
+      return { error: null }
+    } catch (error) {
+      const firebaseError = error as FirebaseAuthError
+      return { 
+        error: { 
+          message: firebaseError.message,
+          code: firebaseError.code
+        } 
+      }
+    }
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    await firebaseSignOut(auth)
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signInWithGitHub, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signUp, signIn, signInWithGitHub, signOut }}>
       {children}
     </AuthContext.Provider>
   )
