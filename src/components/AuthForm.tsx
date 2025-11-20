@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { GithubLogo } from '@phosphor-icons/react'
+import { GithubLogo, GoogleLogo } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
 interface AuthFormProps {
@@ -14,10 +14,11 @@ interface AuthFormProps {
 }
 
 export function AuthForm({ onToggleMode, mode }: AuthFormProps) {
-  const { signIn, signUp, signInWithGitHub } = useAuth()
+  const { signIn, signUp, signInWithGoogle, signInWithGitHub } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
   const [githubLoading, setGithubLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,6 +62,22 @@ export function AuthForm({ onToggleMode, mode }: AuthFormProps) {
     }
   }
 
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true)
+    try {
+      const { error } = await signInWithGoogle()
+      if (error) {
+        toast.error(error.message)
+        setGoogleLoading(false)
+      }
+      // Don't set loading to false here as we're redirecting
+    } catch (error) {
+      toast.error('An unexpected error occurred')
+      console.error(error)
+      setGoogleLoading(false)
+    }
+  }
+
   const handleGitHubSignIn = async () => {
     setGithubLoading(true)
     try {
@@ -93,8 +110,19 @@ export function AuthForm({ onToggleMode, mode }: AuthFormProps) {
             type="button"
             variant="outline"
             className="w-full"
+            onClick={handleGoogleSignIn}
+            disabled={loading || googleLoading || githubLoading}
+          >
+            <GoogleLogo size={18} className="mr-2" />
+            {googleLoading ? 'Redirecting...' : `Continue with Google`}
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
             onClick={handleGitHubSignIn}
-            disabled={loading || githubLoading}
+            disabled={loading || googleLoading || githubLoading}
           >
             <GithubLogo size={18} className="mr-2" />
             {githubLoading ? 'Redirecting...' : `Continue with GitHub`}
