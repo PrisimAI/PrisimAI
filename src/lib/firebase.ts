@@ -6,13 +6,15 @@ import { getAuth, GoogleAuthProvider, GithubAuthProvider } from 'firebase/auth'
 // Get these values from your Firebase console: https://console.firebase.google.com
 // Go to Project Settings > General > Your apps > SDK setup and configuration
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY_HERE",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
-}
+  apiKey: "AIzaSyCU5oNtSXp8VZYn_ow1cChrWPgXg9ccfyA",
+  authDomain: "prisimai-9a06c.firebaseapp.com",
+  projectId: "prisimai-9a06c",
+  storageBucket: "prisimai-9a06c.firebasestorage.app",
+  messagingSenderId: "172096388736",
+  appId: "1:172096388736:web:8a74d6fe13d4ff17c03065",
+  measurementId: "G-0BP67760MX"
+};
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
