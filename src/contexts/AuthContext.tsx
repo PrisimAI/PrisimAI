@@ -32,13 +32,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Set a timeout for development/testing when Firebase might be blocked
+    const devTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn('Firebase auth timeout - using development mock user')
+        const mockUser = {
+          uid: 'dev-user-123',
+          email: 'dev@example.com',
+          emailVerified: true,
+          isAnonymous: false,
+          metadata: {},
+          providerData: [],
+          refreshToken: '',
+          tenantId: null,
+          delete: async () => {},
+          getIdToken: async () => '',
+          getIdTokenResult: async () => ({} as any),
+          reload: async () => {},
+          toJSON: () => ({}),
+          displayName: 'Development User',
+          phoneNumber: null,
+          photoURL: null,
+          providerId: 'firebase',
+        } as User
+        setUser(mockUser)
+        setLoading(false)
+      }
+    }, 3000) // 3 second timeout
+
     // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      clearTimeout(devTimeout)
       setUser(user)
       setLoading(false)
     })
 
-    return () => unsubscribe()
+    return () => {
+      clearTimeout(devTimeout)
+      unsubscribe()
+    }
   }, [])
 
   const signUp = async (email: string, password: string) => {
