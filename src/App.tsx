@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useLocalStorage } from './hooks/use-local-storage'
 import { useAuth } from './contexts/AuthContext'
 import { Toaster, toast } from 'sonner'
@@ -37,15 +37,7 @@ function App() {
     }
   }, [currentConversation?.messages])
 
-  useEffect(() => {
-    if (pendingMessage && currentConversationId) {
-      const messageToSend = pendingMessage
-      setPendingMessage(null)
-      handleSendMessage(messageToSend)
-    }
-  }, [currentConversationId])
-
-  const createNewConversation = () => {
+  const createNewConversation = useCallback(() => {
     const newConversation: Conversation = {
       id: `conv_${Date.now()}`,
       title: mode === 'chat' ? 'New Chat' : 'New Image Generation',
@@ -57,18 +49,18 @@ function App() {
 
     setConversations((current = []) => [newConversation, ...current])
     setCurrentConversationId(newConversation.id)
-  }
+  }, [mode, setConversations])
 
-  const updateConversationTitle = (conversationId: string, firstMessage: string) => {
+  const updateConversationTitle = useCallback((conversationId: string, firstMessage: string) => {
     const title = firstMessage.slice(0, 50) + (firstMessage.length > 50 ? '...' : '')
     setConversations((current = []) =>
       current.map((c) =>
         c.id === conversationId ? { ...c, title, updatedAt: Date.now() } : c
       )
     )
-  }
+  }, [setConversations])
 
-  const addMessage = (conversationId: string, message: ChatMessageType) => {
+  const addMessage = useCallback((conversationId: string, message: ChatMessageType) => {
     setConversations((current = []) =>
       current.map((c) =>
         c.id === conversationId
@@ -76,9 +68,9 @@ function App() {
           : c
       )
     )
-  }
+  }, [setConversations])
 
-  const updateLastMessage = (conversationId: string, content: string, isStreaming: boolean = false) => {
+  const updateLastMessage = useCallback((conversationId: string, content: string, isStreaming: boolean = false) => {
     setConversations((current = []) =>
       current.map((c) => {
         if (c.id !== conversationId) return c
@@ -90,9 +82,9 @@ function App() {
         return { ...c, messages }
       })
     )
-  }
+  }, [setConversations])
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = useCallback(async (content: string) => {
     if (!currentConversationId) {
       createNewConversation()
       setPendingMessage(content)
@@ -189,7 +181,15 @@ function App() {
         setIsGenerating(false)
       }
     }
-  }
+  }, [currentConversationId, isGenerating, conversationsList, mode, textModel, imageModel, createNewConversation, setConversations, updateConversationTitle, addMessage, updateLastMessage])
+
+  useEffect(() => {
+    if (pendingMessage && currentConversationId) {
+      const messageToSend = pendingMessage
+      setPendingMessage(null)
+      handleSendMessage(messageToSend)
+    }
+  }, [currentConversationId, pendingMessage, handleSendMessage])
 
   const handleDeleteConversation = (id: string) => {
     setConversations((current = []) => current.filter((c) => c.id !== id))
