@@ -7,6 +7,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Badge } from '@/components/ui/badge'
+import { Sparkle } from '@phosphor-icons/react'
 import { getTextModels, getImageModels, type TextModel, type ImageModel } from '@/lib/pollinations-api'
 import type { AppMode } from '@/lib/types'
 
@@ -48,27 +50,38 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
   }, [mode])
 
   const models = mode === 'chat' ? textModels : imageModels
-  const displayModels = Array.isArray(models) ? models.slice(0, 10) : []
+  const displayModels = Array.isArray(models) ? models.slice(0, 15) : []
+  
+  const currentModel = displayModels.find(m => m.name === selectedModel)
 
   if (loading) {
     return (
       <div className="border-b bg-background px-6 py-3">
-        <Skeleton className="h-9 w-[200px]" />
+        <Skeleton className="h-9 w-[250px]" />
       </div>
     )
   }
 
   return (
-    <div className="border-b bg-background px-6 py-3">
+    <div className="border-b bg-background px-6 py-3 flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        <Sparkle size={18} className="text-primary" weight="fill" />
+        <span className="text-sm font-medium">Model:</span>
+      </div>
       <Select value={selectedModel} onValueChange={onModelChange}>
-        <SelectTrigger className="w-[200px]">
+        <SelectTrigger className="w-[250px]">
           <SelectValue placeholder="Select model" />
         </SelectTrigger>
         <SelectContent>
           {displayModels.length > 0 ? (
             displayModels.map((model) => (
               <SelectItem key={model.name} value={model.name}>
-                {model.description || model.name}
+                <div className="flex items-center justify-between gap-2 w-full">
+                  <span>{model.description || model.name}</span>
+                  {(model as any).tools && (
+                    <Badge variant="secondary" className="ml-2 text-xs">Tools</Badge>
+                  )}
+                </div>
               </SelectItem>
             ))
           ) : (
@@ -78,6 +91,12 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
           )}
         </SelectContent>
       </Select>
+      {currentModel && (mode === 'chat') && (currentModel as any).tools && (
+        <Badge variant="outline" className="text-xs">
+          <Sparkle size={12} className="mr-1" weight="fill" />
+          Tools Enabled
+        </Badge>
+      )}
     </div>
   )
 }

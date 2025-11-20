@@ -12,6 +12,7 @@ import { AuthPage } from './components/AuthPage'
 import { ScrollArea } from './components/ui/scroll-area'
 import { Skeleton } from './components/ui/skeleton'
 import { generateText, generateImage, type Message } from './lib/pollinations-api'
+import { AI_TOOLS } from './lib/ai-tools'
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode } from './lib/types'
 
 function App() {
@@ -137,6 +138,9 @@ function App() {
             true
           )
           assistantMessage.content += chunk
+        }, {
+          tools: AI_TOOLS,
+          tool_choice: 'auto',
         })
 
         updateLastMessage(currentConversationId, assistantMessage.content, false)
@@ -212,6 +216,19 @@ function App() {
     }
   }
 
+  const handleRegenerateMessage = useCallback((messageIndex: number) => {
+    if (!currentConversation) return
+    
+    // Find the user message that corresponds to this assistant message
+    // Look backwards from the current message
+    for (let i = messageIndex - 1; i >= 0; i--) {
+      if (currentConversation.messages[i].role === 'user') {
+        handleSendMessage(currentConversation.messages[i].content)
+        break
+      }
+    }
+  }, [currentConversation, handleSendMessage])
+
   const handleRegenerate = (prompt: string) => {
     handleSendMessage(prompt)
   }
@@ -279,8 +296,12 @@ function App() {
           ) : mode === 'chat' ? (
             <ScrollArea ref={scrollAreaRef} className="h-full">
               <div className="mx-auto max-w-3xl">
-                {currentConversation.messages.map((message) => (
-                  <ChatMessage key={message.id} message={message} />
+                {currentConversation.messages.map((message, index) => (
+                  <ChatMessage 
+                    key={message.id} 
+                    message={message}
+                    onRegenerate={message.role === 'assistant' ? () => handleRegenerateMessage(index) : undefined}
+                  />
                 ))}
                 {isGenerating && currentConversation.messages[currentConversation.messages.length - 1]?.role === 'user' && (
                   <div className="flex gap-4 bg-muted/50 px-6 py-4">
