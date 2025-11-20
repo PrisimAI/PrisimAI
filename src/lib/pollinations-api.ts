@@ -242,6 +242,16 @@ export async function generateImage(
   // Mock mode: Return a placeholder image when API is unavailable
   if (ENABLE_MOCK_MODE) {
     console.info('Using mock image generation')
+    // Escape prompt to prevent XSS in SVG
+    const escapedPrompt = prompt
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;')
+      .substring(0, 50)
+    const displayPrompt = prompt.length > 50 ? escapedPrompt + '...' : escapedPrompt
+    
     // Create a simple SVG placeholder image with the prompt text
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
       <rect width="512" height="512" fill="#f0f0f0"/>
@@ -249,7 +259,7 @@ export async function generateImage(
         Mock Image
       </text>
       <text x="50%" y="55%" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#999">
-        Prompt: ${prompt.substring(0, 50)}${prompt.length > 50 ? '...' : ''}
+        Prompt: ${displayPrompt}
       </text>
     </svg>`
     const blob = new Blob([svg], { type: 'image/svg+xml' })
