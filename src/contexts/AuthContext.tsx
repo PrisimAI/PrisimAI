@@ -8,7 +8,7 @@ import {
   onAuthStateChanged,
   AuthError as FirebaseAuthError
 } from 'firebase/auth'
-import { auth, githubProvider } from '../lib/firebase'
+import { auth, googleProvider, githubProvider } from '../lib/firebase'
 
 interface AuthError {
   message: string
@@ -20,6 +20,7 @@ interface AuthContextType {
   loading: boolean
   signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
+  signInWithGoogle: () => Promise<{ error: AuthError | null }>
   signInWithGitHub: () => Promise<{ error: AuthError | null }>
   signOut: () => Promise<void>
 }
@@ -70,6 +71,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const signInWithGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider)
+      return { error: null }
+    } catch (error) {
+      const firebaseError = error as FirebaseAuthError
+      return { 
+        error: { 
+          message: firebaseError.message,
+          code: firebaseError.code
+        } 
+      }
+    }
+  }
+
   const signInWithGitHub = async () => {
     try {
       await signInWithPopup(auth, githubProvider)
@@ -90,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, signIn, signInWithGitHub, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signUp, signIn, signInWithGoogle, signInWithGitHub, signOut }}>
       {children}
     </AuthContext.Provider>
   )
