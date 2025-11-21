@@ -37,14 +37,14 @@ export interface GenerateTextOptions {
 
 export interface TextModel {
   name: string
-  description: string
+  description?: string
   aliases?: string[]
   tools?: boolean
 }
 
 export interface ImageModel {
   name: string
-  description: string
+  description?: string
   aliases?: string[]
 }
 
@@ -63,7 +63,7 @@ export async function getTextModels(): Promise<TextModel[]> {
   }
 
   try {
-    const response = await fetch(`${BASE_URL}/text/models`, {
+    const response = await fetch(`${BASE_URL}/v1/models`, {
       headers: {
         Authorization: `Bearer ${API_KEY}`,
       },
@@ -78,7 +78,7 @@ export async function getTextModels(): Promise<TextModel[]> {
     let models = Array.isArray(data) ? data : data.data || []
     
     // Filter out invalid models and ensure they have required properties
-    models = models.filter((m: any) => m && m.name && m.description)
+    models = models.filter((m: any) => m && m.name)
     
     // If no valid models, use fallback
     if (models.length === 0) {
@@ -124,7 +124,7 @@ export async function getImageModels(): Promise<ImageModel[]> {
     let models = Array.isArray(data) ? data : data.data || []
     
     // Filter out invalid models and ensure they have required properties
-    models = models.filter((m: any) => m && m.name && m.description)
+    models = models.filter((m: any) => m && m.name)
     
     // If no valid models, use fallback
     if (models.length === 0) {
