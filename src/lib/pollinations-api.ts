@@ -49,10 +49,10 @@ export interface ImageModel {
 }
 
 const FALLBACK_TEXT_MODELS: TextModel[] = [
-  { name: 'openai', description: 'OpenAI GPT-4', tools: true },
-  { name: 'mistral', description: 'Mistral Large', tools: true },
-  { name: 'claude', description: 'Anthropic Claude', tools: true },
-  { name: 'llama', description: 'Meta Llama 3', tools: false },
+  { name: 'openai', description: 'Advanced Reasoning', tools: true },
+  { name: 'mistral', description: 'Efficient Intelligence', tools: true },
+  { name: 'claude', description: 'Safe Assistant', tools: true },
+  { name: 'llama', description: 'Open Source', tools: false },
 ]
 
 export async function getTextModels(): Promise<TextModel[]> {
@@ -94,11 +94,11 @@ export async function getTextModels(): Promise<TextModel[]> {
 }
 
 const FALLBACK_IMAGE_MODELS: ImageModel[] = [
-  { name: 'flux', description: 'Flux' },
-  { name: 'flux-realism', description: 'Flux Realism' },
-  { name: 'flux-anime', description: 'Flux Anime' },
-  { name: 'flux-3d', description: 'Flux 3D' },
-  { name: 'turbo', description: 'Turbo' },
+  { name: 'flux', description: 'Creative Generation' },
+  { name: 'flux-realism', description: 'Photorealistic Images' },
+  { name: 'flux-anime', description: 'Anime Style' },
+  { name: 'flux-3d', description: '3D Rendering' },
+  { name: 'turbo', description: 'Fast Generation' },
 ]
 
 export async function getImageModels(): Promise<ImageModel[]> {
