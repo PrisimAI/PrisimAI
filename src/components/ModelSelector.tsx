@@ -50,7 +50,7 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
   }, [mode])
 
   const models = mode === 'chat' ? textModels : imageModels
-  const displayModels = Array.isArray(models) ? models.slice(0, 15) : []
+  const displayModels = Array.isArray(models) ? models.slice(0, 19) : []
   
   const currentModel = displayModels.find(m => (m as any).id === selectedModel || (m as any).name === selectedModel)
 
