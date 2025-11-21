@@ -64,6 +64,21 @@ function App() {
     setCurrentConversationId(newConversation.id)
   }, [mode, setConversations])
 
+  const createNewGroupChat = useCallback(() => {
+    const newConversation: Conversation = {
+      id: `conv_${Date.now()}`,
+      title: 'New Group Chat',
+      messages: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      mode: 'chat',
+      isGroupChat: true,
+    }
+
+    setConversations((current = []) => [newConversation, ...current])
+    setCurrentConversationId(newConversation.id)
+  }, [setConversations])
+
   const updateConversationTitle = useCallback((conversationId: string, firstMessage: string) => {
     const title = firstMessage.slice(0, 50) + (firstMessage.length > 50 ? '...' : '')
     setConversations((current = []) =>
@@ -425,6 +440,7 @@ function App() {
         currentConversationId={currentConversationId}
         mode={mode}
         onNewChat={createNewConversation}
+        onNewGroupChat={createNewGroupChat}
         onSelectConversation={setCurrentConversationId}
         onDeleteConversation={handleDeleteConversation}
         onModeChange={handleModeChange}

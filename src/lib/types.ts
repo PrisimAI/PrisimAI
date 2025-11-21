@@ -15,6 +15,7 @@ export interface Conversation {
   updatedAt: number
   mode: 'chat' | 'image'
   isPinned?: boolean
+  isGroupChat?: boolean
 }
 
 export interface GeneratedImage {

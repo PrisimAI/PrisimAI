@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, ChatCircle, Image, Trash, Sparkle, PushPin, TrashSimple } from '@phosphor-icons/react'
+import { Plus, ChatCircle, Image, Trash, Sparkle, PushPin, TrashSimple, UsersThree } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
@@ -16,6 +16,7 @@ interface SidebarProps {
   currentConversationId: string | null
   mode: AppMode
   onNewChat: () => void
+  onNewGroupChat: () => void
   onSelectConversation: (id: string) => void
   onDeleteConversation: (id: string) => void
   onModeChange: (mode: AppMode) => void
@@ -32,6 +33,7 @@ export function Sidebar({
   currentConversationId,
   mode,
   onNewChat,
+  onNewGroupChat,
   onSelectConversation,
   onDeleteConversation,
   onModeChange,
@@ -103,6 +105,13 @@ export function Sidebar({
         <Button onClick={onNewChat} className="w-full justify-start gap-2" variant="default">
           <Plus size={18} />
           New Chat
+        </Button>
+      </div>
+
+      <div className="px-3 pb-3">
+        <Button onClick={onNewGroupChat} className="w-full justify-start gap-2" variant="outline">
+          <UsersThree size={18} />
+          New Group Chat
         </Button>
       </div>
 
