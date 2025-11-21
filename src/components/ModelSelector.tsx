@@ -15,8 +15,6 @@ import {
   type TextModel, 
   type ImageModel 
 } from '@/lib/pollinations-api'
-import { getTierConfig, isModelAllowed } from '@/lib/tiers'
-import { useAuth } from '@/contexts/AuthContext'
 import type { AppMode } from '@/lib/types'
 
 interface ModelSelectorProps {
@@ -29,20 +27,6 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
   const [textModels, setTextModels] = useState<TextModel[]>([])
   const [imageModels, setImageModels] = useState<ImageModel[]>([])
   const [loading, setLoading] = useState(true)
-
-  const { userData } = useAuth()
-  const [tierConfig, setTierConfig] = useState<any>(null)
-
-  // Load tier config
-  useEffect(() => {
-    async function loadTierConfig() {
-      if (userData?.tier) {
-        const config = await getTierConfig(userData.tier)
-        setTierConfig(config)
-      }
-    }
-    loadTierConfig()
-  }, [userData?.tier])
 
   // Load models
   useEffect(() => {
@@ -72,14 +56,7 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
   const models = mode === 'chat' ? textModels : imageModels
   const slicedModels = Array.isArray(models) ? models.slice(0, 19) : []
 
-  // Tier-based filter
-  const filteredModels = slicedModels.filter(model => {
-    if (!tierConfig) return true
-    const modelId = (model as any).id || (model as any).name
-    return isModelAllowed(modelId, tierConfig)
-  })
-
-  const currentModel = filteredModels.find(
+  const currentModel = slicedModels.find(
     m => (m as any).id === selectedModel || (m as any).name === selectedModel
   )
 
@@ -104,8 +81,8 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
         </SelectTrigger>
 
         <SelectContent>
-          {filteredModels.length > 0 ? (
-            filteredModels.map((model) => {
+          {slicedModels.length > 0 ? (
+            slicedModels.map((model) => {
               const modelId = (model as any).id || (model as any).name
               const modelDescription = model.description || modelId
 
