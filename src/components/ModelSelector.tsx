@@ -54,9 +54,9 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
 
   // Pick correct model list
   const models = mode === 'chat' ? textModels : imageModels
-  const slicedModels = Array.isArray(models) ? models.slice(0, 19) : []
+  const displayModels = Array.isArray(models) ? models : []
 
-  const currentModel = slicedModels.find(
+  const currentModel = displayModels.find(
     m => (m as any).id === selectedModel || (m as any).name === selectedModel
   )
 
@@ -81,8 +81,8 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
         </SelectTrigger>
 
         <SelectContent>
-          {slicedModels.length > 0 ? (
-            slicedModels.map((model) => {
+          {displayModels.length > 0 ? (
+            displayModels.map((model) => {
               const modelId = (model as any).id || (model as any).name
               const modelDescription = model.description || modelId
 
