@@ -1,448 +1,166 @@
-# Firebase User Tiers Setup Guide
+# Firebase User Tiers Setup Guide (Client-Side Only)
 
-This guide explains how to implement a three-tier subscription system (Free, Pro, and Deluxe) for PrisimAI using Firebase Authentication custom claims and Firestore.
+This guide explains how to implement a three-tier subscription system (Free, Pro, and Deluxe) for PrisimAI using **only Firestore** and client-side code. **No server-side code or Cloud Functions required.**
 
 ## Overview
 
 The tier system will control:
 - **Model Access**: Which AI models users can use
-- **Rate Limits**: Message limits and speed restrictions
+- **Rate Limits**: Message limits and speed restrictions  
 - **Features**: Premium features available per tier
 
 ### Tier Breakdown
 
 | Tier | Available Models | Chat Limits | Speed |
 |------|-----------------|-------------|-------|
-| **Free** | mistral-fast, mistral, gemini, gemini-search, openai, openai-fast | Lowest | Slowest |
-| **Pro** | All models EXCEPT: openai-large, midijourney, claude-large, openai-reasoning, deepseek, perplexity-reasoning, gemini-large, openai-audio | Limited | Limited |
+| **Free** | mistral-fast, mistral, gemini, gemini-search, openai, openai-fast | Lowest (20/day) | Slowest (3/min) |
+| **Pro** | All models EXCEPT: openai-large, midijourney, claude-large, openai-reasoning, deepseek, perplexity-reasoning, gemini-large, openai-audio | Limited (100/day) | Limited (10/min) |
 | **Deluxe** | ALL models | Unlimited | Unlimited |
 
-## Implementation Methods
+## Implementation Method
 
-There are two approaches to implement user tiers in Firebase:
-
-### Method 1: Custom Claims (Recommended)
-Best for authentication-level checks and simple tier management.
-
-### Method 2: Firestore Database
-Best for complex tier features, usage tracking, and subscription management.
-
-**Recommendation**: Use **both methods together** - Custom Claims for quick tier checks and Firestore for detailed tier data and usage tracking.
+This guide uses **Firestore only** - all tier information is stored in Firestore and managed client-side. You'll manually set tiers through the Firebase Console, and the client app will read and enforce them.
 
 ---
 
-## Part 1: Adding Custom Claims to Firebase Authentication
+## Part 1: Setting Up Firestore Database
 
-Custom claims allow you to add tier information directly to the user's authentication token.
+### Step 1: Enable Firestore
 
-### Step 1: Set Up Firebase Admin SDK
+1. **Go to Firebase Console**: [https://console.firebase.google.com](https://console.firebase.google.com)
+2. **Select your PrisimAI project**
+3. **Click "Firestore Database"** in the left sidebar
+4. **Click "Create database"**
+5. **Choose "Start in production mode"** (we'll add custom rules next)
+6. **Select a location** (choose closest to your users)
+7. **Click "Enable"**
 
-You'll need Firebase Admin SDK to set custom claims. This must be done server-side.
+### Step 2: Create Tier Configuration Documents
 
-#### Option A: Using Firebase Cloud Functions (Recommended)
+In the Firestore Console, create a collection called `tiers` with three documents:
 
-1. **Install Firebase CLI** (if not already installed):
-   ```bash
-   npm install -g firebase-tools
-   ```
+#### 1. Create Collection `tiers`
 
-2. **Initialize Firebase Functions** in your project:
-   ```bash
-   cd /path/to/your/PrisimAI/project
-   firebase init functions
-   ```
-   - Choose JavaScript or TypeScript (TypeScript recommended)
-   - Choose to install dependencies
+1. Click **"Start collection"**
+2. Enter **Collection ID**: `tiers`
+3. Click **"Next"**
 
-3. **Install Firebase Admin SDK** in the functions directory:
-   ```bash
-   cd functions
-   npm install firebase-admin
-   ```
+#### 2. Add Document: `free`
 
-4. **Create a function to set user tier** (`functions/index.js` or `functions/index.ts`):
+- **Document ID**: `free` (type this manually)
+- Add the following fields:
 
-   ```javascript
-   const functions = require('firebase-functions');
-   const admin = require('firebase-admin');
-   admin.initializeApp();
+| Field Name | Type | Value |
+|------------|------|-------|
+| `name` | string | `free` |
+| `displayName` | string | `Free` |
+| `allowedModels` | array | `mistral-fast`, `mistral`, `gemini`, `gemini-search`, `openai`, `openai-fast` |
+| `messagesPerDay` | number | `20` |
+| `requestsPerMinute` | number | `3` |
 
-   // Function to set user tier (callable from client)
-   exports.setUserTier = functions.https.onCall(async (data, context) => {
-     // Check if request is made by authenticated user
-     if (!context.auth) {
-       throw new functions.https.HttpsError(
-         'unauthenticated',
-         'User must be authenticated to set tier.'
-       );
-     }
+Click "Add field" and create a **map** field called `features`:
+- `features.imageGeneration` (boolean): `false`
+- `features.advancedModels` (boolean): `false`
+- `features.prioritySupport` (boolean): `false`
 
-     const { userId, tier } = data;
-     const validTiers = ['free', 'pro', 'deluxe'];
+Click **"Save"**
 
-     // Validate tier
-     if (!validTiers.includes(tier)) {
-       throw new functions.https.HttpsError(
-         'invalid-argument',
-         'Invalid tier specified. Must be: free, pro, or deluxe'
-       );
-     }
+#### 3. Add Document: `pro`
 
-     // TODO: Add authorization check here
-     // Only admins or payment webhook should be able to set tiers
-     // For now, we'll allow any authenticated user (CHANGE THIS IN PRODUCTION)
+Click **"Add document"**:
+- **Document ID**: `pro`
+- Add the following fields:
 
-     try {
-       // Set custom claim
-       await admin.auth().setCustomUserClaims(userId, { tier });
+| Field Name | Type | Value |
+|------------|------|-------|
+| `name` | string | `pro` |
+| `displayName` | string | `Pro` |
+| `allowedModels` | array | Add these items: `mistral-fast`, `mistral`, `gemini`, `gemini-search`, `openai`, `openai-fast`, `llama`, `claude`, `gpt4` |
+| `messagesPerDay` | number | `100` |
+| `requestsPerMinute` | number | `10` |
 
-       // Also store in Firestore for easier querying
-       await admin.firestore().collection('users').doc(userId).set({
-         tier,
-         updatedAt: admin.firestore.FieldValue.serverTimestamp()
-       }, { merge: true });
+Add map field `features`:
+- `features.imageGeneration` (boolean): `true`
+- `features.advancedModels` (boolean): `true`
+- `features.prioritySupport` (boolean): `false`
 
-       return { 
-         success: true, 
-         message: `User tier set to ${tier}` 
-       };
-     } catch (error) {
-       throw new functions.https.HttpsError(
-         'internal',
-         'Failed to set user tier: ' + error.message
-       );
-     }
-   });
+Click **"Save"**
 
-   // Function to automatically set tier to 'free' when new user signs up
-   exports.setDefaultTierOnSignup = functions.auth.user().onCreate(async (user) => {
-     try {
-       // Set default tier to 'free'
-       await admin.auth().setCustomUserClaims(user.uid, { tier: 'free' });
+**Note**: Pro tier does NOT include these 8 premium models: `openai-large`, `midijourney`, `claude-large`, `openai-reasoning`, `deepseek`, `perplexity-reasoning`, `gemini-large`, `openai-audio`
 
-       // Also create Firestore document
-       await admin.firestore().collection('users').doc(user.uid).set({
-         tier: 'free',
-         email: user.email,
-         createdAt: admin.firestore.FieldValue.serverTimestamp(),
-         messagesUsed: 0,
-         messagesLimit: 20, // Free tier limit
-         lastResetDate: admin.firestore.FieldValue.serverTimestamp()
-       });
+#### 4. Add Document: `deluxe`
 
-       console.log(`Set default tier 'free' for new user: ${user.uid}`);
-     } catch (error) {
-       console.error('Error setting default tier:', error);
-     }
-   });
+Click **"Add document"**:
+- **Document ID**: `deluxe`
+- Add the following fields:
 
-   // Function to get user tier (callable from client)
-   exports.getUserTier = functions.https.onCall(async (data, context) => {
-     if (!context.auth) {
-       throw new functions.https.HttpsError(
-         'unauthenticated',
-         'User must be authenticated.'
-       );
-     }
+| Field Name | Type | Value |
+|------------|------|-------|
+| `name` | string | `deluxe` |
+| `displayName` | string | `Deluxe` |
+| `allowedModels` | array | `*` (single item: asterisk means all models) |
+| `messagesPerDay` | number | `-1` (negative means unlimited) |
+| `requestsPerMinute` | number | `-1` (negative means unlimited) |
 
-     try {
-       const userRecord = await admin.auth().getUser(context.auth.uid);
-       const tier = userRecord.customClaims?.tier || 'free';
-       
-       return { tier: tier };
-     } catch (error) {
-       throw new functions.https.HttpsError(
-         'internal',
-         'Failed to get user tier: ' + error.message
-       );
-     }
-   });
-   ```
+Add map field `features`:
+- `features.imageGeneration` (boolean): `true`
+- `features.advancedModels` (boolean): `true`
+- `features.prioritySupport` (boolean): `true`
+- `features.customModels` (boolean): `true`
 
-5. **Deploy the functions**:
-   ```bash
-   firebase deploy --only functions
-   ```
+Click **"Save"**
 
-#### Option B: Using Node.js Backend
+### Step 3: Understand Users Collection Structure
 
-If you have a separate backend server:
+When a user signs up, the client app will automatically create a document in the `users` collection.
 
-```javascript
-const admin = require('firebase-admin');
-const serviceAccount = require('./path/to/serviceAccountKey.json');
+The structure for each user document (`users/{userId}`):
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+| Field Name | Type | Description |
+|------------|------|-------------|
+| `tier` | string | `'free'`, `'pro'`, or `'deluxe'` |
+| `email` | string | User's email address |
+| `createdAt` | timestamp | When the user signed up |
+| `updatedAt` | timestamp | Last tier update |
+| `messagesUsed` | number | Messages used in current period |
+| `messagesLimit` | number | Message limit based on tier |
+| `lastResetDate` | timestamp | When usage counter was last reset |
 
-async function setUserTier(userId, tier) {
-  await admin.auth().setCustomUserClaims(userId, { tier: tier });
-  console.log(`User ${userId} tier set to ${tier}`);
-}
+### Step 4: Set Firestore Security Rules
 
-// Usage
-setUserTier('user-uid-here', 'pro');
-```
-
----
-
-## Part 2: Setting Up Firestore for Tier Management
-
-### Step 1: Create Firestore Database
-
-1. **Go to Firebase Console** → **Firestore Database**
-2. **Click "Create database"**
-3. **Choose "Start in production mode"** (we'll set custom rules)
-4. **Select a location** and click "Enable"
-
-### Step 2: Define Firestore Structure
-
-Create the following collections:
-
-#### Users Collection (`users/{userId}`)
-
-```javascript
-{
-  tier: 'free',                    // 'free', 'pro', or 'deluxe'
-  email: 'user@example.com',
-  createdAt: Timestamp,
-  updatedAt: Timestamp,
-  
-  // Usage tracking
-  messagesUsed: 0,                 // Messages used in current period
-  messagesLimit: 20,               // Message limit based on tier
-  lastResetDate: Timestamp,        // When usage counter was last reset
-  
-  // Speed limiting
-  requestsInLastMinute: 0,
-  lastRequestTime: Timestamp
-}
-```
-
-#### Tiers Collection (`tiers/{tierName}`)
-
-Create this collection to define tier configurations:
-
-```javascript
-// Document: tiers/free
-{
-  name: 'free',
-  displayName: 'Free',
-  allowedModels: [
-    'mistral-fast',
-    'mistral',
-    'gemini',
-    'gemini-search',
-    'openai',
-    'openai-fast'
-  ],
-  messagesPerDay: 20,
-  requestsPerMinute: 3,
-  features: {
-    imageGeneration: false,
-    advancedModels: false,
-    prioritySupport: false
-  }
-}
-
-// Document: tiers/pro
-{
-  name: 'pro',
-  displayName: 'Pro',
-  allowedModels: [
-    'mistral-fast',
-    'mistral',
-    'gemini',
-    'gemini-search',
-    'openai',
-    'openai-fast',
-    'llama',
-    'claude',
-    'gpt4'
-    // NOTE: Pro tier excludes these premium models:
-    // 'openai-large', 'midijourney', 'claude-large', 'openai-reasoning',
-    // 'deepseek', 'perplexity-reasoning', 'gemini-large', 'openai-audio'
-  ],
-  messagesPerDay: 100,
-  requestsPerMinute: 10,
-  features: {
-    imageGeneration: true,
-    advancedModels: true,
-    prioritySupport: false
-  }
-}
-
-// Document: tiers/deluxe
-{
-  name: 'deluxe',
-  displayName: 'Deluxe',
-  allowedModels: ['*'],  // All models
-  messagesPerDay: -1,    // Unlimited (-1)
-  requestsPerMinute: -1, // Unlimited (-1)
-  features: {
-    imageGeneration: true,
-    advancedModels: true,
-    prioritySupport: true,
-    customModels: true
-  }
-}
-```
-
-### Step 3: Set Firestore Security Rules
-
-Update your Firestore security rules to protect tier data:
+1. In Firestore, click the **"Rules"** tab
+2. Replace the rules with:
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users can read their own tier data
+    // Users can read their own data
     match /users/{userId} {
       allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if false; // Only Cloud Functions can write
+      // Users can create their own document on signup
+      allow create: if request.auth != null && request.auth.uid == userId;
+      // Users cannot update their own tier (prevents cheating)
+      allow update: if false;
+      allow delete: if false;
     }
     
-    // Anyone can read tier configurations
+    // Anyone authenticated can read tier configurations
     match /tiers/{tierName} {
       allow read: if request.auth != null;
-      allow write: if false; // Only admins via Cloud Functions
+      allow write: if false;
     }
   }
 }
 ```
+
+3. Click **"Publish"**
 
 ---
 
-## Part 3: Client-Side Implementation
+## Part 2: Client-Side Implementation
 
-### Step 1: Update AuthContext to Include Tier
-
-Modify `/src/contexts/AuthContext.tsx`:
-
-```typescript
-import { createContext, useContext, useEffect, useState } from 'react'
-import { 
-  User, 
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut as firebaseSignOut,
-  onAuthStateChanged,
-  AuthError as FirebaseAuthError
-} from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
-import { auth, googleProvider, githubProvider, db } from '../lib/firebase'
-
-export type UserTier = 'free' | 'pro' | 'deluxe'
-
-interface AuthError {
-  message: string
-  code?: string
-}
-
-interface UserData {
-  tier: UserTier
-  messagesUsed: number
-  messagesLimit: number
-}
-
-interface AuthContextType {
-  user: User | null
-  userData: UserData | null
-  loading: boolean
-  signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
-  signInWithGoogle: () => Promise<{ error: AuthError | null }>
-  signInWithGitHub: () => Promise<{ error: AuthError | null }>
-  signOut: () => Promise<void>
-  refreshUserData: () => Promise<void>
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [userData, setUserData] = useState<UserData | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  const fetchUserData = async (uid: string) => {
-    try {
-      const userDoc = await getDoc(doc(db, 'users', uid))
-      if (userDoc.exists()) {
-        const data = userDoc.data()
-        setUserData({
-          tier: data.tier || 'free',
-          messagesUsed: data.messagesUsed || 0,
-          messagesLimit: data.messagesLimit || 20
-        })
-      } else {
-        // Default to free tier if no Firestore document
-        setUserData({
-          tier: 'free',
-          messagesUsed: 0,
-          messagesLimit: 20
-        })
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error)
-      setUserData({
-        tier: 'free',
-        messagesUsed: 0,
-        messagesLimit: 20
-      })
-    }
-  }
-
-  const refreshUserData = async () => {
-    if (user) {
-      await fetchUserData(user.uid)
-    }
-  }
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user)
-      if (user) {
-        await fetchUserData(user.uid)
-      } else {
-        setUserData(null)
-      }
-      setLoading(false)
-    })
-
-    return () => unsubscribe()
-  }, [])
-
-  // ... rest of the auth methods remain the same ...
-
-  return (
-    <AuthContext.Provider value={{ 
-      user, 
-      userData, 
-      loading, 
-      signUp, 
-      signIn, 
-      signInWithGoogle, 
-      signInWithGitHub, 
-      signOut,
-      refreshUserData 
-    }}>
-      {children}
-    </AuthContext.Provider>
-  )
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
-  return context
-}
-```
-
-### Step 2: Update Firebase Config
+### Step 1: Update Firebase Configuration
 
 Modify `/src/lib/firebase.ts` to include Firestore:
 
@@ -453,8 +171,14 @@ import { getFirestore } from 'firebase/firestore'
 
 // Your existing firebase config...
 const firebaseConfig = {
-  // ... your config
-}
+  apiKey: "AIzaSyCU5oNtSXp8VZYn_ow1cChrWPgXg9ccfyA",
+  authDomain: "prisimai-9a06c.firebaseapp.com",
+  projectId: "prisimai-9a06c",
+  storageBucket: "prisimai-9a06c.firebasestorage.app",
+  messagingSenderId: "172096388736",
+  appId: "1:172096388736:web:8a74d6fe13d4ff17c03065",
+  measurementId: "G-0BP67760MX"
+};
 
 const app = initializeApp(firebaseConfig)
 
@@ -467,14 +191,15 @@ export const githubProvider = new GithubAuthProvider()
 export default app
 ```
 
-### Step 3: Create Tier Utilities
+### Step 2: Create Tier Utilities File
 
 Create a new file `/src/lib/tiers.ts`:
 
 ```typescript
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from './firebase'
-import type { UserTier } from '@/contexts/AuthContext'
+
+export type UserTier = 'free' | 'pro' | 'deluxe'
 
 export interface TierConfig {
   name: string
@@ -490,9 +215,22 @@ export interface TierConfig {
   }
 }
 
+export interface UserData {
+  tier: UserTier
+  email: string
+  createdAt: any
+  updatedAt: any
+  messagesUsed: number
+  messagesLimit: number
+  lastResetDate: any
+}
+
 // Cache for tier configs
 const tierConfigCache: Map<UserTier, TierConfig> = new Map()
 
+/**
+ * Get tier configuration from Firestore
+ */
 export async function getTierConfig(tier: UserTier): Promise<TierConfig> {
   // Check cache first
   if (tierConfigCache.has(tier)) {
@@ -514,6 +252,9 @@ export async function getTierConfig(tier: UserTier): Promise<TierConfig> {
   return getDefaultTierConfig(tier)
 }
 
+/**
+ * Fallback tier configurations (in case Firestore is unavailable)
+ */
 function getDefaultTierConfig(tier: UserTier): TierConfig {
   const configs: Record<UserTier, TierConfig> = {
     free: {
@@ -575,7 +316,10 @@ function getDefaultTierConfig(tier: UserTier): TierConfig {
   return configs[tier]
 }
 
-export function isModelAllowed(modelId: string, tier: UserTier, tierConfig: TierConfig): boolean {
+/**
+ * Check if a model is allowed for the given tier
+ */
+export function isModelAllowed(modelId: string, tierConfig: TierConfig): boolean {
   // Deluxe has access to all models
   if (tierConfig.allowedModels.includes('*')) {
     return true
@@ -585,6 +329,9 @@ export function isModelAllowed(modelId: string, tier: UserTier, tierConfig: Tier
   return tierConfig.allowedModels.includes(modelId)
 }
 
+/**
+ * Check if user can send a message based on their limits
+ */
 export function canSendMessage(messagesUsed: number, messagesLimit: number): boolean {
   // Unlimited (-1) means always allowed
   if (messagesLimit === -1) {
@@ -593,151 +340,243 @@ export function canSendMessage(messagesUsed: number, messagesLimit: number): boo
 
   return messagesUsed < messagesLimit
 }
+
+/**
+ * Initialize user document in Firestore when they first sign up
+ */
+export async function initializeUserTier(userId: string, email: string): Promise<void> {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId))
+    
+    // Only create if doesn't exist
+    if (!userDoc.exists()) {
+      await setDoc(doc(db, 'users', userId), {
+        tier: 'free',
+        email: email,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        messagesUsed: 0,
+        messagesLimit: 20,
+        lastResetDate: serverTimestamp()
+      })
+      console.log(`Initialized tier 'free' for user: ${userId}`)
+    }
+  } catch (error) {
+    console.error('Error initializing user tier:', error)
+  }
+}
+
+/**
+ * Get user data from Firestore
+ */
+export async function getUserData(userId: string): Promise<UserData | null> {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId))
+    if (userDoc.exists()) {
+      return userDoc.data() as UserData
+    }
+  } catch (error) {
+    console.error('Error fetching user data:', error)
+  }
+  return null
+}
 ```
 
-### Step 4: Update ModelSelector to Respect Tiers
+### Step 3: Update AuthContext
 
-Modify `/src/components/ModelSelector.tsx`:
+Modify `/src/contexts/AuthContext.tsx` to include tier data. Add the `UserData` import and state:
 
 ```typescript
-import { useState, useEffect } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import { getTierConfig, isModelAllowed } from '@/lib/tiers'
-// ... other imports ...
+import { getUserData, initializeUserTier, type UserData } from '../lib/tiers'
 
-export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelectorProps) {
-  const { userData } = useAuth()
-  const [textModels, setTextModels] = useState<TextModel[]>([])
-  const [allowedModels, setAllowedModels] = useState<Set<string>>(new Set())
-  // ... other state ...
+// Add to AuthContextType interface:
+userData: UserData | null
+refreshUserData: () => Promise<void>
 
-  useEffect(() => {
-    async function loadTierConfig() {
-      if (userData?.tier) {
-        const config = await getTierConfig(userData.tier)
-        setAllowedModels(new Set(config.allowedModels))
-      }
+// Add state in AuthProvider:
+const [userData, setUserData] = useState<UserData | null>(null)
+
+// Add this function in AuthProvider:
+const fetchUserData = async (user: User) => {
+  try {
+    // Initialize tier document if this is a new user
+    await initializeUserTier(user.uid, user.email || '')
+    
+    // Fetch user data
+    const data = await getUserData(user.uid)
+    if (data) {
+      setUserData(data)
+    } else {
+      // Fallback default
+      setUserData({
+        tier: 'free',
+        email: user.email || '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        messagesUsed: 0,
+        messagesLimit: 20,
+        lastResetDate: new Date()
+      })
     }
-    loadTierConfig()
-  }, [userData?.tier])
-
-  // ... existing loadModels code ...
-
-  // Filter models based on tier
-  const filteredModels = displayModels.filter(model => {
-    const modelId = (model as any).id || (model as any).name
-    return allowedModels.has('*') || allowedModels.has(modelId)
-  })
-
-  return (
-    // ... render with filteredModels instead of displayModels
-  )
+  } catch (error) {
+    console.error('Error fetching user data:', error)
+  }
 }
+
+const refreshUserData = async () => {
+  if (user) {
+    await fetchUserData(user)
+  }
+}
+
+// Update the onAuthStateChanged callback:
+onAuthStateChanged(auth, async (user) => {
+  clearTimeout(devTimeout)
+  setUser(user)
+  if (user) {
+    await fetchUserData(user)
+  } else {
+    setUserData(null)
+  }
+  setLoading(false)
+})
+
+// Add to the return value:
+return (
+  <AuthContext.Provider value={{ 
+    user, 
+    userData,  // Add this
+    loading, 
+    signUp, 
+    signIn, 
+    signInWithGoogle, 
+    signInWithGitHub, 
+    signOut,
+    refreshUserData  // Add this
+  }}>
+    {children}
+  </AuthContext.Provider>
+)
+```
+
+### Step 4: Update ModelSelector to Filter by Tier
+
+Modify `/src/components/ModelSelector.tsx` to filter models based on user tier:
+
+```typescript
+import { getTierConfig, isModelAllowed } from '@/lib/tiers'
+import { useAuth } from '@/contexts/AuthContext'
+
+// Add inside the component:
+const { userData } = useAuth()
+const [tierConfig, setTierConfig] = useState<any>(null)
+
+// Load tier configuration
+useEffect(() => {
+  async function loadTierConfig() {
+    if (userData?.tier) {
+      const config = await getTierConfig(userData.tier)
+      setTierConfig(config)
+    }
+  }
+  loadTierConfig()
+}, [userData?.tier])
+
+// Filter models based on user tier (replace the displayModels line):
+const displayModels = Array.isArray(models) ? models.slice(0, 19) : []
+
+const filteredModels = displayModels.filter(model => {
+  if (!tierConfig) return true // Show all if no tier config yet
+  
+  const modelId = (model as any).id || (model as any).name
+  return isModelAllowed(modelId, tierConfig)
+})
+
+// Use filteredModels instead of displayModels in the rendering
 ```
 
 ---
 
-## Part 4: Manual Tier Management (Admin Panel)
+## Part 3: Managing User Tiers
 
-Since you'll need to manually set tiers initially, here are options:
+### How to Set a User's Tier
 
-### Option 1: Using Firebase Console
+Since this is client-side only, you'll manually set tiers through the Firebase Console:
+
+#### Using Firebase Console
 
 1. **Go to Firebase Console** → **Firestore Database**
 2. **Click on "users" collection**
-3. **Select a user document**
-4. **Edit the `tier` field** to `'free'`, `'pro'`, or `'deluxe'`
+3. **Find the user document** (search by email or UID)
+4. **Click on the document** to open it
+5. **Edit the `tier` field**:
+   - Change value to `'free'`, `'pro'`, or `'deluxe'`
+6. **Update the `messagesLimit` field** to match the tier:
+   - Free: `20`
+   - Pro: `100`
+   - Deluxe: `-1` (unlimited)
+7. **Click "Update"**
 
-### Option 2: Using Firebase CLI
+The user will see the change next time they refresh the page or sign in again.
 
-Create a script `scripts/set-user-tier.js`:
+---
 
-```javascript
-const admin = require('firebase-admin');
-const serviceAccount = require('./serviceAccountKey.json');
+## Part 4: Testing Your Implementation
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+### Test Checklist
 
-async function setUserTier(email, tier) {
-  try {
-    const user = await admin.auth().getUserByEmail(email);
-    await admin.auth().setCustomUserClaims(user.uid, { tier });
-    await admin.firestore().collection('users').doc(user.uid).set({
-      tier,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-    
-    console.log(`✓ Set ${email} to ${tier} tier`);
-  } catch (error) {
-    console.error(`✗ Error: ${error.message}`);
-  }
-}
+1. **Test New User Signup**
+   - [ ] Sign up with a test email
+   - [ ] Check Firestore Console → `users` collection
+   - [ ] Verify user document has `tier: 'free'`
+   - [ ] Verify only 6 models appear in model selector
 
-// Usage
-const email = process.argv[2];
-const tier = process.argv[3];
+2. **Test Pro Tier**
+   - [ ] Change user tier to `'pro'` in Firestore
+   - [ ] Refresh the app
+   - [ ] Verify more models available (but not premium 8)
 
-if (!email || !tier) {
-  console.log('Usage: node set-user-tier.js <email> <tier>');
-  console.log('Example: node set-user-tier.js user@example.com pro');
-  process.exit(1);
-}
+3. **Test Deluxe Tier**
+   - [ ] Change user tier to `'deluxe'`
+   - [ ] Refresh the app
+   - [ ] Verify all models are available
 
-setUserTier(email, tier).then(() => process.exit(0));
-```
+---
 
-Run it:
-```bash
-node scripts/set-user-tier.js user@example.com pro
-```
+## Part 5: Optional Enhancements
 
-### Option 3: Simple Admin Component
+### Display Tier Badge
 
-Create a simple admin component in your app (secure this properly in production):
+Add a tier badge to show the current user's tier in the UI (already included in the ModelSelector code above).
+
+### Show Usage Stats
+
+Create a component to display usage information:
 
 ```typescript
-// src/components/AdminPanel.tsx
-import { useState } from 'react'
-import { getFunctions, httpsCallable } from 'firebase/functions'
+// src/components/UsageStats.tsx
+import { useAuth } from '@/contexts/AuthContext'
+import { Badge } from '@/components/ui/badge'
 
-export function AdminPanel() {
-  const [email, setEmail] = useState('')
-  const [tier, setTier] = useState<'free' | 'pro' | 'deluxe'>('free')
-  const [loading, setLoading] = useState(false)
-
-  const handleSetTier = async () => {
-    setLoading(true)
-    try {
-      const functions = getFunctions()
-      const setUserTier = httpsCallable(functions, 'setUserTier')
-      await setUserTier({ email, tier })
-      alert(`Successfully set ${email} to ${tier} tier`)
-    } catch (error) {
-      alert('Error: ' + error.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
+export function UsageStats() {
+  const { userData } = useAuth()
+  
+  if (!userData) return null
+  
+  const { messagesUsed, messagesLimit, tier } = userData
+  const isUnlimited = messagesLimit === -1
+  
   return (
-    <div className="p-4">
-      <h2>Admin: Set User Tier</h2>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="user@example.com"
-      />
-      <select value={tier} onChange={(e) => setTier(e.target.value as any)}>
-        <option value="free">Free</option>
-        <option value="pro">Pro</option>
-        <option value="deluxe">Deluxe</option>
-      </select>
-      <button onClick={handleSetTier} disabled={loading}>
-        Set Tier
-      </button>
+    <div className="p-4 border rounded-lg">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium">Your Plan</span>
+        <Badge>
+          {tier.charAt(0).toUpperCase() + tier.slice(1)}
+        </Badge>
+      </div>
+      <p className="text-sm text-muted-foreground">
+        {isUnlimited ? 'Unlimited messages' : `${messagesUsed} / ${messagesLimit} messages used`}
+      </p>
     </div>
   )
 }
@@ -745,105 +584,55 @@ export function AdminPanel() {
 
 ---
 
-## Part 5: Testing Your Implementation
-
-### Step 1: Create Test Users
-
-1. Sign up with a test email
-2. Check Firebase Console → Authentication → Users
-3. Verify the user has tier 'free' by default
-
-### Step 2: Test Tier Changes
-
-1. Use one of the methods above to change a user's tier
-2. Sign out and sign back in
-3. Check that the tier is reflected in the UI
-4. Verify model restrictions work correctly
-
-### Step 3: Test Each Tier
-
-Create test accounts for each tier and verify:
-
-- **Free**: Can only select the 6 allowed models
-- **Pro**: Can select most models but not premium ones
-- **Deluxe**: Can select all models
-
----
-
-## Part 6: Next Steps
-
-After basic tier implementation:
-
-1. **Add Payment Integration**
-   - Integrate Stripe or similar payment provider
-   - Create webhook to automatically upgrade tiers on payment
-
-2. **Add Usage Tracking**
-   - Track messages sent per day
-   - Implement rate limiting based on tier
-   - Show usage stats in user profile
-
-3. **Add Tier Upgrade UI**
-   - Create pricing page
-   - Add upgrade prompts when users hit limits
-   - Show tier comparison
-
-4. **Add Admin Dashboard**
-   - View all users and their tiers
-   - Manual tier management
-   - Usage analytics
-
----
-
 ## Troubleshooting
 
-### "Custom claims not showing immediately"
-- Custom claims are added to the token on next sign-in
-- Force user to sign out and sign in again, or refresh the token:
-  ```typescript
-  await user.getIdToken(true) // Force refresh
-  ```
+### "Permission denied" when creating user document
+- Check Firestore security rules allow `create` for authenticated users
+- Verify user is signed in when document is created
 
-### "Firestore permission denied"
-- Check your security rules
-- Make sure user is authenticated
-- Verify the document path is correct
+### User tier not updating
+- Refresh the page after changing tier in Console
+- Check browser console for errors
+- Sign out and sign back in
 
-### "Cloud Function not found"
-- Make sure you deployed the functions: `firebase deploy --only functions`
-- Check function name matches in client code
-- Verify Firebase project is selected: `firebase use <project-id>`
+### Models not filtering correctly
+- Check `allowedModels` array in tier documents
+- Verify model IDs match exactly (case-sensitive)
+- Check browser console for errors
 
 ---
 
 ## Security Considerations
 
-1. **Never trust client-side tier checks alone**
-   - Always verify tier on the backend/Cloud Functions
-   - Firestore rules should enforce tier restrictions
+### Important Notes
 
-2. **Protect tier-setting functions**
-   - Only admins or payment webhooks should set tiers
-   - Implement proper authorization checks
+1. **Tier validation is client-side only** - Users could theoretically bypass restrictions by modifying client code
+   - For production, validate tiers on a backend/API
+   - For MVP/small projects, client-side is acceptable
 
-3. **Rate limiting**
-   - Implement server-side rate limiting
-   - Don't rely solely on client-side checks
+2. **Firestore rules prevent tier tampering** - Users cannot change their own tier (rules block `update` and `delete`)
 
-4. **Audit logs**
-   - Log all tier changes
-   - Track who made changes and when
+3. **For production, you should**:
+   - Add a payment processor (Stripe, PayPal)
+   - Create webhook to auto-update tiers on payment
+   - Add backend API for tier validation
+   - Implement proper usage tracking
 
 ---
 
 ## Summary
 
-This implementation gives you:
+You now have:
 - ✅ Three-tier system (Free, Pro, Deluxe)
+- ✅ Firestore-based tier management
 - ✅ Model access restrictions per tier
-- ✅ Automatic tier assignment on signup
-- ✅ Easy tier management
-- ✅ Usage tracking foundation
-- ✅ Scalable architecture for future features
+- ✅ Automatic tier initialization on signup
+- ✅ Manual tier management via Firebase Console
+- ✅ Client-side tier enforcement
+- ✅ **No server-side code required**
 
-Remember to secure your Cloud Functions and Firestore rules before deploying to production!
+Next steps:
+- Test with real users
+- Add payment integration when ready
+- Implement usage tracking
+- Create tier upgrade UI
