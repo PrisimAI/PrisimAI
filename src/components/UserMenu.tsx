@@ -10,13 +10,19 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { SignOut, User, Gear, Code } from '@phosphor-icons/react'
+import { SignOut, User, Gear, Code, Brain, Robot, Star } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { ProfileDialog } from './ProfileDialog'
 import { SettingsDialog } from './SettingsDialog'
 import { APIDocsDialog } from './APIDocsDialog'
 
-export function UserMenu() {
+interface UserMenuProps {
+  onOpenMemory?: () => void
+  onOpenPersonas?: () => void
+  onOpenFavorites?: () => void
+}
+
+export function UserMenu({ onOpenMemory, onOpenPersonas, onOpenFavorites }: UserMenuProps) {
   const { user, signOut } = useAuth()
   const [profileOpen, setProfileOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -67,6 +73,24 @@ export function UserMenu() {
             <Gear className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>
+          {onOpenMemory && (
+            <DropdownMenuItem onClick={onOpenMemory}>
+              <Brain className="mr-2 h-4 w-4" />
+              <span>Memory</span>
+            </DropdownMenuItem>
+          )}
+          {onOpenPersonas && (
+            <DropdownMenuItem onClick={onOpenPersonas}>
+              <Robot className="mr-2 h-4 w-4" />
+              <span>AI Personas</span>
+            </DropdownMenuItem>
+          )}
+          {onOpenFavorites && (
+            <DropdownMenuItem onClick={onOpenFavorites}>
+              <Star className="mr-2 h-4 w-4" />
+              <span>Favorites</span>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem onClick={() => setApiDocsOpen(true)}>
             <Code className="mr-2 h-4 w-4" />
             <span>API Documentation</span>

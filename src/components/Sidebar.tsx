@@ -1,10 +1,15 @@
-import { Plus, ChatCircle, Image, Trash, Sparkle } from '@phosphor-icons/react'
+import { useState } from 'react'
+import { Plus, ChatCircle, Image, Trash, Sparkle, PushPin, TrashSimple } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import type { Conversation, AppMode } from '@/lib/types'
 import { UserMenu } from '@/components/UserMenu'
+import { SearchBar } from '@/components/SearchBar'
+import { ClearAllDialog } from '@/components/ClearAllDialog'
+import { ConversationActions } from '@/components/ConversationActions'
+import { RenameConversationDialog } from '@/components/RenameConversationDialog'
 
 interface SidebarProps {
   conversations: Conversation[]
@@ -14,6 +19,12 @@ interface SidebarProps {
   onSelectConversation: (id: string) => void
   onDeleteConversation: (id: string) => void
   onModeChange: (mode: AppMode) => void
+  onPinConversation?: (id: string) => void
+  onClearAll?: () => void
+  onRenameConversation?: (id: string, newTitle: string) => void
+  onOpenMemory?: () => void
+  onOpenPersonas?: () => void
+  onOpenFavorites?: () => void
 }
 
 export function Sidebar({
@@ -24,9 +35,53 @@ export function Sidebar({
   onSelectConversation,
   onDeleteConversation,
   onModeChange,
+  onPinConversation,
+  onClearAll,
+  onRenameConversation,
+  onOpenMemory,
+  onOpenPersonas,
+  onOpenFavorites,
 }: SidebarProps) {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [clearAllOpen, setClearAllOpen] = useState(false)
+  const [renameConvId, setRenameConvId] = useState<string | null>(null)
+
   const chatConversations = conversations.filter((c) => c.mode === 'chat')
   const imageConversations = conversations.filter((c) => c.mode === 'image')
+  
+  const currentModeConversations = mode === 'chat' ? chatConversations : imageConversations
+  
+  // Filter conversations based on search query
+  const filteredConversations = currentModeConversations.filter((c) => {
+    if (!searchQuery) return true
+    const query = searchQuery.toLowerCase()
+    return (
+      c.title.toLowerCase().includes(query) ||
+      c.messages.some(m => m.content.toLowerCase().includes(query))
+    )
+  })
+  
+  // Sort: pinned first, then by updatedAt
+  const sortedConversations = [...filteredConversations].sort((a, b) => {
+    if (a.isPinned && !b.isPinned) return -1
+    if (!a.isPinned && b.isPinned) return 1
+    return b.updatedAt - a.updatedAt
+  })
+
+  const handleClearAll = () => {
+    if (onClearAll) {
+      onClearAll()
+      setClearAllOpen(false)
+    }
+  }
+
+  const renameConversation = conversations.find(c => c.id === renameConvId)
+  
+  const handleRename = (newTitle: string) => {
+    if (renameConvId && onRenameConversation) {
+      onRenameConversation(renameConvId, newTitle)
+    }
+  }
 
   return (
     <div className="flex h-full w-64 flex-col border-r bg-card">
@@ -37,7 +92,11 @@ export function Sidebar({
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">PrisimAI</h1>
         </div>
-        <UserMenu />
+        <UserMenu 
+          onOpenMemory={onOpenMemory}
+          onOpenPersonas={onOpenPersonas}
+          onOpenFavorites={onOpenFavorites}
+        />
       </div>
 
       <div className="px-3 pb-3">
@@ -70,16 +129,25 @@ export function Sidebar({
 
       <Separator />
 
+      <div className="px-3 pb-3 pt-3">
+        <SearchBar onSearch={setSearchQuery} />
+      </div>
+
       <ScrollArea className="flex-1">
         <div className="space-y-1 p-3">
-          {mode === 'chat' && chatConversations.length === 0 && (
-            <p className="px-3 py-2 text-sm text-muted-foreground">No conversations yet</p>
-          )}
-          {mode === 'image' && imageConversations.length === 0 && (
-            <p className="px-3 py-2 text-sm text-muted-foreground">No image generations yet</p>
+          {currentModeConversations.length === 0 && (
+            <p className="px-3 py-2 text-sm text-muted-foreground">
+              {mode === 'chat' ? 'No conversations yet' : 'No image generations yet'}
+            </p>
           )}
           
-          {(mode === 'chat' ? chatConversations : imageConversations).map((conversation) => (
+          {currentModeConversations.length > 0 && sortedConversations.length === 0 && (
+            <p className="px-3 py-2 text-sm text-muted-foreground">
+              No results found for "{searchQuery}"
+            </p>
+          )}
+          
+          {sortedConversations.map((conversation) => (
             <div
               key={conversation.id}
               className={cn(
@@ -87,27 +155,60 @@ export function Sidebar({
                 currentConversationId === conversation.id && 'bg-muted'
               )}
             >
+              {conversation.isPinned && (
+                <PushPin size={12} className="text-muted-foreground shrink-0" weight="fill" />
+              )}
               <button
                 onClick={() => onSelectConversation(conversation.id)}
                 className="flex-1 truncate text-left"
               >
                 {conversation.title}
               </button>
-              <Button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onDeleteConversation(conversation.id)
-                }}
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 opacity-0 transition-opacity group-hover:opacity-100"
-              >
-                <Trash size={14} />
-              </Button>
+              <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <ConversationActions
+                  conversation={conversation}
+                  onPin={onPinConversation ? () => onPinConversation(conversation.id) : undefined}
+                  onDelete={() => onDeleteConversation(conversation.id)}
+                  onRename={onRenameConversation ? () => setRenameConvId(conversation.id) : undefined}
+                />
+              </div>
             </div>
           ))}
         </div>
       </ScrollArea>
+
+      {currentModeConversations.length > 0 && onClearAll && (
+        <>
+          <Separator />
+          <div className="p-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
+              onClick={() => setClearAllOpen(true)}
+            >
+              <TrashSimple size={16} />
+              Clear All ({currentModeConversations.length})
+            </Button>
+          </div>
+        </>
+      )}
+
+      <ClearAllDialog
+        open={clearAllOpen}
+        onOpenChange={setClearAllOpen}
+        onConfirm={handleClearAll}
+        count={currentModeConversations.length}
+      />
+
+      {renameConversation && (
+        <RenameConversationDialog
+          open={!!renameConvId}
+          onOpenChange={(open) => !open && setRenameConvId(null)}
+          currentTitle={renameConversation.title}
+          onRename={handleRename}
+        />
+      )}
     </div>
   )
 }

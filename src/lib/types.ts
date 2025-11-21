@@ -4,6 +4,7 @@ export interface ChatMessage {
   content: string
   timestamp: number
   isStreaming?: boolean
+  isFavorite?: boolean
 }
 
 export interface Conversation {
@@ -13,6 +14,7 @@ export interface Conversation {
   createdAt: number
   updatedAt: number
   mode: 'chat' | 'image'
+  isPinned?: boolean
 }
 
 export interface GeneratedImage {
