@@ -98,7 +98,16 @@ async function generateModelDescription(modelName: string, modelType: 'text' | '
   } catch (error) {
     console.error(`Failed to generate description for ${modelName}:`, error)
     // Return a simple fallback based on the model name
-    return modelName.split('-').slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+    const parts = modelName.split('-').filter(p => p.length > 0)
+    if (parts.length >= 2) {
+      return parts.slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+    } else if (parts.length === 1) {
+      // For single-word names, add a generic second word based on type
+      const capitalizedName = parts[0].charAt(0).toUpperCase() + parts[0].slice(1)
+      return `${capitalizedName} ${modelType === 'text' ? 'Model' : 'Generator'}`
+    }
+    // Ultimate fallback
+    return modelType === 'text' ? 'Text Model' : 'Image Generator'
   }
 }
 
