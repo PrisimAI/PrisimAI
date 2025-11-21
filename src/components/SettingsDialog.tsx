@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTheme } from 'next-themes'
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface SettingsDialogProps {
   open: boolean
@@ -20,6 +28,7 @@ interface SettingsDialogProps {
 }
 
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
+  const { theme, setTheme } = useTheme()
   const [streamingEnabled, setStreamingEnabled] = useState(true)
   const [toolsEnabled, setToolsEnabled] = useState(true)
   const [systemMessage, setSystemMessage] = useState('')
@@ -43,6 +52,27 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
           <TabsContent value="general" className="space-y-4">
             <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="theme">Theme</Label>
+                  <div className="text-sm text-muted-foreground">
+                    Choose your preferred color theme
+                  </div>
+                </div>
+                <Select value={theme} onValueChange={setTheme}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select theme" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">Light</SelectItem>
+                    <SelectItem value="dark">Dark</SelectItem>
+                    <SelectItem value="system">System</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Separator />
+
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="streaming">Enable Streaming</Label>
