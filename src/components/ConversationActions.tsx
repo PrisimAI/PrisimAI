@@ -18,7 +18,7 @@ import {
   PushPin,
   ChartBar,
   FileText,
-  FileCsv,
+  File,
   FileCode,
   PencilSimple,
 } from '@phosphor-icons/react'
@@ -121,7 +121,7 @@ export function ConversationActions({ conversation, onPin, onDelete, onRename }:
               As Text (.txt)
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleExportMarkdown}>
-              <FileCsv className="mr-2 h-4 w-4" />
+              <File className="mr-2 h-4 w-4" />
               As Markdown (.md)
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleExportJSON}>

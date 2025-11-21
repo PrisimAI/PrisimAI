@@ -9,7 +9,7 @@ export function exportAsText(conversation: Conversation): string {
   lines.push(`Conversation: ${conversation.title}`)
   lines.push(`Created: ${new Date(conversation.createdAt).toLocaleString()}`)
   lines.push(`Updated: ${new Date(conversation.updatedAt).toLocaleString()}`)
-  lines.push('=' .repeat(60))
+  lines.push('='.repeat(60))
   lines.push('')
   
   conversation.messages.forEach((message) => {
