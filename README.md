@@ -1,6 +1,6 @@
 # ✨ PrisimAI
 
-A modern, minimalist AI platform that enables users to interact with advanced language models and generate images through a clean, ChatGPT-inspired interface.
+A modern AI platform that enables users to interact with advanced language models and generate images through a clean, ChatGPT-inspired interface.
 
 ## 🚀 Features
 
