@@ -94,11 +94,11 @@ You'll need Firebase Admin SDK to set custom claims. This must be done server-si
 
      try {
        // Set custom claim
-       await admin.auth().setCustomUserClaims(userId, { tier: tier });
+       await admin.auth().setCustomUserClaims(userId, { tier });
 
        // Also store in Firestore for easier querying
        await admin.firestore().collection('users').doc(userId).set({
-         tier: tier,
+         tier,
          updatedAt: admin.firestore.FieldValue.serverTimestamp()
        }, { merge: true });
 
@@ -259,16 +259,10 @@ Create this collection to define tier configurations:
     'openai-fast',
     'llama',
     'claude',
-    'gpt4',
-    // All except these:
-    // 'openai-large',
-    // 'midijourney',
-    // 'claude-large',
-    // 'openai-reasoning',
-    // 'deepseek',
-    // 'perplexity-reasoning',
-    // 'gemini-large',
-    // 'openai-audio'
+    'gpt4'
+    // NOTE: Pro tier excludes these premium models:
+    // 'openai-large', 'midijourney', 'claude-large', 'openai-reasoning',
+    // 'deepseek', 'perplexity-reasoning', 'gemini-large', 'openai-audio'
   ],
   messagesPerDay: 100,
   requestsPerMinute: 10,
