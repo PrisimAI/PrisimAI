@@ -63,7 +63,7 @@ export async function getTextModels(): Promise<TextModel[]> {
   }
 
   try {
-    const response = await fetch(`${BASE_URL}/v1/models`, {
+    const response = await fetch(`${BASE_URL}/text/models`, {
       headers: {
         Authorization: `Bearer ${API_KEY}`,
       },
