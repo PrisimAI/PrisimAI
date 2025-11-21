@@ -37,79 +37,23 @@ export interface GenerateTextOptions {
 
 export interface TextModel {
   name: string
-  description?: string
+  description: string
   aliases?: string[]
   tools?: boolean
 }
 
 export interface ImageModel {
   name: string
-  description?: string
+  description: string
   aliases?: string[]
 }
 
 const FALLBACK_TEXT_MODELS: TextModel[] = [
-  { name: 'openai', description: 'Advanced Reasoning', tools: true },
-  { name: 'mistral', description: 'Efficient Intelligence', tools: true },
-  { name: 'claude', description: 'Safe Assistant', tools: true },
-  { name: 'llama', description: 'Open Source', tools: false },
+  { name: 'openai', description: 'OpenAI GPT-4', tools: true },
+  { name: 'mistral', description: 'Mistral Large', tools: true },
+  { name: 'claude', description: 'Anthropic Claude', tools: true },
+  { name: 'llama', description: 'Meta Llama 3', tools: false },
 ]
-
-// Helper function to generate a two-word description for a model using AI
-async function generateModelDescription(modelName: string, modelType: 'text' | 'image'): Promise<string> {
-  try {
-    const prompt = `Generate a concise two-word description for an AI model named "${modelName}". The model is a ${modelType} generation model. Respond with ONLY the two-word description, nothing else.`
-    
-    const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'openai',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 10,
-        temperature: 0.7,
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to generate description')
-    }
-
-    const data = await response.json()
-    
-    // Add null checks for nested properties
-    if (!data?.choices?.[0]?.message?.content) {
-      throw new Error('Invalid API response structure')
-    }
-    
-    const description = data.choices[0].message.content.trim()
-    
-    // Ensure it's roughly two words (allow some flexibility)
-    const words = description.split(/\s+/)
-    if (words.length <= 3) {
-      return description
-    }
-    
-    // If too long, just return first two words
-    return words.slice(0, 2).join(' ')
-  } catch (error) {
-    console.error(`Failed to generate description for ${modelName}:`, error)
-    // Return a simple fallback based on the model name
-    const parts = modelName.split('-').filter(p => p.length > 0)
-    if (parts.length >= 2) {
-      return parts.slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
-    } else if (parts.length === 1) {
-      // For single-word names, add a generic second word based on type
-      const capitalizedName = parts[0].charAt(0).toUpperCase() + parts[0].slice(1)
-      return `${capitalizedName} ${modelType === 'text' ? 'Model' : 'Generator'}`
-    }
-    // Ultimate fallback
-    return modelType === 'text' ? 'Text Model' : 'Image Generator'
-  }
-}
 
 export async function getTextModels(): Promise<TextModel[]> {
   // In mock mode or if API is blocked, return fallback models immediately
@@ -119,7 +63,7 @@ export async function getTextModels(): Promise<TextModel[]> {
   }
 
   try {
-    const response = await fetch(`${BASE_URL}/v1/models`, {
+    const response = await fetch(`${BASE_URL}/text/models`, {
       headers: {
         Authorization: `Bearer ${API_KEY}`,
       },
@@ -134,7 +78,7 @@ export async function getTextModels(): Promise<TextModel[]> {
     let models = Array.isArray(data) ? data : data.data || []
     
     // Filter out invalid models and ensure they have required properties
-    models = models.filter((m: any) => m && m.name)
+    models = models.filter((m: any) => m && m.name && m.description)
     
     // If no valid models, use fallback
     if (models.length === 0) {
@@ -142,17 +86,7 @@ export async function getTextModels(): Promise<TextModel[]> {
       return FALLBACK_TEXT_MODELS
     }
     
-    // Generate descriptions for models that don't have them (sequential to avoid rate limits)
-    const modelsWithDescriptions = []
-    for (const model of models) {
-      if (!model.description) {
-        console.info(`Generating description for model: ${model.name}`)
-        model.description = await generateModelDescription(model.name, 'text')
-      }
-      modelsWithDescriptions.push(model)
-    }
-    
-    return modelsWithDescriptions
+    return models
   } catch (error) {
     console.error('Error fetching text models:', error)
     return FALLBACK_TEXT_MODELS
@@ -160,11 +94,11 @@ export async function getTextModels(): Promise<TextModel[]> {
 }
 
 const FALLBACK_IMAGE_MODELS: ImageModel[] = [
-  { name: 'flux', description: 'Creative Generation' },
-  { name: 'flux-realism', description: 'Photorealistic Images' },
-  { name: 'flux-anime', description: 'Anime Style' },
-  { name: 'flux-3d', description: '3D Rendering' },
-  { name: 'turbo', description: 'Fast Generation' },
+  { name: 'flux', description: 'Flux' },
+  { name: 'flux-realism', description: 'Flux Realism' },
+  { name: 'flux-anime', description: 'Flux Anime' },
+  { name: 'flux-3d', description: 'Flux 3D' },
+  { name: 'turbo', description: 'Turbo' },
 ]
 
 export async function getImageModels(): Promise<ImageModel[]> {
@@ -190,7 +124,7 @@ export async function getImageModels(): Promise<ImageModel[]> {
     let models = Array.isArray(data) ? data : data.data || []
     
     // Filter out invalid models and ensure they have required properties
-    models = models.filter((m: any) => m && m.name)
+    models = models.filter((m: any) => m && m.name && m.description)
     
     // If no valid models, use fallback
     if (models.length === 0) {
@@ -198,17 +132,7 @@ export async function getImageModels(): Promise<ImageModel[]> {
       return FALLBACK_IMAGE_MODELS
     }
     
-    // Generate descriptions for models that don't have them (sequential to avoid rate limits)
-    const modelsWithDescriptions = []
-    for (const model of models) {
-      if (!model.description) {
-        console.info(`Generating description for model: ${model.name}`)
-        model.description = await generateModelDescription(model.name, 'image')
-      }
-      modelsWithDescriptions.push(model)
-    }
-    
-    return modelsWithDescriptions
+    return models
   } catch (error) {
     console.error('Error fetching image models:', error)
     return FALLBACK_IMAGE_MODELS
