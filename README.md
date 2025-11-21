@@ -9,6 +9,7 @@ A modern, minimalist AI platform that enables users to interact with advanced la
 - **Conversation History**: Persistent storage of chat conversations with ability to view and continue previous sessions
 - **Model Selection**: Choose between different AI models for text and image generation
 - **🔐 User Authentication**: Secure account creation and login powered by Firebase
+- **💎 Subscription Tiers**: Three-tier system (Free, Pro, Deluxe) with different model access and usage limits
 
 ## 🛠️ Setup
 
@@ -44,6 +45,8 @@ A modern, minimalist AI platform that enables users to interact with advanced la
 ## 📚 Documentation
 
 - **[Firebase Setup Guide](./FIREBASE_CREDENTIAL_LOCATIONS.md)**: Complete guide for setting up authentication with Firebase
+- **[Tier System Setup](./FIREBASE_TIERS_SETUP.md)**: Comprehensive guide for implementing Free, Pro, and Deluxe subscription tiers
+- **[Quick Tier Setup Reference](./QUICK_TIER_SETUP.md)**: Condensed checklist for tier implementation
 - **[Product Requirements](./PRD.md)**: Detailed product requirements and design direction
 
 ## 🏗️ Development
