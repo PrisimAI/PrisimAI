@@ -9,7 +9,14 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { Sparkle } from '@phosphor-icons/react'
-import { getTextModels, getImageModels, type TextModel, type ImageModel } from '@/lib/pollinations-api'
+import { 
+  getTextModels, 
+  getImageModels, 
+  type TextModel, 
+  type ImageModel 
+} from '@/lib/pollinations-api'
+import { getTierConfig, isModelAllowed } from '@/lib/tiers'
+import { useAuth } from '@/contexts/AuthContext'
 import type { AppMode } from '@/lib/types'
 
 interface ModelSelectorProps {
@@ -23,6 +30,21 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
   const [imageModels, setImageModels] = useState<ImageModel[]>([])
   const [loading, setLoading] = useState(true)
 
+  const { userData } = useAuth()
+  const [tierConfig, setTierConfig] = useState<any>(null)
+
+  // Load tier config
+  useEffect(() => {
+    async function loadTierConfig() {
+      if (userData?.tier) {
+        const config = await getTierConfig(userData.tier)
+        setTierConfig(config)
+      }
+    }
+    loadTierConfig()
+  }, [userData?.tier])
+
+  // Load models
   useEffect(() => {
     async function loadModels() {
       setLoading(true)
@@ -36,11 +58,8 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
         }
       } catch (error) {
         console.error('Failed to load models:', error)
-        if (mode === 'chat') {
-          setTextModels([])
-        } else {
-          setImageModels([])
-        }
+        if (mode === 'chat') setTextModels([])
+        else setImageModels([])
       } finally {
         setLoading(false)
       }
@@ -49,10 +68,20 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
     loadModels()
   }, [mode])
 
+  // Pick correct model list
   const models = mode === 'chat' ? textModels : imageModels
-  const displayModels = Array.isArray(models) ? models.slice(0, 19) : []
-  
-  const currentModel = displayModels.find(m => (m as any).id === selectedModel || (m as any).name === selectedModel)
+  const slicedModels = Array.isArray(models) ? models.slice(0, 19) : []
+
+  // Tier-based filter
+  const filteredModels = slicedModels.filter(model => {
+    if (!tierConfig) return true
+    const modelId = (model as any).id || (model as any).name
+    return isModelAllowed(modelId, tierConfig)
+  })
+
+  const currentModel = filteredModels.find(
+    m => (m as any).id === selectedModel || (m as any).name === selectedModel
+  )
 
   if (loading) {
     return (
@@ -68,21 +97,26 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
         <Sparkle size={18} className="text-primary" weight="fill" />
         <span className="text-sm font-medium">Model:</span>
       </div>
+
       <Select value={selectedModel} onValueChange={onModelChange}>
         <SelectTrigger className="w-[250px]">
           <SelectValue placeholder="Select model" />
         </SelectTrigger>
+
         <SelectContent>
-          {displayModels.length > 0 ? (
-            displayModels.map((model) => {
+          {filteredModels.length > 0 ? (
+            filteredModels.map((model) => {
               const modelId = (model as any).id || (model as any).name
               const modelDescription = model.description || modelId
+
               return (
                 <SelectItem key={modelId} value={modelId}>
                   <div className="flex items-center justify-between gap-2 w-full">
                     <span>{modelDescription}</span>
                     {(model as any).tools && (
-                      <Badge variant="secondary" className="ml-2 text-xs shrink-0">Tools</Badge>
+                      <Badge variant="secondary" className="ml-2 text-xs shrink-0">
+                        Tools
+                      </Badge>
                     )}
                   </div>
                 </SelectItem>
@@ -95,7 +129,8 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
           )}
         </SelectContent>
       </Select>
-      {currentModel && (mode === 'chat') && (currentModel as any).tools && (
+
+      {currentModel && mode === 'chat' && (currentModel as any).tools && (
         <Badge variant="outline" className="text-xs">
           <Sparkle size={12} className="mr-1" weight="fill" />
           Tools Enabled
