@@ -55,6 +55,47 @@ const FALLBACK_TEXT_MODELS: TextModel[] = [
   { name: 'llama', description: 'Open Source', tools: false },
 ]
 
+// Helper function to generate a two-word description for a model using AI
+async function generateModelDescription(modelName: string, modelType: 'text' | 'image'): Promise<string> {
+  try {
+    const prompt = `Generate a concise two-word description for an AI model named "${modelName}". The model is a ${modelType} generation model. Respond with ONLY the two-word description, nothing else.`
+    
+    const response = await fetch(`${BASE_URL}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'openai',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 10,
+        temperature: 0.7,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to generate description')
+    }
+
+    const data = await response.json()
+    const description = data.choices[0].message.content.trim()
+    
+    // Ensure it's roughly two words (allow some flexibility)
+    const words = description.split(/\s+/)
+    if (words.length <= 3) {
+      return description
+    }
+    
+    // If too long, just return first two words
+    return words.slice(0, 2).join(' ')
+  } catch (error) {
+    console.error(`Failed to generate description for ${modelName}:`, error)
+    // Return a simple fallback based on the model name
+    return modelName.split('-').slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  }
+}
+
 export async function getTextModels(): Promise<TextModel[]> {
   // In mock mode or if API is blocked, return fallback models immediately
   if (ENABLE_MOCK_MODE) {
@@ -86,7 +127,18 @@ export async function getTextModels(): Promise<TextModel[]> {
       return FALLBACK_TEXT_MODELS
     }
     
-    return models
+    // Generate descriptions for models that don't have them
+    const modelsWithDescriptions = await Promise.all(
+      models.map(async (model: any) => {
+        if (!model.description) {
+          console.info(`Generating description for model: ${model.name}`)
+          model.description = await generateModelDescription(model.name, 'text')
+        }
+        return model
+      })
+    )
+    
+    return modelsWithDescriptions
   } catch (error) {
     console.error('Error fetching text models:', error)
     return FALLBACK_TEXT_MODELS
@@ -132,7 +184,18 @@ export async function getImageModels(): Promise<ImageModel[]> {
       return FALLBACK_IMAGE_MODELS
     }
     
-    return models
+    // Generate descriptions for models that don't have them
+    const modelsWithDescriptions = await Promise.all(
+      models.map(async (model: any) => {
+        if (!model.description) {
+          console.info(`Generating description for model: ${model.name}`)
+          model.description = await generateModelDescription(model.name, 'image')
+        }
+        return model
+      })
+    )
+    
+    return modelsWithDescriptions
   } catch (error) {
     console.error('Error fetching image models:', error)
     return FALLBACK_IMAGE_MODELS
