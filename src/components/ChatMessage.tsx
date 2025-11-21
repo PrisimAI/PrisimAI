@@ -1,26 +1,45 @@
 import { useState } from 'react'
-import { User, Sparkle, Copy, Check, ArrowsClockwise } from '@phosphor-icons/react'
+import { User, Sparkle, Copy, Check, ArrowsClockwise, PencilSimple, X } from '@phosphor-icons/react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import type { ChatMessage as ChatMessageType } from '@/lib/types'
 import { marked } from 'marked'
+import { FavoriteButton } from '@/components/FavoriteButton'
 
 interface ChatMessageProps {
   message: ChatMessageType
   onRegenerate?: () => void
+  onToggleFavorite?: () => void
+  onEdit?: (newContent: string) => void
 }
 
-export function ChatMessage({ message, onRegenerate }: ChatMessageProps) {
+export function ChatMessage({ message, onRegenerate, onToggleFavorite, onEdit }: ChatMessageProps) {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editContent, setEditContent] = useState(message.content)
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content)
     setCopied(true)
     toast.success('Copied to clipboard')
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleSaveEdit = () => {
+    if (onEdit && editContent.trim()) {
+      onEdit(editContent)
+      setIsEditing(false)
+      toast.success('Message updated')
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setEditContent(message.content)
+    setIsEditing(false)
   }
 
   // Parse markdown for assistant messages
@@ -40,16 +59,42 @@ export function ChatMessage({ message, onRegenerate }: ChatMessageProps) {
         </AvatarFallback>
       </Avatar>
       <div className="flex-1 space-y-2 overflow-hidden">
-        <p className="text-sm font-medium">{isUser ? 'You' : 'PrisimAI'}</p>
-        <div className={cn('prose prose-sm dark:prose-invert max-w-none', message.isStreaming && 'streaming-cursor')}>
-          {!isUser && !message.isStreaming ? (
-            <div dangerouslySetInnerHTML={{ __html: formattedContent }} />
-          ) : (
-            <p className="whitespace-pre-wrap break-words leading-relaxed">{message.content}</p>
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-medium">{isUser ? 'You' : 'PrisimAI'}</p>
+          {message.isFavorite && (
+            <span className="text-xs text-yellow-600 dark:text-yellow-500">⭐ Favorited</span>
           )}
         </div>
         
-        {!message.isStreaming && (
+        {isEditing ? (
+          <div className="space-y-2">
+            <Textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              className="min-h-[100px]"
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <Button size="sm" onClick={handleSaveEdit}>
+                Save
+              </Button>
+              <Button size="sm" variant="ghost" onClick={handleCancelEdit}>
+                <X size={14} className="mr-1" />
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className={cn('prose prose-sm dark:prose-invert max-w-none', message.isStreaming && 'streaming-cursor')}>
+            {!isUser && !message.isStreaming ? (
+              <div dangerouslySetInnerHTML={{ __html: formattedContent }} />
+            ) : (
+              <p className="whitespace-pre-wrap break-words leading-relaxed">{message.content}</p>
+            )}
+          </div>
+        )}
+        
+        {!message.isStreaming && !isEditing && (
           <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
             <Button
               variant="ghost"
@@ -69,6 +114,23 @@ export function ChatMessage({ message, onRegenerate }: ChatMessageProps) {
                 </>
               )}
             </Button>
+            {onToggleFavorite && (
+              <FavoriteButton
+                isFavorite={message.isFavorite}
+                onToggle={onToggleFavorite}
+              />
+            )}
+            {isUser && onEdit && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={() => setIsEditing(true)}
+              >
+                <PencilSimple size={14} className="mr-1" />
+                Edit
+              </Button>
+            )}
             {!isUser && onRegenerate && (
               <Button
                 variant="ghost"
