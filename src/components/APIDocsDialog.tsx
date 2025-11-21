@@ -192,7 +192,9 @@ export function APIDocsDialog({ open, onOpenChange }: APIDocsDialogProps) {
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY'
   }
-})`}
+})
+.then(res => res.json())
+.then(models => models.map(m => ({ id: m.name || m.id })))`}
                   />
                 </div>
 
