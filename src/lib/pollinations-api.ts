@@ -36,7 +36,7 @@ export interface GenerateTextOptions {
 }
 
 export interface TextModel {
-  name: string
+  id: string
   description?: string
   aliases?: string[]
   tools?: boolean
@@ -49,10 +49,10 @@ export interface ImageModel {
 }
 
 const FALLBACK_TEXT_MODELS: TextModel[] = [
-  { name: 'openai', description: 'OpenAI GPT-4', tools: true },
-  { name: 'mistral', description: 'Mistral Large', tools: true },
-  { name: 'claude', description: 'Anthropic Claude', tools: true },
-  { name: 'llama', description: 'Meta Llama 3', tools: false },
+  { id: 'openai', description: 'OpenAI GPT-4', tools: true },
+  { id: 'mistral', description: 'Mistral Large', tools: true },
+  { id: 'claude', description: 'Anthropic Claude', tools: true },
+  { id: 'llama', description: 'Meta Llama 3', tools: false },
 ]
 
 export async function getTextModels(): Promise<TextModel[]> {
@@ -63,7 +63,7 @@ export async function getTextModels(): Promise<TextModel[]> {
   }
 
   try {
-    const response = await fetch(`${BASE_URL}/text/models`, {
+    const response = await fetch(`${BASE_URL}/v1/models`, {
       headers: {
         Authorization: `Bearer ${API_KEY}`,
       },
@@ -77,8 +77,15 @@ export async function getTextModels(): Promise<TextModel[]> {
     const data = await response.json()
     let models = Array.isArray(data) ? data : data.data || []
     
-    // Filter out invalid models and ensure they have required properties
-    models = models.filter((m: any) => m && m.name)
+    // Transform models to use 'id' field instead of 'name'
+    models = models
+      .filter((m: any) => m && (m.name || m.id))
+      .map((m: any) => ({
+        id: m.id || m.name,
+        description: m.description,
+        aliases: m.aliases,
+        tools: m.tools
+      }))
     
     // If no valid models, use fallback
     if (models.length === 0) {

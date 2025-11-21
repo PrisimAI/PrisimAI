@@ -52,7 +52,7 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
   const models = mode === 'chat' ? textModels : imageModels
   const displayModels = Array.isArray(models) ? models.slice(0, 15) : []
   
-  const currentModel = displayModels.find(m => m.name === selectedModel)
+  const currentModel = displayModels.find(m => (m as any).id === selectedModel || (m as any).name === selectedModel)
 
   if (loading) {
     return (
@@ -74,16 +74,20 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
         </SelectTrigger>
         <SelectContent>
           {displayModels.length > 0 ? (
-            displayModels.map((model) => (
-              <SelectItem key={model.name} value={model.name}>
-                <div className="flex items-center justify-between gap-2 w-full">
-                  <span>{model.description || model.name}</span>
-                  {(model as any).tools && (
-                    <Badge variant="secondary" className="ml-2 text-xs shrink-0">Tools</Badge>
-                  )}
-                </div>
-              </SelectItem>
-            ))
+            displayModels.map((model) => {
+              const modelId = (model as any).id || (model as any).name
+              const modelDescription = model.description || modelId
+              return (
+                <SelectItem key={modelId} value={modelId}>
+                  <div className="flex items-center justify-between gap-2 w-full">
+                    <span>{modelDescription}</span>
+                    {(model as any).tools && (
+                      <Badge variant="secondary" className="ml-2 text-xs shrink-0">Tools</Badge>
+                    )}
+                  </div>
+                </SelectItem>
+              )
+            })
           ) : (
             <SelectItem value="default" disabled>
               No models available
