@@ -79,6 +79,12 @@ async function generateModelDescription(modelName: string, modelType: 'text' | '
     }
 
     const data = await response.json()
+    
+    // Add null checks for nested properties
+    if (!data?.choices?.[0]?.message?.content) {
+      throw new Error('Invalid API response structure')
+    }
+    
     const description = data.choices[0].message.content.trim()
     
     // Ensure it's roughly two words (allow some flexibility)
@@ -127,16 +133,15 @@ export async function getTextModels(): Promise<TextModel[]> {
       return FALLBACK_TEXT_MODELS
     }
     
-    // Generate descriptions for models that don't have them
-    const modelsWithDescriptions = await Promise.all(
-      models.map(async (model: any) => {
-        if (!model.description) {
-          console.info(`Generating description for model: ${model.name}`)
-          model.description = await generateModelDescription(model.name, 'text')
-        }
-        return model
-      })
-    )
+    // Generate descriptions for models that don't have them (sequential to avoid rate limits)
+    const modelsWithDescriptions = []
+    for (const model of models) {
+      if (!model.description) {
+        console.info(`Generating description for model: ${model.name}`)
+        model.description = await generateModelDescription(model.name, 'text')
+      }
+      modelsWithDescriptions.push(model)
+    }
     
     return modelsWithDescriptions
   } catch (error) {
@@ -184,16 +189,15 @@ export async function getImageModels(): Promise<ImageModel[]> {
       return FALLBACK_IMAGE_MODELS
     }
     
-    // Generate descriptions for models that don't have them
-    const modelsWithDescriptions = await Promise.all(
-      models.map(async (model: any) => {
-        if (!model.description) {
-          console.info(`Generating description for model: ${model.name}`)
-          model.description = await generateModelDescription(model.name, 'image')
-        }
-        return model
-      })
-    )
+    // Generate descriptions for models that don't have them (sequential to avoid rate limits)
+    const modelsWithDescriptions = []
+    for (const model of models) {
+      if (!model.description) {
+        console.info(`Generating description for model: ${model.name}`)
+        model.description = await generateModelDescription(model.name, 'image')
+      }
+      modelsWithDescriptions.push(model)
+    }
     
     return modelsWithDescriptions
   } catch (error) {
