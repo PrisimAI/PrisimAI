@@ -46,7 +46,6 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
             </Avatar>
             <div className="flex-1">
               <h3 className="font-semibold">{userEmail}</h3>
-              <p className="text-sm text-muted-foreground">Free Plan</p>
               <Badge variant="secondary" className="mt-1">
                 Active
               </Badge>

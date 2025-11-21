@@ -10,12 +10,6 @@ import {
 } from 'firebase/auth'
 import { auth, googleProvider, githubProvider } from '../lib/firebase'
 
-import { 
-  getUserData, 
-  initializeUserTier, 
-  type UserData 
-} from '../lib/tiers'
-
 // Types
 interface AuthError {
   message: string
@@ -24,14 +18,12 @@ interface AuthError {
 
 interface AuthContextType {
   user: User | null
-  userData: UserData | null
   loading: boolean
   signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
   signInWithGoogle: () => Promise<{ error: AuthError | null }>
   signInWithGitHub: () => Promise<{ error: AuthError | null }>
   signOut: () => Promise<void>
-  refreshUserData: () => Promise<void>
 }
 
 // Context
@@ -39,36 +31,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [userData, setUserData] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
-
-  // Load user tier data
-  const fetchUserData = async (user: User) => {
-    try {
-      await initializeUserTier(user.uid, user.email || '')
-
-      const data = await getUserData(user.uid)
-      if (data) {
-        setUserData(data)
-      } else {
-        setUserData({
-          tier: 'free',
-          email: user.email || '',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          messagesUsed: 0,
-          messagesLimit: 20,
-          lastResetDate: new Date()
-        })
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error)
-    }
-  }
-
-  const refreshUserData = async () => {
-    if (user) await fetchUserData(user)
-  }
 
   // Auth listener
   useEffect(() => {
@@ -96,7 +59,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } as User
 
         setUser(mockUser)
-        fetchUserData(mockUser)
         setLoading(false)
       }
     }, 3000)
@@ -104,13 +66,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (usr) => {
       clearTimeout(devTimeout)
       setUser(usr)
-      
-      if (usr) {
-        await fetchUserData(usr)
-      } else {
-        setUserData(null)
-      }
-
       setLoading(false)
     })
 
@@ -164,20 +119,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     await firebaseSignOut(auth)
     setUser(null)
-    setUserData(null)
   }
 
   return (
     <AuthContext.Provider value={{
       user,
-      userData,
       loading,
       signUp,
       signIn,
       signInWithGoogle,
       signInWithGitHub,
-      signOut,
-      refreshUserData
+      signOut
     }}>
       {children}
     </AuthContext.Provider>
