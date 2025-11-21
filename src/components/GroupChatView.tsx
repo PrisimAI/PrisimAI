@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { User, Robot, PaperPlaneRight, ArrowBendUpLeft } from '@phosphor-icons/react'
+import { User, Robot, PaperPlaneRight, ArrowBendUpLeft, Users } from '@phosphor-icons/react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'

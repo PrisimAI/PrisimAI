@@ -22,6 +22,9 @@ interface SidebarProps {
   onPinConversation?: (id: string) => void
   onClearAll?: () => void
   onRenameConversation?: (id: string, newTitle: string) => void
+  onOpenMemory?: () => void
+  onOpenPersonas?: () => void
+  onOpenFavorites?: () => void
 }
 
 export function Sidebar({
@@ -35,6 +38,9 @@ export function Sidebar({
   onPinConversation,
   onClearAll,
   onRenameConversation,
+  onOpenMemory,
+  onOpenPersonas,
+  onOpenFavorites,
 }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [clearAllOpen, setClearAllOpen] = useState(false)
@@ -86,7 +92,11 @@ export function Sidebar({
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">PrisimAI</h1>
         </div>
-        <UserMenu />
+        <UserMenu 
+          onOpenMemory={onOpenMemory}
+          onOpenPersonas={onOpenPersonas}
+          onOpenFavorites={onOpenFavorites}
+        />
       </div>
 
       <div className="px-3 pb-3">

@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
-import { Robot, Users } from '@phosphor-icons/react'
+import { Robot, Users, User } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import type { AIPersona, GroupChatParticipant } from '@/lib/memory-types'
 

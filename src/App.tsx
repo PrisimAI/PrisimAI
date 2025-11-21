@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useLocalStorage } from './hooks/use-local-storage'
+import { useKeyboardShortcuts } from './hooks/use-keyboard-shortcuts'
 import { useAuth } from './contexts/AuthContext'
 import { Toaster, toast } from 'sonner'
 import { Sidebar } from './components/Sidebar'
@@ -11,19 +12,30 @@ import { ModelSelector } from './components/ModelSelector'
 import { AuthPage } from './components/AuthPage'
 import { ScrollArea } from './components/ui/scroll-area'
 import { Skeleton } from './components/ui/skeleton'
+import { MemoryManager } from './components/MemoryManager'
+import { PersonaManager } from './components/PersonaManager'
+import { FavoritesDialog } from './components/FavoritesDialog'
+import { KeyboardShortcutsDialog } from './components/KeyboardShortcutsDialog'
 import { generateText, generateImage, type Message } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode } from './lib/types'
+import type { MemoryEntry, AIPersona } from './lib/memory-types'
 
 function App() {
   const { user, loading: authLoading } = useAuth()
   const [conversations, setConversations] = useLocalStorage<Conversation[]>('conversations', [])
+  const [memories, setMemories] = useLocalStorage<MemoryEntry[]>('memories', [])
+  const [personas, setPersonas] = useLocalStorage<AIPersona[]>('personas', [])
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const [mode, setMode] = useState<AppMode>('chat')
   const [textModel, setTextModel] = useState('openai')
   const [imageModel, setImageModel] = useState('flux')
   const [isGenerating, setIsGenerating] = useState(false)
   const [pendingMessage, setPendingMessage] = useState<string | null>(null)
+  const [memoryDialogOpen, setMemoryDialogOpen] = useState(false)
+  const [personaDialogOpen, setPersonaDialogOpen] = useState(false)
+  const [favoritesDialogOpen, setFavoritesDialogOpen] = useState(false)
+  const [shortcutsDialogOpen, setShortcutsDialogOpen] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
   const conversationsList = conversations || []
@@ -220,6 +232,121 @@ function App() {
     }
   }
 
+  const handlePinConversation = (id: string) => {
+    setConversations((current = []) =>
+      current.map((c) =>
+        c.id === id ? { ...c, isPinned: !c.isPinned, updatedAt: Date.now() } : c
+      )
+    )
+  }
+
+  const handleRenameConversation = (id: string, newTitle: string) => {
+    setConversations((current = []) =>
+      current.map((c) =>
+        c.id === id ? { ...c, title: newTitle, updatedAt: Date.now() } : c
+      )
+    )
+    toast.success('Conversation renamed')
+  }
+
+  const handleClearAllConversations = () => {
+    setConversations((current = []) => current.filter((c) => c.mode !== mode))
+    setCurrentConversationId(null)
+    toast.success('All conversations cleared')
+  }
+
+  const handleToggleFavorite = (messageId: string) => {
+    if (!currentConversationId) return
+    setConversations((current = []) =>
+      current.map((c) => {
+        if (c.id !== currentConversationId) return c
+        const messages = c.messages.map((m) =>
+          m.id === messageId ? { ...m, isFavorite: !m.isFavorite } : m
+        )
+        return { ...c, messages, updatedAt: Date.now() }
+      })
+    )
+  }
+
+  const handleEditMessage = (messageId: string, newContent: string) => {
+    if (!currentConversationId) return
+    setConversations((current = []) =>
+      current.map((c) => {
+        if (c.id !== currentConversationId) return c
+        const messages = c.messages.map((m) =>
+          m.id === messageId ? { ...m, content: newContent } : m
+        )
+        return { ...c, messages, updatedAt: Date.now() }
+      })
+    )
+    // Regenerate response after edit
+    handleSendMessage(newContent)
+  }
+
+  const handleUnfavoriteMessage = (conversationId: string, messageId: string) => {
+    setConversations((current = []) =>
+      current.map((c) => {
+        if (c.id !== conversationId) return c
+        const messages = c.messages.map((m) =>
+          m.id === messageId ? { ...m, isFavorite: false } : m
+        )
+        return { ...c, messages }
+      })
+    )
+  }
+
+  // Memory handlers
+  const handleAddMemory = (memory: Omit<MemoryEntry, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newMemory: MemoryEntry = {
+      ...memory,
+      id: `mem_${Date.now()}`,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    }
+    setMemories((current = []) => [...current, newMemory])
+  }
+
+  const handleUpdateMemory = (id: string, updates: Partial<MemoryEntry>) => {
+    setMemories((current = []) =>
+      current.map((m) =>
+        m.id === id ? { ...m, ...updates, updatedAt: Date.now() } : m
+      )
+    )
+  }
+
+  const handleDeleteMemory = (id: string) => {
+    setMemories((current = []) => current.filter((m) => m.id !== id))
+  }
+
+  // Persona handlers
+  const handleAddPersona = (persona: Omit<AIPersona, 'id'>) => {
+    const newPersona: AIPersona = {
+      ...persona,
+      id: `persona_${Date.now()}`,
+    }
+    setPersonas((current = []) => [...current, newPersona])
+  }
+
+  const handleUpdatePersona = (id: string, updates: Partial<AIPersona>) => {
+    setPersonas((current = []) =>
+      current.map((p) => (p.id === id ? { ...p, ...updates } : p))
+    )
+  }
+
+  const handleDeletePersona = (id: string) => {
+    setPersonas((current = []) => current.filter((p) => p.id !== id))
+  }
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    { key: 'n', ctrl: true, handler: createNewConversation },
+    { key: 'k', ctrl: true, handler: () => document.getElementById('search-input')?.focus() },
+    { key: 'f', ctrl: true, handler: () => setFavoritesDialogOpen(true) },
+    { key: '/', ctrl: true, handler: () => setShortcutsDialogOpen(true) },
+    { key: '1', ctrl: true, handler: () => handleModeChange('chat') },
+    { key: '2', ctrl: true, handler: () => handleModeChange('image') },
+  ], !memoryDialogOpen && !personaDialogOpen && !favoritesDialogOpen && !shortcutsDialogOpen)
+
   const handleModeChange = (newMode: AppMode) => {
     setMode(newMode)
     setCurrentConversationId(null)
@@ -301,6 +428,12 @@ function App() {
         onSelectConversation={setCurrentConversationId}
         onDeleteConversation={handleDeleteConversation}
         onModeChange={handleModeChange}
+        onPinConversation={handlePinConversation}
+        onRenameConversation={handleRenameConversation}
+        onClearAll={handleClearAllConversations}
+        onOpenMemory={() => setMemoryDialogOpen(true)}
+        onOpenPersonas={() => setPersonaDialogOpen(true)}
+        onOpenFavorites={() => setFavoritesDialogOpen(true)}
       />
 
       <div className="flex flex-1 flex-col">
@@ -321,6 +454,8 @@ function App() {
                     key={message.id} 
                     message={message}
                     onRegenerate={message.role === 'assistant' ? () => handleRegenerateMessage(index) : undefined}
+                    onToggleFavorite={() => handleToggleFavorite(message.id)}
+                    onEdit={message.role === 'user' ? (newContent) => handleEditMessage(message.id, newContent) : undefined}
                   />
                 ))}
                 {isGenerating && currentConversation.messages[currentConversation.messages.length - 1]?.role === 'user' && (
@@ -360,6 +495,36 @@ function App() {
           placeholder={mode === 'chat' ? 'Ask anything' : 'Describe the image you want to create'}
         />
       </div>
+
+      <MemoryManager
+        open={memoryDialogOpen}
+        onOpenChange={setMemoryDialogOpen}
+        memories={memories || []}
+        onAddMemory={handleAddMemory}
+        onUpdateMemory={handleUpdateMemory}
+        onDeleteMemory={handleDeleteMemory}
+      />
+
+      <PersonaManager
+        open={personaDialogOpen}
+        onOpenChange={setPersonaDialogOpen}
+        personas={personas || []}
+        onAddPersona={handleAddPersona}
+        onUpdatePersona={handleUpdatePersona}
+        onDeletePersona={handleDeletePersona}
+      />
+
+      <FavoritesDialog
+        open={favoritesDialogOpen}
+        onOpenChange={setFavoritesDialogOpen}
+        conversations={conversationsList}
+        onUnfavorite={handleUnfavoriteMessage}
+      />
+
+      <KeyboardShortcutsDialog
+        open={shortcutsDialogOpen}
+        onOpenChange={setShortcutsDialogOpen}
+      />
 
       <Toaster position="top-center" />
     </div>
