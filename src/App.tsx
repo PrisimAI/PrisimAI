@@ -11,6 +11,7 @@ import { ImageGeneration } from './components/ImageGeneration'
 import { ModelSelector } from './components/ModelSelector'
 import { AuthPage } from './components/AuthPage'
 import { RoleplayPage } from './components/RoleplayPage'
+import { GroupChatInterface } from './components/GroupChatInterface'
 import { ScrollArea } from './components/ui/scroll-area'
 import { Skeleton } from './components/ui/skeleton'
 import { MemoryManager } from './components/MemoryManager'
@@ -486,15 +487,22 @@ function App() {
         )}
 
         <div className="flex-1 overflow-hidden">
-          {mode === 'roleplay' ? (
+          {mode === 'roleplay' && !currentConversationId ? (
             <RoleplayPage
               personas={personas || []}
               onOpenPersonaManager={() => setPersonaDialogOpen(true)}
               onCreateGroupChat={handleCreateGroupChatWithPersonas}
             />
+          ) : currentConversation?.isGroupChat ? (
+            <GroupChatInterface
+              conversation={currentConversation}
+              personas={personas || []}
+              onSendMessage={handleSendMessage}
+              isGenerating={isGenerating}
+            />
           ) : showEmpty ? (
             <EmptyState mode={mode} onExampleClick={handleExampleClick} />
-          ) : mode === 'chat' ? (
+          ) : mode === 'chat' || mode === 'roleplay' ? (
             <ScrollArea ref={scrollAreaRef} className="h-full">
               <div className="mx-auto max-w-3xl">
                 {currentConversation.messages.map((message, index) => (
@@ -537,7 +545,7 @@ function App() {
           )}
         </div>
 
-        {mode !== 'roleplay' && (
+        {mode !== 'roleplay' && !currentConversation?.isGroupChat && (
           <ChatInput
             onSend={handleSendMessage}
             disabled={isGenerating}
