@@ -198,7 +198,10 @@ function App() {
           { role: 'user' as const, content },
         ]
 
-        await generateText(messages, textModel, (chunk) => {
+        // Use Mistral for roleplay mode, otherwise use selected model
+        const modelToUse = mode === 'roleplay' || currentConversation?.isGroupChat ? 'mistral' : textModel
+
+        await generateText(messages, modelToUse, (chunk) => {
           updateLastMessage(
             currentConversationId,
             assistantMessage.content + chunk,
@@ -206,8 +209,8 @@ function App() {
           )
           assistantMessage.content += chunk
         }, {
-          tools: AI_TOOLS,
-          tool_choice: 'auto',
+          tools: mode === 'roleplay' || currentConversation?.isGroupChat ? undefined : AI_TOOLS,
+          tool_choice: mode === 'roleplay' || currentConversation?.isGroupChat ? undefined : 'auto',
         })
 
         updateLastMessage(currentConversationId, assistantMessage.content, false)
