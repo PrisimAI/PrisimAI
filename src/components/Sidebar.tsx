@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, ChatCircle, Image, Trash, Sparkle, PushPin, TrashSimple, UsersThree } from '@phosphor-icons/react'
+import { Plus, ChatCircle, Image, Trash, Sparkle, PushPin, TrashSimple, UsersThree, MaskHappy } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
@@ -50,8 +50,9 @@ export function Sidebar({
 
   const chatConversations = conversations.filter((c) => c.mode === 'chat')
   const imageConversations = conversations.filter((c) => c.mode === 'image')
+  const roleplayConversations = conversations.filter((c) => c.mode === 'roleplay')
   
-  const currentModeConversations = mode === 'chat' ? chatConversations : imageConversations
+  const currentModeConversations = mode === 'chat' ? chatConversations : mode === 'image' ? imageConversations : roleplayConversations
   
   // Filter conversations based on search query
   const filteredConversations = currentModeConversations.filter((c) => {
@@ -146,7 +147,7 @@ export function Sidebar({
         <div className="space-y-1 p-3">
           {currentModeConversations.length === 0 && (
             <p className="px-3 py-2 text-sm text-muted-foreground">
-              {mode === 'chat' ? 'No conversations yet' : 'No image generations yet'}
+              {mode === 'chat' ? 'No conversations yet' : mode === 'image' ? 'No image generations yet' : 'No group chats yet'}
             </p>
           )}
           
@@ -202,6 +203,20 @@ export function Sidebar({
           </div>
         </>
       )}
+
+      {/* Roleplay Button - Always visible at the bottom */}
+      <Separator />
+      <div className="p-3">
+        <Button
+          variant={mode === 'roleplay' ? 'default' : 'outline'}
+          size="sm"
+          className="w-full justify-start gap-2"
+          onClick={() => onModeChange('roleplay')}
+        >
+          <MaskHappy size={16} weight="fill" />
+          AI Roleplay
+        </Button>
+      </div>
 
       <ClearAllDialog
         open={clearAllOpen}
