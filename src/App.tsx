@@ -10,6 +10,8 @@ import { EmptyState } from './components/EmptyState'
 import { ImageGeneration } from './components/ImageGeneration'
 import { ModelSelector } from './components/ModelSelector'
 import { AuthPage } from './components/AuthPage'
+import { RoleplayPage } from './components/RoleplayPage'
+import { GroupChatInterface } from './components/GroupChatInterface'
 import { ScrollArea } from './components/ui/scroll-area'
 import { Skeleton } from './components/ui/skeleton'
 import { MemoryManager } from './components/MemoryManager'
@@ -18,8 +20,9 @@ import { FavoritesDialog } from './components/FavoritesDialog'
 import { KeyboardShortcutsDialog } from './components/KeyboardShortcutsDialog'
 import { generateText, generateImage, type Message } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
+import { ROLEPLAY_MODEL } from './lib/personas-config'
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode } from './lib/types'
-import type { MemoryEntry, AIPersona } from './lib/memory-types'
+import type { MemoryEntry, AIPersona, GroupChatParticipant } from './lib/memory-types'
 
 function App() {
   const { user, loading: authLoading } = useAuth()
@@ -77,6 +80,29 @@ function App() {
 
     setConversations((current = []) => [newConversation, ...current])
     setCurrentConversationId(newConversation.id)
+  }, [setConversations])
+
+  const handleCreateGroupChatWithPersonas = useCallback((title: string, participants: GroupChatParticipant[]) => {
+    // Extract persona IDs from participants
+    const personaIds = participants
+      .filter(p => p.type === 'ai' && p.personaId)
+      .map(p => p.personaId!)
+
+    const newConversation: Conversation = {
+      id: `conv_${Date.now()}`,
+      title,
+      messages: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      mode: 'roleplay',
+      isGroupChat: true,
+      participants: personaIds,
+    }
+
+    setConversations((current = []) => [newConversation, ...current])
+    setCurrentConversationId(newConversation.id)
+    setMode('roleplay')
+    toast.success(`Group chat "${title}" created with ${personaIds.length} AI personas`)
   }, [setConversations])
 
   const updateConversationTitle = useCallback((conversationId: string, firstMessage: string) => {
@@ -173,7 +199,10 @@ function App() {
           { role: 'user' as const, content },
         ]
 
-        await generateText(messages, textModel, (chunk) => {
+        // Use Mistral for roleplay mode, otherwise use selected model
+        const modelToUse = mode === 'roleplay' || currentConversation?.isGroupChat ? ROLEPLAY_MODEL : textModel
+
+        await generateText(messages, modelToUse, (chunk) => {
           updateLastMessage(
             currentConversationId,
             assistantMessage.content + chunk,
@@ -181,8 +210,8 @@ function App() {
           )
           assistantMessage.content += chunk
         }, {
-          tools: AI_TOOLS,
-          tool_choice: 'auto',
+          tools: mode === 'roleplay' || currentConversation?.isGroupChat ? undefined : AI_TOOLS,
+          tool_choice: mode === 'roleplay' || currentConversation?.isGroupChat ? undefined : 'auto',
         })
 
         updateLastMessage(currentConversationId, assistantMessage.content, false)
@@ -453,16 +482,31 @@ function App() {
       />
 
       <div className="flex flex-1 flex-col">
-        <ModelSelector
-          mode={mode}
-          selectedModel={mode === 'chat' ? textModel : imageModel}
-          onModelChange={mode === 'chat' ? setTextModel : setImageModel}
-        />
+        {mode !== 'roleplay' && (
+          <ModelSelector
+            mode={mode}
+            selectedModel={mode === 'chat' ? textModel : imageModel}
+            onModelChange={mode === 'chat' ? setTextModel : setImageModel}
+          />
+        )}
 
         <div className="flex-1 overflow-hidden">
-          {showEmpty ? (
+          {mode === 'roleplay' && !currentConversationId ? (
+            <RoleplayPage
+              personas={personas || []}
+              onOpenPersonaManager={() => setPersonaDialogOpen(true)}
+              onCreateGroupChat={handleCreateGroupChatWithPersonas}
+            />
+          ) : currentConversation?.isGroupChat ? (
+            <GroupChatInterface
+              conversation={currentConversation}
+              personas={personas || []}
+              onSendMessage={handleSendMessage}
+              isGenerating={isGenerating}
+            />
+          ) : showEmpty ? (
             <EmptyState mode={mode} onExampleClick={handleExampleClick} />
-          ) : mode === 'chat' ? (
+          ) : mode === 'chat' || mode === 'roleplay' ? (
             <ScrollArea ref={scrollAreaRef} className="h-full">
               <div className="mx-auto max-w-3xl">
                 {currentConversation.messages.map((message, index) => (
@@ -505,11 +549,13 @@ function App() {
           )}
         </div>
 
-        <ChatInput
-          onSend={handleSendMessage}
-          disabled={isGenerating}
-          placeholder={mode === 'chat' ? 'Ask anything' : 'Describe the image you want to create'}
-        />
+        {mode !== 'roleplay' && !currentConversation?.isGroupChat && (
+          <ChatInput
+            onSend={handleSendMessage}
+            disabled={isGenerating}
+            placeholder={mode === 'chat' ? 'Ask anything' : 'Describe the image you want to create'}
+          />
+        )}
       </div>
 
       <MemoryManager

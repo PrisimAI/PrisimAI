@@ -13,9 +13,10 @@ export interface Conversation {
   messages: ChatMessage[]
   createdAt: number
   updatedAt: number
-  mode: 'chat' | 'image'
+  mode: 'chat' | 'image' | 'roleplay'
   isPinned?: boolean
   isGroupChat?: boolean
+  participants?: string[] // IDs of personas participating in group chat
 }
 
 export interface GeneratedImage {
@@ -26,4 +27,4 @@ export interface GeneratedImage {
   model: string
 }
 
-export type AppMode = 'chat' | 'image'
+export type AppMode = 'chat' | 'image' | 'roleplay'
