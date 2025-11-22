@@ -20,6 +20,7 @@ import { FavoritesDialog } from './components/FavoritesDialog'
 import { KeyboardShortcutsDialog } from './components/KeyboardShortcutsDialog'
 import { generateText, generateImage, type Message } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
+import { ROLEPLAY_MODEL } from './lib/personas-config'
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode } from './lib/types'
 import type { MemoryEntry, AIPersona, GroupChatParticipant } from './lib/memory-types'
 
@@ -199,7 +200,7 @@ function App() {
         ]
 
         // Use Mistral for roleplay mode, otherwise use selected model
-        const modelToUse = mode === 'roleplay' || currentConversation?.isGroupChat ? 'mistral' : textModel
+        const modelToUse = mode === 'roleplay' || currentConversation?.isGroupChat ? ROLEPLAY_MODEL : textModel
 
         await generateText(messages, modelToUse, (chunk) => {
           updateLastMessage(
