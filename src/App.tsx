@@ -21,7 +21,7 @@ import { FavoritesDialog } from './components/FavoritesDialog'
 import { KeyboardShortcutsDialog } from './components/KeyboardShortcutsDialog'
 import { generateText, generateImage, type Message } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
-import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS } from './lib/personas-config'
+import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS, ROLEPLAY_ENFORCEMENT_RULES } from './lib/personas-config'
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode } from './lib/types'
 import type { MemoryEntry, AIPersona, GroupChatParticipant } from './lib/memory-types'
 
@@ -229,9 +229,12 @@ function App() {
           ]
           const persona = allPersonas.find(p => p.id === personaId)
           if (persona) {
+            // Combine character-specific prompt with roleplay enforcement rules
+            const enhancedSystemPrompt = `${persona.systemPrompt}\n\n${ROLEPLAY_ENFORCEMENT_RULES}`
+            
             messages.push({
               role: 'system' as const,
-              content: persona.systemPrompt,
+              content: enhancedSystemPrompt,
             })
           }
         }
