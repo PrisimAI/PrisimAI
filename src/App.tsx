@@ -11,7 +11,8 @@ import { ImageGeneration } from './components/ImageGeneration'
 import { ModelSelector } from './components/ModelSelector'
 import { AuthPage } from './components/AuthPage'
 import { RoleplayPage } from './components/RoleplayPage'
-import { GroupChatInterface } from './components/GroupChatInterface'
+import { RoleplayChat } from './components/RoleplayChat'
+import { GroupChatRoleplay } from './components/GroupChatRoleplay'
 import { ScrollArea } from './components/ui/scroll-area'
 import { Skeleton } from './components/ui/skeleton'
 import { MemoryManager } from './components/MemoryManager'
@@ -506,6 +507,73 @@ function App() {
     )
   }
 
+  // Check if we're in a single persona roleplay chat (not group chat)
+  const isSinglePersonaRoleplay = mode === 'roleplay' && currentConversation && !currentConversation.isGroupChat && currentConversation.participants?.length === 1
+  
+  // Check if we're in a group roleplay chat
+  const isGroupRoleplay = mode === 'roleplay' && currentConversation && currentConversation.isGroupChat && currentConversation.participants && currentConversation.participants.length > 0
+
+  // Get current persona for single persona chats
+  const getCurrentPersona = (): AIPersona | undefined => {
+    if (!isSinglePersonaRoleplay || !currentConversation?.participants?.[0]) return undefined
+    
+    const allPersonas: AIPersona[] = [
+      ...PREMADE_PERSONAS.map((p, idx) => ({ ...p, id: `premade_${idx}` })),
+      ...CHARACTER_PERSONAS.map((p, idx) => ({ ...p, id: `character_${idx}` })),
+      ...(personas || []),
+    ]
+    
+    return allPersonas.find(p => p.id === currentConversation.participants![0])
+  }
+
+  // Get personas for group chat
+  const getGroupPersonas = (): AIPersona[] => {
+    if (!isGroupRoleplay || !currentConversation?.participants) return []
+    
+    const allPersonas: AIPersona[] = [
+      ...PREMADE_PERSONAS.map((p, idx) => ({ ...p, id: `premade_${idx}` })),
+      ...CHARACTER_PERSONAS.map((p, idx) => ({ ...p, id: `character_${idx}` })),
+      ...(personas || []),
+    ]
+    
+    return allPersonas.filter(p => currentConversation.participants!.includes(p.id))
+  }
+
+  const currentPersona = getCurrentPersona()
+  const groupPersonas = getGroupPersonas()
+
+  // If we're in a group roleplay chat, render the dedicated GroupChatRoleplay component
+  if (isGroupRoleplay && groupPersonas.length > 0) {
+    return (
+      <div className="flex h-screen overflow-hidden">
+        <GroupChatRoleplay
+          conversation={currentConversation}
+          personas={groupPersonas}
+          onSendMessage={handleSendMessage}
+          onBack={() => setCurrentConversationId(null)}
+          isGenerating={isGenerating}
+        />
+        <Toaster position="top-center" />
+      </div>
+    )
+  }
+
+  // If we're in a single persona roleplay chat, render the dedicated RoleplayChat component
+  if (isSinglePersonaRoleplay && currentPersona) {
+    return (
+      <div className="flex h-screen overflow-hidden">
+        <RoleplayChat
+          conversation={currentConversation}
+          persona={currentPersona}
+          onSendMessage={handleSendMessage}
+          onBack={() => setCurrentConversationId(null)}
+          isGenerating={isGenerating}
+        />
+        <Toaster position="top-center" />
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar
@@ -542,16 +610,9 @@ function App() {
               onCreateGroupChat={handleCreateGroupChatWithPersonas}
               onStartPersonaChat={handleStartPersonaChat}
             />
-          ) : currentConversation?.isGroupChat ? (
-            <GroupChatInterface
-              conversation={currentConversation}
-              personas={personas || []}
-              onSendMessage={handleSendMessage}
-              isGenerating={isGenerating}
-            />
           ) : showEmpty ? (
             <EmptyState mode={mode} onExampleClick={handleExampleClick} />
-          ) : mode === 'chat' || mode === 'roleplay' ? (
+          ) : mode === 'chat' ? (
             <ScrollArea ref={scrollAreaRef} className="h-full">
               <div className="mx-auto max-w-3xl">
                 {currentConversation.messages.map((message, index) => (
