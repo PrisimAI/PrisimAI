@@ -86,7 +86,7 @@ export function GroupChatRoleplay({
             </Button>
             <div className="flex items-center gap-2 flex-1">
               <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg p-1.5 sm:p-2">
-                <UsersThree size={20} className="sm:w-6 sm:h-6" weight="fill" className="text-white" />
+                <UsersThree size={20} className="sm:w-6 sm:h-6 text-white" weight="fill" />
               </div>
               <div className="flex-1 min-w-0">
                 <h1 className="text-base sm:text-lg font-semibold truncate">{conversation.title}</h1>
@@ -123,7 +123,7 @@ export function GroupChatRoleplay({
           {conversation.messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center px-4">
               <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-5 sm:p-6 mb-3 sm:mb-4">
-                <UsersThree size={40} className="sm:w-12 sm:h-12" weight="fill" className="text-white" />
+                <UsersThree size={40} className="sm:w-12 sm:h-12 text-white" weight="fill" />
               </div>
               <h2 className="text-xl sm:text-2xl font-semibold mb-2">Group Roleplay Chat</h2>
               <p className="text-muted-foreground max-w-md mb-3 sm:mb-4 text-sm sm:text-base">
@@ -170,7 +170,7 @@ export function GroupChatRoleplay({
                         }}
                       >
                         {isUser ? (
-                          <User className="text-white" size={16} className="sm:w-[18px] sm:h-[18px]" weight="bold" />
+                          <User className="text-white sm:w-[18px] sm:h-[18px]" size={16} weight="bold" />
                         ) : (
                           <span className="text-white font-semibold text-xs sm:text-sm">
                             {persona?.name.charAt(0) || 'A'}
