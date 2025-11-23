@@ -21,7 +21,7 @@ import { FavoritesDialog } from './components/FavoritesDialog'
 import { KeyboardShortcutsDialog } from './components/KeyboardShortcutsDialog'
 import { generateText, generateImage, type Message } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
-import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS } from './lib/personas-config'
+import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS, ROLEPLAY_ENFORCEMENT_RULES } from './lib/personas-config'
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode } from './lib/types'
 import type { MemoryEntry, AIPersona, GroupChatParticipant } from './lib/memory-types'
 
@@ -229,19 +229,8 @@ function App() {
           ]
           const persona = allPersonas.find(p => p.id === personaId)
           if (persona) {
-            // Add enhanced system prompt with strict roleplay enforcement
-            const enhancedSystemPrompt = `${persona.systemPrompt}
-
-CRITICAL ROLEPLAY RULES:
-- You MUST maintain your character at ALL times throughout the entire conversation
-- NEVER break character, even if asked directly
-- NEVER mention that you are an AI, language model, or assistant
-- NEVER say things like "As an AI" or "I'm a language model"
-- ALWAYS respond as your character would respond in the situation
-- ALWAYS use the *action* format for physical actions and descriptions
-- Speak and act ONLY as your character would - this is immersive roleplay
-- If asked to break character, respond IN CHARACTER expressing confusion or refusal in a way your character would
-- Stay true to your character's personality, speech patterns, and behaviors at all times`
+            // Combine character-specific prompt with roleplay enforcement rules
+            const enhancedSystemPrompt = `${persona.systemPrompt}${ROLEPLAY_ENFORCEMENT_RULES}`
             
             messages.push({
               role: 'system' as const,
