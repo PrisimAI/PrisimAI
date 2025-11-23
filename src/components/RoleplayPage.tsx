@@ -122,7 +122,7 @@ export function RoleplayPage({
             />
           </div>
           <div className="flex gap-2">
-            <Select value={categoryFilter} onValueChange={(value: any) => setCategoryFilter(value)}>
+            <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as typeof categoryFilter)}>
               <SelectTrigger className="w-[140px]">
                 <SelectValue />
               </SelectTrigger>
@@ -133,7 +133,7 @@ export function RoleplayPage({
                 <SelectItem value="custom">Custom</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+            <Select value={sortBy} onValueChange={(value) => setSortBy(value as typeof sortBy)}>
               <SelectTrigger className="w-[160px]">
                 <SelectValue />
               </SelectTrigger>
