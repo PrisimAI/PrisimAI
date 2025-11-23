@@ -74,22 +74,22 @@ export function GroupChatRoleplay({
     <div className="flex flex-col h-screen bg-gradient-to-b from-purple-50 to-pink-50 dark:from-slate-950 dark:to-purple-950">
       {/* Header */}
       <div className="border-b bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-3">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-2 sm:py-3">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="shrink-0"
+              className="shrink-0 h-8 w-8 sm:h-9 sm:w-9 p-0"
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
             </Button>
             <div className="flex items-center gap-2 flex-1">
-              <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg p-2">
-                <UsersThree size={24} weight="fill" className="text-white" />
+              <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg p-1.5 sm:p-2">
+                <UsersThree size={20} className="sm:w-6 sm:h-6" weight="fill" className="text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h1 className="text-lg font-semibold truncate">{conversation.title}</h1>
+                <h1 className="text-base sm:text-lg font-semibold truncate">{conversation.title}</h1>
                 <p className="text-xs text-muted-foreground">
                   {personas.length} AI character{personas.length !== 1 ? 's' : ''} in chat
                 </p>
@@ -97,19 +97,20 @@ export function GroupChatRoleplay({
             </div>
           </div>
           {/* Participants */}
-          <div className="flex gap-2 flex-wrap ml-10">
-            <Badge variant="default" className="gap-1">
-              <User size={12} />
-              You
+          <div className="flex gap-1.5 sm:gap-2 flex-wrap ml-8 sm:ml-10">
+            <Badge variant="default" className="gap-1 text-xs h-6">
+              <User size={10} className="sm:w-3 sm:h-3" />
+              <span className="hidden sm:inline">You</span>
+              <span className="sm:hidden">U</span>
             </Badge>
             {personas.map((persona) => (
               <Badge
                 key={persona.id}
                 variant="secondary"
-                className="gap-1"
+                className="gap-1 text-xs h-6 max-w-[120px] sm:max-w-none"
                 style={{ borderLeft: `3px solid ${persona.color}` }}
               >
-                <span className="text-xs">{persona.name}</span>
+                <span className="text-xs truncate">{persona.name}</span>
               </Badge>
             ))}
           </div>
@@ -118,33 +119,33 @@ export function GroupChatRoleplay({
 
       {/* Messages */}
       <ScrollArea ref={scrollAreaRef} className="flex-1">
-        <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           {conversation.messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-6 mb-4">
-                <UsersThree size={48} weight="fill" className="text-white" />
+            <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center px-4">
+              <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-5 sm:p-6 mb-3 sm:mb-4">
+                <UsersThree size={40} className="sm:w-12 sm:h-12" weight="fill" className="text-white" />
               </div>
-              <h2 className="text-2xl font-semibold mb-2">Group Roleplay Chat</h2>
-              <p className="text-muted-foreground max-w-md mb-4">
+              <h2 className="text-xl sm:text-2xl font-semibold mb-2">Group Roleplay Chat</h2>
+              <p className="text-muted-foreground max-w-md mb-3 sm:mb-4 text-sm sm:text-base">
                 {personas.length} AI characters are ready to interact with you and each other
               </p>
               <div className="flex flex-wrap gap-2 justify-center max-w-md">
                 {personas.map((persona) => (
                   <div
                     key={persona.id}
-                    className="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-full px-3 py-1.5 border shadow-sm"
+                    className="flex items-center gap-1.5 sm:gap-2 bg-white dark:bg-slate-800 rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 border shadow-sm"
                   >
                     <div
-                      className="w-5 h-5 rounded-full flex items-center justify-center text-xs text-white font-semibold"
+                      className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-xs text-white font-semibold"
                       style={{ backgroundColor: persona.color }}
                     >
                       {persona.name.charAt(0)}
                     </div>
-                    <span className="text-sm font-medium">{persona.name}</span>
+                    <span className="text-xs sm:text-sm font-medium">{persona.name}</span>
                   </div>
                 ))}
               </div>
-              <p className="text-sm text-muted-foreground mt-6">
+              <p className="text-xs sm:text-sm text-muted-foreground mt-4 sm:mt-6">
                 Start the conversation below
               </p>
             </div>
@@ -158,32 +159,32 @@ export function GroupChatRoleplay({
                   <div
                     key={message.id}
                     className={cn(
-                      'flex gap-3 mb-6',
+                      'flex gap-2 sm:gap-3 mb-4 sm:mb-6',
                       isUser && 'flex-row-reverse'
                     )}
                   >
-                    <Avatar className="h-9 w-9 shrink-0">
+                    <Avatar className="h-8 w-8 sm:h-9 sm:w-9 shrink-0">
                       <AvatarFallback
                         style={{
                           backgroundColor: isUser ? '#3b82f6' : persona?.color || '#6b7280',
                         }}
                       >
                         {isUser ? (
-                          <User className="text-white" size={18} weight="bold" />
+                          <User className="text-white" size={16} className="sm:w-[18px] sm:h-[18px]" weight="bold" />
                         ) : (
-                          <span className="text-white font-semibold text-sm">
+                          <span className="text-white font-semibold text-xs sm:text-sm">
                             {persona?.name.charAt(0) || 'A'}
                           </span>
                         )}
                       </AvatarFallback>
                     </Avatar>
                     <div className={cn('flex-1 space-y-1', isUser && 'flex flex-col items-end')}>
-                      <p className="text-sm font-medium">
+                      <p className="text-xs sm:text-sm font-medium">
                         {isUser ? 'You' : persona?.name || 'AI'}
                       </p>
                       <div
                         className={cn(
-                          'rounded-2xl px-4 py-2.5 max-w-[85%] inline-block',
+                          'rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 max-w-[90%] sm:max-w-[85%] inline-block',
                           isUser
                             ? 'bg-blue-500 text-white'
                             : 'bg-white dark:bg-slate-800 border shadow-sm',
@@ -191,7 +192,7 @@ export function GroupChatRoleplay({
                         )}
                       >
                         {isUser || message.isStreaming ? (
-                          <p className="text-[15px] leading-relaxed whitespace-pre-wrap break-words">
+                          <p className="text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap break-words">
                             {message.content}
                           </p>
                         ) : (
@@ -208,13 +209,13 @@ export function GroupChatRoleplay({
                 )
               })}
               {isGenerating && conversation.messages[conversation.messages.length - 1]?.role === 'user' && (
-                <div className="flex gap-3 mb-6">
-                  <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+                <div className="flex gap-2 sm:gap-3 mb-4 sm:mb-6">
+                  <Skeleton className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 rounded-full" />
                   <div className="flex-1 space-y-1">
-                    <Skeleton className="h-4 w-24" />
-                    <div className="rounded-2xl px-4 py-2.5 bg-white dark:bg-slate-800 border shadow-sm max-w-[85%]">
-                      <Skeleton className="h-4 w-full mb-2" />
-                      <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 sm:h-4 w-20 sm:w-24" />
+                    <div className="rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 bg-white dark:bg-slate-800 border shadow-sm max-w-[90%] sm:max-w-[85%]">
+                      <Skeleton className="h-3 sm:h-4 w-full mb-2" />
+                      <Skeleton className="h-3 sm:h-4 w-3/4" />
                     </div>
                   </div>
                 </div>
@@ -225,28 +226,28 @@ export function GroupChatRoleplay({
       </ScrollArea>
 
       {/* Input */}
-      <div className="border-t bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex gap-3 items-end">
+      <div className="border-t bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm safe-bottom">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+          <div className="flex gap-2 sm:gap-3 items-end">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Message the group..."
               disabled={isGenerating}
-              className="min-h-[52px] max-h-32 resize-none rounded-2xl bg-white dark:bg-slate-800 border-2 focus-visible:ring-1"
+              className="min-h-[48px] sm:min-h-[52px] max-h-32 resize-none rounded-2xl bg-white dark:bg-slate-800 border-2 focus-visible:ring-1 text-sm sm:text-base"
               rows={1}
             />
             <Button
               onClick={handleSend}
               disabled={!input.trim() || isGenerating}
               size="lg"
-              className="h-[52px] px-5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              className="h-[48px] sm:h-[52px] px-4 sm:px-5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shrink-0"
             >
-              <PaperPlaneRight size={20} weight="fill" />
+              <PaperPlaneRight size={18} className="sm:w-5 sm:h-5" weight="fill" />
             </Button>
           </div>
-          <p className="mt-2 text-center text-xs text-muted-foreground">
+          <p className="mt-2 text-center text-xs text-muted-foreground px-2">
             AI characters will respond in turn • Responses are AI-generated
           </p>
         </div>

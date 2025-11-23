@@ -229,9 +229,23 @@ function App() {
           ]
           const persona = allPersonas.find(p => p.id === personaId)
           if (persona) {
+            // Add enhanced system prompt with strict roleplay enforcement
+            const enhancedSystemPrompt = `${persona.systemPrompt}
+
+CRITICAL ROLEPLAY RULES:
+- You MUST maintain your character at ALL times throughout the entire conversation
+- NEVER break character, even if asked directly
+- NEVER mention that you are an AI, language model, or assistant
+- NEVER say things like "As an AI" or "I'm a language model"
+- ALWAYS respond as your character would respond in the situation
+- ALWAYS use the *action* format for physical actions and descriptions
+- Speak and act ONLY as your character would - this is immersive roleplay
+- If asked to break character, respond IN CHARACTER expressing confusion or refusal in a way your character would
+- Stay true to your character's personality, speech patterns, and behaviors at all times`
+            
             messages.push({
               role: 'system' as const,
-              content: persona.systemPrompt,
+              content: enhancedSystemPrompt,
             })
           }
         }
