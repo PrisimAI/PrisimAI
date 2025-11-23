@@ -17,9 +17,10 @@
     }
   }
 
-  /* Improve touch targets on mobile */
+  /* Improve touch targets on mobile - exclude icon-only buttons */
   @media (max-width: 640px) {
-    button, a, [role="button"] {
+    button:not([class*="icon-only"]):not([aria-label*="icon"]), 
+    a[role="button"]:not([class*="icon-only"]) {
       min-height: 44px;
       min-width: 44px;
     }

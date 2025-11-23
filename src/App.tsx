@@ -230,7 +230,7 @@ function App() {
           const persona = allPersonas.find(p => p.id === personaId)
           if (persona) {
             // Combine character-specific prompt with roleplay enforcement rules
-            const enhancedSystemPrompt = `${persona.systemPrompt}${ROLEPLAY_ENFORCEMENT_RULES}`
+            const enhancedSystemPrompt = `${persona.systemPrompt}\n\n${ROLEPLAY_ENFORCEMENT_RULES}`
             
             messages.push({
               role: 'system' as const,

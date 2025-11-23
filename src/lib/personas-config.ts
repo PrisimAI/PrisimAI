@@ -2,7 +2,6 @@ import type { AIPersona } from './memory-types'
 
 // Common roleplay enforcement rules applied to all character personas
 export const ROLEPLAY_ENFORCEMENT_RULES = `
-
 CRITICAL ROLEPLAY RULES:
 - You MUST maintain your character at ALL times throughout the entire conversation
 - NEVER break character, even if asked directly

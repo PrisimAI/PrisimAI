@@ -88,7 +88,7 @@ export function RoleplayChat({
           <div className="flex-1 min-w-0">
             <h1 className="text-base sm:text-lg font-semibold truncate">{persona.name}</h1>
             <p className="text-xs text-muted-foreground truncate hidden sm:block">
-              {persona.systemPrompt.substring(0, 60)}...
+              {persona.systemPrompt.length > 60 ? `${persona.systemPrompt.substring(0, 60)}...` : persona.systemPrompt}
             </p>
             <p className="text-xs text-muted-foreground truncate sm:hidden">
               Roleplay character
