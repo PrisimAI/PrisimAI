@@ -20,7 +20,7 @@ import { FavoritesDialog } from './components/FavoritesDialog'
 import { KeyboardShortcutsDialog } from './components/KeyboardShortcutsDialog'
 import { generateText, generateImage, type Message } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
-import { ROLEPLAY_MODEL } from './lib/personas-config'
+import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS } from './lib/personas-config'
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode } from './lib/types'
 import type { MemoryEntry, AIPersona, GroupChatParticipant } from './lib/memory-types'
 
@@ -43,6 +43,13 @@ function App() {
 
   const conversationsList = conversations || []
   const currentConversation = conversationsList.find((c) => c.id === currentConversationId)
+
+  // Sync mode with current conversation's mode
+  useEffect(() => {
+    if (currentConversation) {
+      setMode(currentConversation.mode)
+    }
+  }, [currentConversationId, currentConversation?.mode])
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -80,6 +87,24 @@ function App() {
 
     setConversations((current = []) => [newConversation, ...current])
     setCurrentConversationId(newConversation.id)
+  }, [setConversations])
+
+  const handleStartPersonaChat = useCallback((persona: AIPersona) => {
+    const newConversation: Conversation = {
+      id: `conv_${Date.now()}`,
+      title: `Chat with ${persona.name}`,
+      messages: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      mode: 'roleplay',
+      isGroupChat: false,
+      participants: [persona.id],
+    }
+
+    setConversations((current = []) => [newConversation, ...current])
+    setCurrentConversationId(newConversation.id)
+    setMode('roleplay')
+    toast.success(`Started chat with ${persona.name}`)
   }, [setConversations])
 
   const handleCreateGroupChatWithPersonas = useCallback((title: string, participants: GroupChatParticipant[]) => {
@@ -168,7 +193,7 @@ function App() {
       updateConversationTitle(currentConversationId, content)
     }
 
-    if (mode === 'chat') {
+    if (mode === 'chat' || mode === 'roleplay') {
       const userMessage: ChatMessageType = {
         id: `msg_${Date.now()}`,
         role: 'user',
@@ -191,13 +216,32 @@ function App() {
 
       try {
         // Build message history from the conversation messages before we added the new ones
-        const messages: Message[] = [
+        const messages: Message[] = []
+        
+        // Add system prompt for persona chats
+        if (mode === 'roleplay' && currentConversation?.participants && currentConversation.participants.length === 1) {
+          const personaId = currentConversation.participants[0]
+          const allPersonas: AIPersona[] = [
+            ...PREMADE_PERSONAS.map((p, idx) => ({ ...p, id: `premade_${idx}` })),
+            ...CHARACTER_PERSONAS.map((p, idx) => ({ ...p, id: `character_${idx}` })),
+            ...(personas || []),
+          ]
+          const persona = allPersonas.find(p => p.id === personaId)
+          if (persona) {
+            messages.push({
+              role: 'system' as const,
+              content: persona.systemPrompt,
+            })
+          }
+        }
+        
+        messages.push(
           ...conversationMessages.map((m) => ({
             role: m.role as 'user' | 'assistant',
             content: m.content,
           })),
-          { role: 'user' as const, content },
-        ]
+          { role: 'user' as const, content }
+        )
 
         // Use Mistral for roleplay mode, otherwise use selected model
         const modelToUse = mode === 'roleplay' || currentConversation?.isGroupChat ? ROLEPLAY_MODEL : textModel
@@ -496,6 +540,7 @@ function App() {
               personas={personas || []}
               onOpenPersonaManager={() => setPersonaDialogOpen(true)}
               onCreateGroupChat={handleCreateGroupChatWithPersonas}
+              onStartPersonaChat={handleStartPersonaChat}
             />
           ) : currentConversation?.isGroupChat ? (
             <GroupChatInterface
