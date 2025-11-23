@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MaskHappy, Plus, Robot, UsersThree, Sparkle } from '@phosphor-icons/react'
+import { MaskHappy, Plus, Robot, UsersThree, Sparkle, ChatCircle } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,12 +12,14 @@ interface RoleplayPageProps {
   personas: AIPersona[]
   onOpenPersonaManager: () => void
   onCreateGroupChat: (title: string, participants: GroupChatParticipant[]) => void
+  onStartPersonaChat: (persona: AIPersona) => void
 }
 
 export function RoleplayPage({
   personas,
   onOpenPersonaManager,
   onCreateGroupChat,
+  onStartPersonaChat,
 }: RoleplayPageProps) {
   const [groupChatDialogOpen, setGroupChatDialogOpen] = useState(false)
 
@@ -67,33 +69,44 @@ export function RoleplayPage({
               <h2 className="text-xl font-semibold">Premade Personas</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {PREMADE_PERSONAS.map((persona, idx) => (
-                <Card key={idx} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: persona.color }}
+              {PREMADE_PERSONAS.map((persona, idx) => {
+                const personaWithId = { ...persona, id: `premade_${idx}` }
+                return (
+                  <Card key={idx} className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: persona.color }}
+                        >
+                          <Robot size={20} weight="fill" className="text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-lg">{persona.name}</CardTitle>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription className="line-clamp-3">
+                        {persona.systemPrompt}
+                      </CardDescription>
+                      <div className="flex gap-2 mt-3">
+                        <Badge variant="secondary" className="text-xs">
+                          Temp: {persona.temperature}
+                        </Badge>
+                      </div>
+                      <Button 
+                        onClick={() => onStartPersonaChat(personaWithId)} 
+                        className="w-full mt-3"
+                        size="sm"
                       >
-                        <Robot size={20} weight="fill" className="text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-lg">{persona.name}</CardTitle>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="line-clamp-3">
-                      {persona.systemPrompt}
-                    </CardDescription>
-                    <div className="flex gap-2 mt-3">
-                      <Badge variant="secondary" className="text-xs">
-                        Temp: {persona.temperature}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        <ChatCircle size={16} className="mr-2" />
+                        Start Chat
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </div>
           </div>
 
@@ -105,33 +118,44 @@ export function RoleplayPage({
               <Badge variant="secondary" className="text-xs">Roleplay</Badge>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {CHARACTER_PERSONAS.map((persona, idx) => (
-                <Card key={idx} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: persona.color }}
+              {CHARACTER_PERSONAS.map((persona, idx) => {
+                const personaWithId = { ...persona, id: `character_${idx}` }
+                return (
+                  <Card key={idx} className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: persona.color }}
+                        >
+                          <MaskHappy size={20} weight="fill" className="text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-lg">{persona.name}</CardTitle>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription className="line-clamp-3">
+                        {persona.systemPrompt}
+                      </CardDescription>
+                      <div className="flex gap-2 mt-3">
+                        <Badge variant="secondary" className="text-xs">
+                          Temp: {persona.temperature}
+                        </Badge>
+                      </div>
+                      <Button 
+                        onClick={() => onStartPersonaChat(personaWithId)} 
+                        className="w-full mt-3"
+                        size="sm"
                       >
-                        <MaskHappy size={20} weight="fill" className="text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-lg">{persona.name}</CardTitle>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="line-clamp-3">
-                      {persona.systemPrompt}
-                    </CardDescription>
-                    <div className="flex gap-2 mt-3">
-                      <Badge variant="secondary" className="text-xs">
-                        Temp: {persona.temperature}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        <ChatCircle size={16} className="mr-2" />
+                        Start Chat
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </div>
           </div>
 
@@ -167,6 +191,14 @@ export function RoleplayPage({
                           Temp: {persona.temperature}
                         </Badge>
                       </div>
+                      <Button 
+                        onClick={() => onStartPersonaChat(persona)} 
+                        className="w-full mt-3"
+                        size="sm"
+                      >
+                        <ChatCircle size={16} className="mr-2" />
+                        Start Chat
+                      </Button>
                     </CardContent>
                   </Card>
                 ))}
