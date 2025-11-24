@@ -10,6 +10,19 @@ import "./main.css"
 import "./styles/theme.css"
 import "./index.css"
 
+// Register service worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/PrisimAI/sw.js', { scope: '/PrisimAI/' })
+      .then(registration => {
+        console.log('ServiceWorker registered: ', registration);
+      })
+      .catch(registrationError => {
+        console.log('ServiceWorker registration failed: ', registrationError);
+      });
+  });
+}
+
 createRoot(document.getElementById('root')!).render(
   <ErrorBoundary FallbackComponent={ErrorFallback}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

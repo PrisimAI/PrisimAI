@@ -20,6 +20,7 @@ import { PersonaManager } from './components/PersonaManager'
 import { FavoritesDialog } from './components/FavoritesDialog'
 import { KeyboardShortcutsDialog } from './components/KeyboardShortcutsDialog'
 import { OfflineModeDialog } from './components/OfflineModeDialog'
+import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { LiquidMetalBackground } from './components/LiquidMetalBackground'
 import { generateText, generateImage, type Message, setOfflineMode } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
@@ -779,6 +780,7 @@ function App() {
         onModelSelect={handleOfflineModelSelect}
       />
 
+      <PWAInstallPrompt />
       <Toaster position="top-center" />
     </div>
   )
