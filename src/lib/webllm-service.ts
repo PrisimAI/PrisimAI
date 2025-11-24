@@ -79,12 +79,17 @@ class WebLLMService {
     modelId: string,
     onProgress?: (progress: ModelLoadProgress) => void
   ): Promise<void> {
-    // If already initializing this model, wait for it
-    if (this.initializationPromise && this.currentModel === modelId) {
-      return this.initializationPromise;
+    // If already initializing the same model, wait for it
+    if (this.initializationPromise) {
+      // If it's the same model being initialized, wait
+      if (this.currentModel === modelId || !this.currentModel) {
+        return this.initializationPromise;
+      }
+      // If different model, wait for current init to finish first
+      await this.initializationPromise;
     }
 
-    // If a different model is loaded, reload
+    // If a different model is loaded, unload it first
     if (this.currentModel && this.currentModel !== modelId) {
       await this.unload();
     }
@@ -131,8 +136,13 @@ class WebLLMService {
       throw new Error('WebLLM engine not initialized. Call initModel first.');
     }
 
-    // Convert messages to WebLLM format
-    const webllmMessages = messages.map(msg => ({
+    // Convert messages to WebLLM format with proper typing
+    interface WebLLMMessage {
+      role: 'system' | 'user' | 'assistant';
+      content: string;
+    }
+
+    const webllmMessages: WebLLMMessage[] = messages.map(msg => ({
       role: msg.role === 'system' ? 'system' : msg.role === 'user' ? 'user' : 'assistant',
       content: msg.content,
     }));
@@ -141,7 +151,7 @@ class WebLLMService {
       // Streaming mode
       let fullResponse = '';
       const chunks = await this.engine.chat.completions.create({
-        messages: webllmMessages as any,
+        messages: webllmMessages,
         stream: true,
         temperature: 0.7,
         max_tokens: 2048,
@@ -159,7 +169,7 @@ class WebLLMService {
     } else {
       // Non-streaming mode
       const response = await this.engine.chat.completions.create({
-        messages: webllmMessages as any,
+        messages: webllmMessages,
         temperature: 0.7,
         max_tokens: 2048,
       });
@@ -173,9 +183,14 @@ class WebLLMService {
    */
   async unload(): Promise<void> {
     if (this.engine) {
-      this.engine = null;
-      this.currentModel = null;
-      // WebLLM handles cleanup automatically
+      // WebLLM engine cleanup
+      try {
+        // Engine will be garbage collected
+        this.engine = null;
+        this.currentModel = null;
+      } catch (error) {
+        console.error('Error during WebLLM cleanup:', error);
+      }
     }
   }
 

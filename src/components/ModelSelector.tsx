@@ -15,6 +15,7 @@ import {
   type TextModel, 
   type ImageModel,
   isOfflineMode,
+  onOfflineModeChange,
 } from '@/lib/pollinations-api'
 import type { AppMode } from '@/lib/types'
 
@@ -28,15 +29,15 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
   const [textModels, setTextModels] = useState<TextModel[]>([])
   const [imageModels, setImageModels] = useState<ImageModel[]>([])
   const [loading, setLoading] = useState(true)
-  const [offlineMode, setOfflineMode] = useState(false)
+  const [offlineMode, setOfflineMode] = useState(isOfflineMode())
 
-  // Check offline mode status
+  // Subscribe to offline mode changes
   useEffect(() => {
-    const interval = setInterval(() => {
-      setOfflineMode(isOfflineMode())
-    }, 1000)
+    const unsubscribe = onOfflineModeChange((enabled) => {
+      setOfflineMode(enabled)
+    })
     
-    return () => clearInterval(interval)
+    return unsubscribe
   }, [])
 
   // Load models

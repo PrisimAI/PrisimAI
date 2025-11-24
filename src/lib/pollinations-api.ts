@@ -9,12 +9,24 @@ const ENABLE_MOCK_MODE = import.meta.env.DEV || import.meta.env.VITE_ENABLE_MOCK
 // Offline mode state (controlled by App component)
 let offlineModeEnabled = false
 
+// Event emitter for offline mode changes
+const offlineModeChangeEvent = new Event('offlineModeChange')
+
 export function setOfflineMode(enabled: boolean) {
   offlineModeEnabled = enabled
+  // Dispatch event to notify listeners
+  window.dispatchEvent(offlineModeChangeEvent)
 }
 
 export function isOfflineMode(): boolean {
   return offlineModeEnabled
+}
+
+// Subscribe to offline mode changes
+export function onOfflineModeChange(callback: (enabled: boolean) => void): () => void {
+  const handler = () => callback(offlineModeEnabled)
+  window.addEventListener('offlineModeChange', handler)
+  return () => window.removeEventListener('offlineModeChange', handler)
 }
 
 export interface Message {
