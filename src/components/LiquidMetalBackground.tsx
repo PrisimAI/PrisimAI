@@ -23,7 +23,7 @@ export function LiquidMetalBackground({ className = '', opacity = 0.3 }: LiquidM
     setSize()
     window.addEventListener('resize', setSize)
 
-    // Animation parameters - enhanced for more visible liquid metal effect
+    // Animation parameters - highly visible liquid metal effect
     let time = 0
     const waves: Array<{
       amplitude: number
@@ -32,19 +32,19 @@ export function LiquidMetalBackground({ className = '', opacity = 0.3 }: LiquidM
       offset: number
       color: string
     }> = [
-      { amplitude: 60, frequency: 0.003, speed: 0.6, offset: 0, color: 'rgba(147, 51, 234, 0.2)' }, // Purple - increased amplitude and opacity
-      { amplitude: 70, frequency: 0.002, speed: 0.4, offset: Math.PI / 3, color: 'rgba(59, 130, 246, 0.18)' }, // Blue
-      { amplitude: 55, frequency: 0.004, speed: 0.8, offset: Math.PI / 2, color: 'rgba(168, 85, 247, 0.15)' }, // Violet
-      { amplitude: 65, frequency: 0.0025, speed: 0.5, offset: Math.PI, color: 'rgba(99, 102, 241, 0.17)' }, // Indigo
-      { amplitude: 50, frequency: 0.0035, speed: 0.65, offset: Math.PI / 4, color: 'rgba(124, 58, 237, 0.14)' }, // Additional purple wave
+      { amplitude: 80, frequency: 0.003, speed: 0.6, offset: 0, color: 'rgba(147, 51, 234, 0.35)' }, // Purple - much more visible
+      { amplitude: 90, frequency: 0.002, speed: 0.4, offset: Math.PI / 3, color: 'rgba(59, 130, 246, 0.3)' }, // Blue
+      { amplitude: 70, frequency: 0.004, speed: 0.8, offset: Math.PI / 2, color: 'rgba(168, 85, 247, 0.28)' }, // Violet
+      { amplitude: 85, frequency: 0.0025, speed: 0.5, offset: Math.PI, color: 'rgba(99, 102, 241, 0.32)' }, // Indigo
+      { amplitude: 75, frequency: 0.0035, speed: 0.65, offset: Math.PI / 4, color: 'rgba(124, 58, 237, 0.25)' }, // Additional purple wave
     ]
 
-    // Metallic gradient - enhanced for better visibility
+    // Metallic gradient - much more visible
     const createMetallicGradient = (x: number, y: number, radius: number) => {
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius)
-      gradient.addColorStop(0, 'rgba(226, 232, 240, 0.12)')
-      gradient.addColorStop(0.5, 'rgba(148, 163, 184, 0.08)')
-      gradient.addColorStop(1, 'rgba(71, 85, 105, 0.05)')
+      gradient.addColorStop(0, 'rgba(226, 232, 240, 0.25)')
+      gradient.addColorStop(0.5, 'rgba(148, 163, 184, 0.18)')
+      gradient.addColorStop(1, 'rgba(71, 85, 105, 0.12)')
       return gradient
     }
 
@@ -53,16 +53,16 @@ export function LiquidMetalBackground({ className = '', opacity = 0.3 }: LiquidM
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      // Background metallic gradient - enhanced and animated
+      // Background metallic gradient - more visible and animated
       const bgGradient = ctx.createLinearGradient(
         Math.sin(time * 0.1) * canvas.width * 0.3,
         Math.cos(time * 0.15) * canvas.height * 0.3,
         canvas.width + Math.cos(time * 0.1) * canvas.width * 0.3,
         canvas.height + Math.sin(time * 0.15) * canvas.height * 0.3
       )
-      bgGradient.addColorStop(0, 'rgba(30, 41, 59, 0.04)')
-      bgGradient.addColorStop(0.5, 'rgba(51, 65, 85, 0.06)')
-      bgGradient.addColorStop(1, 'rgba(30, 41, 59, 0.04)')
+      bgGradient.addColorStop(0, 'rgba(30, 41, 59, 0.08)')
+      bgGradient.addColorStop(0.5, 'rgba(51, 65, 85, 0.12)')
+      bgGradient.addColorStop(1, 'rgba(30, 41, 59, 0.08)')
       ctx.fillStyle = bgGradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -107,7 +107,7 @@ export function LiquidMetalBackground({ className = '', opacity = 0.3 }: LiquidM
         ctx.fill()
       }
 
-      // Add shimmer effect - more visible and faster
+      // Add shimmer effect - highly visible and faster
       const shimmerGradient = ctx.createLinearGradient(
         -canvas.width + ((time * 150) % (canvas.width * 2)),
         0,
@@ -115,7 +115,7 @@ export function LiquidMetalBackground({ className = '', opacity = 0.3 }: LiquidM
         canvas.height
       )
       shimmerGradient.addColorStop(0, 'rgba(255, 255, 255, 0)')
-      shimmerGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.05)')
+      shimmerGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.12)')
       shimmerGradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
 
       ctx.fillStyle = shimmerGradient
