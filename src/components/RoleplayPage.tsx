@@ -16,26 +16,27 @@ interface PersonaAvatarProps {
 }
 
 function PersonaAvatar({ persona, icon: Icon }: PersonaAvatarProps) {
+  const [imageError, setImageError] = useState(false)
+  const showFallback = !persona.avatar || imageError
+
   return (
     <>
-      {persona.avatar ? (
+      {persona.avatar && !imageError && (
         <img
           src={persona.avatar}
           alt={persona.name}
           className="w-10 h-10 rounded-full object-cover"
-          onError={(e) => {
-            // Fallback to colored circle with icon on image load error
-            e.currentTarget.style.display = 'none'
-            e.currentTarget.nextElementSibling?.classList.remove('hidden')
-          }}
+          onError={() => setImageError(true)}
         />
-      ) : null}
-      <div
-        className={`w-10 h-10 rounded-full flex items-center justify-center ${persona.avatar ? 'hidden' : ''}`}
-        style={{ backgroundColor: persona.color }}
-      >
-        <Icon size={20} weight="fill" className="text-white" />
-      </div>
+      )}
+      {showFallback && (
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: persona.color }}
+        >
+          <Icon size={20} weight="fill" className="text-white" />
+        </div>
+      )}
     </>
   )
 }
