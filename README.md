@@ -113,6 +113,8 @@ PrisimAI now supports running AI models directly in your browser without an inte
 
 ## 📚 Documentation
 
+- **[PWA Guide](./PWA_GUIDE.md)**: Complete guide for Progressive Web App features, installation, and offline capabilities
+- **[Offline Mode Guide](./OFFLINE_MODE.md)**: Detailed user guide for WebLLM offline mode
 - **[Firebase Setup Guide](./FIREBASE_CREDENTIAL_LOCATIONS.md)**: Complete guide for setting up authentication with Firebase
 - **[Tier System Setup](./FIREBASE_TIERS_SETUP.md)**: Comprehensive guide for implementing Free, Pro, and Deluxe subscription tiers
 - **[Quick Tier Setup Reference](./QUICK_TIER_SETUP.md)**: Condensed checklist for tier implementation
