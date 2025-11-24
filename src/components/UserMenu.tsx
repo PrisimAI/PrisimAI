@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { SignOut, User, Gear, Code, Brain, Robot, Star } from '@phosphor-icons/react'
+import { SignOut, User, Gear, Code, Brain, Robot, Star, CloudSlash } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { ProfileDialog } from './ProfileDialog'
 import { SettingsDialog } from './SettingsDialog'
@@ -20,9 +20,10 @@ interface UserMenuProps {
   onOpenMemory?: () => void
   onOpenPersonas?: () => void
   onOpenFavorites?: () => void
+  onOpenOfflineMode?: () => void
 }
 
-export function UserMenu({ onOpenMemory, onOpenPersonas, onOpenFavorites }: UserMenuProps) {
+export function UserMenu({ onOpenMemory, onOpenPersonas, onOpenFavorites, onOpenOfflineMode }: UserMenuProps) {
   const { user, signOut } = useAuth()
   const [profileOpen, setProfileOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -89,6 +90,12 @@ export function UserMenu({ onOpenMemory, onOpenPersonas, onOpenFavorites }: User
             <DropdownMenuItem onClick={onOpenFavorites}>
               <Star className="mr-2 h-4 w-4" />
               <span>Favorites</span>
+            </DropdownMenuItem>
+          )}
+          {onOpenOfflineMode && (
+            <DropdownMenuItem onClick={onOpenOfflineMode}>
+              <CloudSlash className="mr-2 h-4 w-4" />
+              <span>Offline Mode</span>
             </DropdownMenuItem>
           )}
           <DropdownMenuItem onClick={() => setApiDocsOpen(true)}>

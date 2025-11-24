@@ -28,3 +28,9 @@ export interface GeneratedImage {
 }
 
 export type AppMode = 'chat' | 'image' | 'roleplay'
+
+export interface OfflineSettings {
+  enabled: boolean
+  selectedModel: string | null
+  modelLoaded: boolean
+}

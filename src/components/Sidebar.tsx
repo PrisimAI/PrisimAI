@@ -26,6 +26,7 @@ interface SidebarProps {
   onOpenMemory?: () => void
   onOpenPersonas?: () => void
   onOpenFavorites?: () => void
+  onOpenOfflineMode?: () => void
 }
 
 export function Sidebar({
@@ -43,6 +44,7 @@ export function Sidebar({
   onOpenMemory,
   onOpenPersonas,
   onOpenFavorites,
+  onOpenOfflineMode,
 }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [clearAllOpen, setClearAllOpen] = useState(false)
@@ -99,6 +101,7 @@ export function Sidebar({
           onOpenMemory={onOpenMemory}
           onOpenPersonas={onOpenPersonas}
           onOpenFavorites={onOpenFavorites}
+          onOpenOfflineMode={onOpenOfflineMode}
         />
       </div>
 
