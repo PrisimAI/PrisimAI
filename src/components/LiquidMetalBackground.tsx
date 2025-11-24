@@ -48,6 +48,7 @@ export function LiquidMetalBackground({ className = '', opacity = 0.3 }: LiquidM
     }
 
     // Animation loop
+    let animationId: number
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
@@ -115,10 +116,11 @@ export function LiquidMetalBackground({ className = '', opacity = 0.3 }: LiquidM
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       time += 0.01
-      requestAnimationFrame(animate)
+      animationId = requestAnimationFrame(animate)
     }
 
-    const animationId = requestAnimationFrame(animate)
+    // Start animation
+    animationId = requestAnimationFrame(animate)
 
     return () => {
       window.removeEventListener('resize', setSize)

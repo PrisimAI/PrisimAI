@@ -6,6 +6,11 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import type { FileAttachment } from '@/lib/types'
 
+// Supported file types for upload
+const ACCEPTED_FILE_TYPES = '.txt,.json,.csv,.md,.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp'
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_FILES_PER_MESSAGE = 5
+
 interface ChatInputProps {
   onSend: (message: string, attachments?: FileAttachment[]) => void
   disabled?: boolean
@@ -35,10 +40,8 @@ export function ChatInput({ onSend, disabled, placeholder = 'Ask anything' }: Ch
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     
-    // Limit file size to 10MB
-    const maxSize = 10 * 1024 * 1024
     const validFiles = files.filter(file => {
-      if (file.size > maxSize) {
+      if (file.size > MAX_FILE_SIZE) {
         toast.error(`${file.name} is too large. Max size is 10MB.`)
         return false
       }
@@ -46,8 +49,8 @@ export function ChatInput({ onSend, disabled, placeholder = 'Ask anything' }: Ch
     })
 
     // Limit number of files
-    if (attachments.length + validFiles.length > 5) {
-      toast.error('Maximum 5 files allowed per message')
+    if (attachments.length + validFiles.length > MAX_FILES_PER_MESSAGE) {
+      toast.error(`Maximum ${MAX_FILES_PER_MESSAGE} files allowed per message`)
       return
     }
 
@@ -69,7 +72,7 @@ export function ChatInput({ onSend, disabled, placeholder = 'Ask anything' }: Ch
         }
 
         const attachment: FileAttachment = {
-          id: `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: `file_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
           name: file.name,
           type: file.type,
           size: file.size,
@@ -166,7 +169,7 @@ export function ChatInput({ onSend, disabled, placeholder = 'Ask anything' }: Ch
               multiple
               className="hidden"
               onChange={handleFileSelect}
-              accept=".txt,.json,.csv,.md,.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.webp"
+              accept={ACCEPTED_FILE_TYPES}
             />
             <Button
               type="button"
