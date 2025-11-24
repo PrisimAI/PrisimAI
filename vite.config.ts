@@ -7,6 +7,10 @@ import { resolve } from 'path'
 
 const projectRoot = process.env.PROJECT_ROOT || import.meta.dirname
 
+// Cache configuration constants
+const HUGGINGFACE_MODEL_PATTERN = /^https:\/\/huggingface\.co\/.*\.(bin|onnx|wasm|safetensors)$/i;
+const HUGGINGFACE_CDN_PATTERN = /^https:\/\/huggingface\.co\/.*/i;
+
 // https://vite.dev/config/
 export default defineConfig({
   base: '/PrisimAI/',
@@ -57,8 +61,9 @@ export default defineConfig({
         ]
       },
       workbox: {
-        // Increase the size limit to accommodate large bundles
-        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB
+        // Increase the size limit to 50MB to accommodate large bundles and initial model metadata
+        // Note: Actual model files (GB-sized) are cached via runtime caching, not precaching
+        maximumFileSizeToCacheInBytes: 50 * 1024 * 1024, // 50 MB
         globPatterns: ['**/*.{js,css,html,svg,png,ico,txt,woff2}'],
         runtimeCaching: [
           {
@@ -90,8 +95,9 @@ export default defineConfig({
             }
           },
           {
-            // Cache WebLLM model files - these are very large binary files
-            urlPattern: /^https:\/\/huggingface\.co\/.*\.(bin|onnx|wasm|safetensors)$/i,
+            // Cache WebLLM model files - these can be very large (GB-sized)
+            // Using runtime caching instead of precaching to handle large files
+            urlPattern: HUGGINGFACE_MODEL_PATTERN,
             handler: 'CacheFirst',
             options: {
               cacheName: 'webllm-models-cache',
@@ -123,8 +129,8 @@ export default defineConfig({
             }
           },
           {
-            // Cache all HuggingFace CDN assets for WebLLM
-            urlPattern: /^https:\/\/huggingface\.co\/.*/i,
+            // Cache all HuggingFace CDN assets for WebLLM (includes model files)
+            urlPattern: HUGGINGFACE_CDN_PATTERN,
             handler: 'CacheFirst',
             options: {
               cacheName: 'huggingface-cdn-cache',

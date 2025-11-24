@@ -7,6 +7,10 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
+// Constants for configuration
+const PWA_INSTALL_DISMISSED_KEY = 'pwa-install-dismissed'
+const DISMISSAL_PERIOD_DAYS = 7
+
 export function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showPrompt, setShowPrompt] = useState(false)
@@ -36,8 +40,6 @@ export function PWAInstallPrompt() {
 
     // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice
-    
-    console.log(`User response to the install prompt: ${outcome}`)
 
     // Clear the deferredPrompt so it can only be used once
     setDeferredPrompt(null)
@@ -47,16 +49,16 @@ export function PWAInstallPrompt() {
   const handleDismiss = () => {
     setShowPrompt(false)
     // Store dismissal in localStorage to not show again for a while
-    localStorage.setItem('pwa-install-dismissed', Date.now().toString())
+    localStorage.setItem(PWA_INSTALL_DISMISSED_KEY, Date.now().toString())
   }
 
   // Don't show if already installed, dismissed recently, or no prompt available
   useEffect(() => {
-    const dismissed = localStorage.getItem('pwa-install-dismissed')
+    const dismissed = localStorage.getItem(PWA_INSTALL_DISMISSED_KEY)
     if (dismissed) {
       const dismissedTime = parseInt(dismissed)
       const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24)
-      if (daysSinceDismissed < 7) {
+      if (daysSinceDismissed < DISMISSAL_PERIOD_DAYS) {
         setShowPrompt(false)
       }
     }

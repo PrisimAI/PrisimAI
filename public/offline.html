@@ -117,9 +117,12 @@
     </div>
     
     <script>
-        // Auto-reload when back online
+        // Auto-reload when back online with a slight delay to ensure connection is stable
         window.addEventListener('online', () => {
-            window.location.reload();
+            // Wait 2 seconds to ensure connection is stable before reloading
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
         });
     </script>
 </body>
