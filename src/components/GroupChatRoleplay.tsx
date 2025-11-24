@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, KeyboardEvent } from 'react'
-import { User, PaperPlaneRight, ArrowLeft, UsersThree } from '@phosphor-icons/react'
+import { User, PaperPlaneRight, ArrowLeft, UsersThree, IdentificationCard } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import type { Conversation, ChatMessage } from '@/lib/types'
 import type { AIPersona } from '@/lib/memory-types'
 import { marked } from 'marked'
+import { CharacterCardDialog } from '@/components/CharacterCardDialog'
 
 interface GroupChatRoleplayProps {
   conversation: Conversation
@@ -27,6 +28,8 @@ export function GroupChatRoleplay({
   isGenerating,
 }: GroupChatRoleplayProps) {
   const [input, setInput] = useState('')
+  const [selectedPersona, setSelectedPersona] = useState<AIPersona | null>(null)
+  const [cardDialogOpen, setCardDialogOpen] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
   // Auto-scroll to bottom when messages change
@@ -107,10 +110,15 @@ export function GroupChatRoleplay({
               <Badge
                 key={persona.id}
                 variant="secondary"
-                className="gap-1 text-xs h-6 max-w-[120px] sm:max-w-none"
+                className="gap-1 text-xs h-6 max-w-[120px] sm:max-w-none cursor-pointer hover:opacity-80 transition-opacity"
                 style={{ borderLeft: `3px solid ${persona.color}` }}
+                onClick={() => {
+                  setSelectedPersona(persona)
+                  setCardDialogOpen(true)
+                }}
               >
                 <span className="text-xs truncate">{persona.name}</span>
+                <IdentificationCard size={12} className="hidden sm:inline" />
               </Badge>
             ))}
           </div>
@@ -118,7 +126,7 @@ export function GroupChatRoleplay({
       </div>
 
       {/* Messages */}
-      <ScrollArea ref={scrollAreaRef} className="flex-1">
+      <ScrollArea ref={scrollAreaRef} className="flex-1 h-full">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           {conversation.messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center px-4">
@@ -252,6 +260,15 @@ export function GroupChatRoleplay({
           </p>
         </div>
       </div>
+
+      {/* Character Card Dialog */}
+      {selectedPersona && (
+        <CharacterCardDialog
+          open={cardDialogOpen}
+          onOpenChange={setCardDialogOpen}
+          persona={selectedPersona}
+        />
+      )}
     </div>
   )
 }

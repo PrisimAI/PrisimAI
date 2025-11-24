@@ -72,10 +72,60 @@ export function PersonaManager({
   const [newPersona, setNewPersona] = useState<Omit<AIPersona, 'id'>>({
     name: '',
     systemPrompt: '',
+    scenario: '',
     temperature: 0.7,
     color: '#3b82f6',
     enabled: true,
   })
+
+  // Color palette presets
+  const colorPalettes = [
+    { name: 'Blue', value: '#3b82f6' },
+    { name: 'Purple', value: '#a855f7' },
+    { name: 'Pink', value: '#ec4899' },
+    { name: 'Green', value: '#10b981' },
+    { name: 'Orange', value: '#f59e0b' },
+    { name: 'Red', value: '#ef4444' },
+    { name: 'Teal', value: '#14b8a6' },
+    { name: 'Indigo', value: '#6366f1' },
+  ]
+
+  // Quick scenario templates
+  const scenarioTemplates = [
+    'You are in your workspace, ready to assist with any task.',
+    'You\'re in a cozy study surrounded by books and reference materials.',
+    'You\'re in a modern office with state-of-the-art equipment.',
+    'You\'re in a laboratory conducting cutting-edge research.',
+    'You\'re in a creative studio filled with inspiration.',
+  ]
+
+  // Character type templates
+  const characterTypeTemplates = [
+    {
+      type: 'Helper',
+      prompt: 'You are a helpful and supportive assistant who provides clear, practical advice.',
+      temp: 0.7,
+      color: '#3b82f6',
+    },
+    {
+      type: 'Creative',
+      prompt: 'You are a creative and imaginative thinker who loves exploring new ideas and possibilities.',
+      temp: 0.9,
+      color: '#a855f7',
+    },
+    {
+      type: 'Analytical',
+      prompt: 'You are a logical and analytical thinker who breaks down complex problems methodically.',
+      temp: 0.5,
+      color: '#10b981',
+    },
+    {
+      type: 'Roleplay',
+      prompt: 'You are a character in a roleplay scenario. ALWAYS format your responses with spoken dialogue in regular text and actions in *italics*.',
+      temp: 0.8,
+      color: '#ec4899',
+    },
+  ]
 
   const handleAddPersona = () => {
     if (!newPersona.name.trim() || !newPersona.systemPrompt.trim()) {
@@ -87,6 +137,7 @@ export function PersonaManager({
     setNewPersona({
       name: '',
       systemPrompt: '',
+      scenario: '',
       temperature: 0.7,
       color: '#3b82f6',
       enabled: true,
@@ -225,10 +276,39 @@ export function PersonaManager({
         <Separator className="my-4" />
 
         <div className="space-y-4">
-          <h4 className="font-medium flex items-center gap-2">
-            <Plus size={16} />
-            Create New Persona
-          </h4>
+          <div className="flex items-center justify-between">
+            <h4 className="font-medium flex items-center gap-2">
+              <Plus size={16} />
+              Create New Persona
+            </h4>
+            <Badge variant="outline" className="text-xs">
+              Custom Character
+            </Badge>
+          </div>
+
+          {/* Quick Templates */}
+          <div className="space-y-2">
+            <Label className="text-sm">Quick Start Templates</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {characterTypeTemplates.map((template) => (
+                <Button
+                  key={template.type}
+                  variant="outline"
+                  size="sm"
+                  className="justify-start"
+                  onClick={() => setNewPersona({
+                    ...newPersona,
+                    systemPrompt: template.prompt,
+                    temperature: template.temp,
+                    color: template.color,
+                  })}
+                >
+                  {template.type}
+                </Button>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="persona-name">Persona Name</Label>
@@ -240,7 +320,7 @@ export function PersonaManager({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="persona-color">Color</Label>
+              <Label htmlFor="persona-color">Theme Color</Label>
               <div className="flex gap-2">
                 <Input
                   id="persona-color"
@@ -249,29 +329,69 @@ export function PersonaManager({
                   onChange={(e) => setNewPersona({ ...newPersona, color: e.target.value })}
                   className="w-20 h-10"
                 />
-                <Input
-                  value={newPersona.color}
-                  onChange={(e) => setNewPersona({ ...newPersona, color: e.target.value })}
-                  placeholder="#3b82f6"
-                  className="flex-1"
-                />
+                <div className="flex-1 flex flex-wrap gap-1">
+                  {colorPalettes.map((palette) => (
+                    <button
+                      key={palette.value}
+                      className="w-8 h-8 rounded-md border-2 border-transparent hover:border-foreground transition-colors"
+                      style={{ backgroundColor: palette.value }}
+                      onClick={() => setNewPersona({ ...newPersona, color: palette.value })}
+                      title={palette.name}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="persona-prompt">System Prompt</Label>
+            <Label htmlFor="persona-prompt">Character Description & Behavior</Label>
             <Textarea
               id="persona-prompt"
               placeholder="Describe the persona's behavior, expertise, and personality..."
               value={newPersona.systemPrompt}
               onChange={(e) => setNewPersona({ ...newPersona, systemPrompt: e.target.value })}
               rows={3}
+              className="resize-none"
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="persona-temp">
-              Temperature: {newPersona.temperature.toFixed(1)}
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="persona-scenario">Starting Scenario (Optional)</Label>
+              <div className="flex gap-1">
+                {scenarioTemplates.slice(0, 2).map((template, idx) => (
+                  <Button
+                    key={idx}
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 text-xs px-2"
+                    onClick={() => setNewPersona({ ...newPersona, scenario: template })}
+                  >
+                    Example {idx + 1}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <Textarea
+              id="persona-scenario"
+              placeholder="Describe the current situation or setting for this character..."
+              value={newPersona.scenario || ''}
+              onChange={(e) => setNewPersona({ ...newPersona, scenario: e.target.value })}
+              rows={2}
+              className="resize-none"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="persona-temp">
+                Creativity Level: {newPersona.temperature.toFixed(1)}
+              </Label>
+              <Badge variant="secondary" className="text-xs">
+                {newPersona.temperature < 0.5 ? 'Focused' : newPersona.temperature < 0.8 ? 'Balanced' : 'Creative'}
+              </Badge>
+            </div>
             <Slider
               id="persona-temp"
               min={0}
@@ -279,13 +399,20 @@ export function PersonaManager({
               step={0.1}
               value={[newPersona.temperature]}
               onValueChange={(value) => setNewPersona({ ...newPersona, temperature: value[0] })}
+              className="py-2"
             />
             <p className="text-xs text-muted-foreground">
-              Lower = More focused and deterministic, Higher = More creative and random
+              Lower = More predictable & focused • Higher = More creative & varied
             </p>
           </div>
-          <Button onClick={handleAddPersona} className="w-full">
-            <Plus size={16} className="mr-2" />
+
+          <Button 
+            onClick={handleAddPersona} 
+            className="w-full"
+            size="lg"
+            style={{ backgroundColor: newPersona.color }}
+          >
+            <Plus size={18} className="mr-2" />
             Create Persona
           </Button>
         </div>

@@ -13,6 +13,7 @@ export interface AIPersona {
   name: string
   avatar?: string
   systemPrompt: string
+  scenario?: string
   temperature: number
   color: string
   enabled: boolean

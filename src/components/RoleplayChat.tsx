@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, KeyboardEvent } from 'react'
-import { User, PaperPlaneRight, ArrowLeft } from '@phosphor-icons/react'
+import { User, PaperPlaneRight, ArrowLeft, IdentificationCard } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import type { Conversation, ChatMessage } from '@/lib/types'
 import type { AIPersona } from '@/lib/memory-types'
 import { marked } from 'marked'
+import { CharacterCardDialog } from '@/components/CharacterCardDialog'
 
 interface RoleplayChatProps {
   conversation: Conversation
@@ -26,6 +27,7 @@ export function RoleplayChat({
   isGenerating,
 }: RoleplayChatProps) {
   const [input, setInput] = useState('')
+  const [cardDialogOpen, setCardDialogOpen] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -78,8 +80,9 @@ export function RoleplayChat({
             <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
           </Button>
           <div
-            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
             style={{ backgroundColor: persona.color }}
+            onClick={() => setCardDialogOpen(true)}
           >
             <span className="text-white text-base sm:text-lg font-semibold">
               {persona.name.charAt(0)}
@@ -94,11 +97,20 @@ export function RoleplayChat({
               Roleplay character
             </p>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCardDialogOpen(true)}
+            className="shrink-0"
+          >
+            <IdentificationCard size={18} className="sm:mr-2" />
+            <span className="hidden sm:inline">View Card</span>
+          </Button>
         </div>
       </div>
 
       {/* Messages */}
-      <ScrollArea ref={scrollAreaRef} className="flex-1">
+      <ScrollArea ref={scrollAreaRef} className="flex-1 h-full">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           {conversation.messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center px-4">
@@ -221,6 +233,13 @@ export function RoleplayChat({
           </p>
         </div>
       </div>
+
+      {/* Character Card Dialog */}
+      <CharacterCardDialog
+        open={cardDialogOpen}
+        onOpenChange={setCardDialogOpen}
+        persona={persona}
+      />
     </div>
   )
 }
