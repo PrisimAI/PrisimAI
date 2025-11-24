@@ -11,6 +11,36 @@ A modern, minimalist AI platform that enables users to interact with advanced la
 - **🔐 User Authentication**: Secure account creation and login powered by Firebase
 - **💎 Subscription Tiers**: Three-tier system (Free, Pro, Deluxe) with different model access and usage limits
 - **🔌 Offline Mode** *(Experimental)*: Run AI models locally in your browser using WebLLM and WebGPU
+- **📱 Progressive Web App (PWA)**: Install on any device for native-like experience with offline support
+
+## 📱 Progressive Web App Features
+
+PrisimAI is a full-featured Progressive Web App that can be installed on any device:
+
+### Installation
+1. **Desktop (Chrome/Edge)**:
+   - Click the install icon (⊕) in the address bar
+   - Or click "Install PrisimAI" when the prompt appears
+   - The app will open in its own window
+
+2. **Mobile (Android/iOS)**:
+   - Open the site in your mobile browser
+   - Tap the share button or menu (⋮)
+   - Select "Add to Home Screen" or "Install"
+   - The app icon will appear on your home screen
+
+### PWA Benefits
+- **📴 Full Offline Support**: Access the app and use downloaded models without internet
+- **⚡ Faster Loading**: Cached assets load instantly
+- **🎯 Native Feel**: Standalone app window without browser UI
+- **🔄 Auto-Updates**: Always get the latest features automatically
+- **💾 Intelligent Caching**: 
+  - Static assets cached for instant loading
+  - WebLLM models (up to several GB) cached permanently
+  - Fonts and images cached for offline use
+  - API responses cached with smart expiration
+- **🚀 Quick Access**: Launch from home screen or dock
+- **📲 App Shortcuts**: Quick actions for new chat, image generation, and offline mode
 
 ## 🛠️ Setup
 
@@ -83,6 +113,8 @@ PrisimAI now supports running AI models directly in your browser without an inte
 
 ## 📚 Documentation
 
+- **[PWA Guide](./PWA_GUIDE.md)**: Complete guide for Progressive Web App features, installation, and offline capabilities
+- **[Offline Mode Guide](./OFFLINE_MODE.md)**: Detailed user guide for WebLLM offline mode
 - **[Firebase Setup Guide](./FIREBASE_CREDENTIAL_LOCATIONS.md)**: Complete guide for setting up authentication with Firebase
 - **[Tier System Setup](./FIREBASE_TIERS_SETUP.md)**: Comprehensive guide for implementing Free, Pro, and Deluxe subscription tiers
 - **[Quick Tier Setup Reference](./QUICK_TIER_SETUP.md)**: Condensed checklist for tier implementation
