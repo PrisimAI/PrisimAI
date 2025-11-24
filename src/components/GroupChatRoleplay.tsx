@@ -126,7 +126,7 @@ export function GroupChatRoleplay({
       </div>
 
       {/* Messages */}
-      <ScrollArea ref={scrollAreaRef} className="flex-1">
+      <ScrollArea ref={scrollAreaRef} className="flex-1 h-full">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           {conversation.messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center px-4">
