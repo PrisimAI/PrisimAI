@@ -5,6 +5,16 @@ export interface ChatMessage {
   timestamp: number
   isStreaming?: boolean
   isFavorite?: boolean
+  attachments?: FileAttachment[]
+}
+
+export interface FileAttachment {
+  id: string
+  name: string
+  type: string
+  size: number
+  url: string
+  content?: string // For text files, base64 for images
 }
 
 export interface Conversation {
@@ -28,3 +38,9 @@ export interface GeneratedImage {
 }
 
 export type AppMode = 'chat' | 'image' | 'roleplay'
+
+export interface OfflineSettings {
+  enabled: boolean
+  selectedModel: string | null
+  modelLoaded: boolean
+}

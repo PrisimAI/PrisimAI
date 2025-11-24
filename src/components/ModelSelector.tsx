@@ -8,12 +8,14 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
-import { Sparkle } from '@phosphor-icons/react'
+import { Sparkle, CloudSlash } from '@phosphor-icons/react'
 import { 
   getTextModels, 
   getImageModels, 
   type TextModel, 
-  type ImageModel 
+  type ImageModel,
+  isOfflineMode,
+  onOfflineModeChange,
 } from '@/lib/pollinations-api'
 import type { AppMode } from '@/lib/types'
 
@@ -27,6 +29,16 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
   const [textModels, setTextModels] = useState<TextModel[]>([])
   const [imageModels, setImageModels] = useState<ImageModel[]>([])
   const [loading, setLoading] = useState(true)
+  const [offlineMode, setOfflineMode] = useState(isOfflineMode())
+
+  // Subscribe to offline mode changes
+  useEffect(() => {
+    const unsubscribe = onOfflineModeChange((enabled) => {
+      setOfflineMode(enabled)
+    })
+    
+    return unsubscribe
+  }, [])
 
   // Load models
   useEffect(() => {
@@ -75,43 +87,54 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
         <span className="text-sm font-medium">Model:</span>
       </div>
 
-      <Select value={selectedModel} onValueChange={onModelChange}>
-        <SelectTrigger className="w-[250px]">
-          <SelectValue placeholder="Select model" />
-        </SelectTrigger>
-
-        <SelectContent>
-          {displayModels.length > 0 ? (
-            displayModels.map((model) => {
-              const modelId = (model as any).id || (model as any).name
-              const modelDescription = model.description || modelId
-
-              return (
-                <SelectItem key={modelId} value={modelId}>
-                  <div className="flex items-center justify-between gap-2 w-full">
-                    <span>{modelDescription}</span>
-                    {(model as any).tools && (
-                      <Badge variant="secondary" className="ml-2 text-xs shrink-0">
-                        Tools
-                      </Badge>
-                    )}
-                  </div>
-                </SelectItem>
-              )
-            })
-          ) : (
-            <SelectItem value="default" disabled>
-              No models available
-            </SelectItem>
-          )}
-        </SelectContent>
-      </Select>
-
-      {currentModel && mode === 'chat' && (currentModel as any).tools && (
-        <Badge variant="outline" className="text-xs">
-          <Sparkle size={12} className="mr-1" weight="fill" />
-          Tools Enabled
+      {offlineMode && (
+        <Badge variant="secondary" className="gap-1">
+          <CloudSlash size={14} />
+          Offline Mode
         </Badge>
+      )}
+
+      {!offlineMode && (
+        <>
+          <Select value={selectedModel} onValueChange={onModelChange}>
+            <SelectTrigger className="w-[250px]">
+              <SelectValue placeholder="Select model" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {displayModels.length > 0 ? (
+                displayModels.map((model) => {
+                  const modelId = (model as any).id || (model as any).name
+                  const modelDescription = model.description || modelId
+
+                  return (
+                    <SelectItem key={modelId} value={modelId}>
+                      <div className="flex items-center justify-between gap-2 w-full">
+                        <span>{modelDescription}</span>
+                        {(model as any).tools && (
+                          <Badge variant="secondary" className="ml-2 text-xs shrink-0">
+                            Tools
+                          </Badge>
+                        )}
+                      </div>
+                    </SelectItem>
+                  )
+                })
+              ) : (
+                <SelectItem value="default" disabled>
+                  No models available
+                </SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+
+          {currentModel && mode === 'chat' && (currentModel as any).tools && (
+            <Badge variant="outline" className="text-xs">
+              <Sparkle size={12} className="mr-1" weight="fill" />
+              Tools Enabled
+            </Badge>
+          )}
+        </>
       )}
     </div>
   )

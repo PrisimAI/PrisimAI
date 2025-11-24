@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { User, Sparkle, Copy, Check, ArrowsClockwise, PencilSimple, X } from '@phosphor-icons/react'
+import { User, Sparkle, Copy, Check, ArrowsClockwise, PencilSimple, X, File, Image as ImageIcon, FileText } from '@phosphor-icons/react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import type { ChatMessage as ChatMessageType } from '@/lib/types'
@@ -47,6 +48,18 @@ export function ChatMessage({ message, onRegenerate, onToggleFavorite, onEdit }:
     ? marked.parse(message.content, { async: false }) as string
     : message.content
 
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B'
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  }
+
+  const getFileIcon = (type: string) => {
+    if (type.startsWith('image/')) return <ImageIcon size={16} />
+    if (type.startsWith('text/') || type === 'application/json') return <FileText size={16} />
+    return <File size={16} />
+  }
+
   return (
     <div className={cn('group flex gap-4 px-6 py-4', !isUser && 'bg-muted/50')}>
       <Avatar className="h-8 w-8 shrink-0">
@@ -65,6 +78,36 @@ export function ChatMessage({ message, onRegenerate, onToggleFavorite, onEdit }:
             <span className="text-xs text-yellow-600 dark:text-yellow-500">⭐ Favorited</span>
           )}
         </div>
+
+        {/* File attachments */}
+        {message.attachments && message.attachments.length > 0 && (
+          <div className="space-y-2">
+            {message.attachments.map((file) => (
+              <div key={file.id} className="flex items-center gap-2">
+                {file.type.startsWith('image/') && file.content ? (
+                  <div className="rounded-lg overflow-hidden border max-w-sm">
+                    <img
+                      src={file.content}
+                      alt={file.name}
+                      className="max-h-64 object-contain"
+                    />
+                    <div className="px-2 py-1 bg-muted/50 text-xs flex items-center gap-1">
+                      <ImageIcon size={12} />
+                      <span className="truncate">{file.name}</span>
+                      <span className="text-muted-foreground">({formatFileSize(file.size)})</span>
+                    </div>
+                  </div>
+                ) : (
+                  <Badge variant="outline" className="gap-1">
+                    {getFileIcon(file.type)}
+                    <span className="truncate max-w-[200px]">{file.name}</span>
+                    <span className="text-xs text-muted-foreground">({formatFileSize(file.size)})</span>
+                  </Badge>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
         
         {isEditing ? (
           <div className="space-y-2">

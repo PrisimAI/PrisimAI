@@ -19,10 +19,12 @@ import { MemoryManager } from './components/MemoryManager'
 import { PersonaManager } from './components/PersonaManager'
 import { FavoritesDialog } from './components/FavoritesDialog'
 import { KeyboardShortcutsDialog } from './components/KeyboardShortcutsDialog'
-import { generateText, generateImage, type Message } from './lib/pollinations-api'
+import { OfflineModeDialog } from './components/OfflineModeDialog'
+import { LiquidMetalBackground } from './components/LiquidMetalBackground'
+import { generateText, generateImage, type Message, setOfflineMode } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
 import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS, ROLEPLAY_ENFORCEMENT_RULES } from './lib/personas-config'
-import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode } from './lib/types'
+import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode, OfflineSettings, FileAttachment } from './lib/types'
 import type { MemoryEntry, AIPersona, GroupChatParticipant } from './lib/memory-types'
 
 function App() {
@@ -40,10 +42,21 @@ function App() {
   const [personaDialogOpen, setPersonaDialogOpen] = useState(false)
   const [favoritesDialogOpen, setFavoritesDialogOpen] = useState(false)
   const [shortcutsDialogOpen, setShortcutsDialogOpen] = useState(false)
+  const [offlineModeDialogOpen, setOfflineModeDialogOpen] = useState(false)
+  const [offlineSettings, setOfflineSettings] = useLocalStorage<OfflineSettings>('offline-settings', {
+    enabled: false,
+    selectedModel: null,
+    modelLoaded: false,
+  })
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
   const conversationsList = conversations || []
   const currentConversation = conversationsList.find((c) => c.id === currentConversationId)
+
+  // Sync offline mode state
+  useEffect(() => {
+    setOfflineMode(offlineSettings.enabled)
+  }, [offlineSettings.enabled])
 
   // Sync mode with current conversation's mode
   useEffect(() => {
@@ -164,7 +177,7 @@ function App() {
     )
   }, [setConversations])
 
-  const handleSendMessage = useCallback(async (content: string) => {
+  const handleSendMessage = useCallback(async (content: string, attachments?: FileAttachment[]) => {
     if (!currentConversationId) {
       createNewConversation()
       setPendingMessage(content)
@@ -200,6 +213,7 @@ function App() {
         role: 'user',
         content,
         timestamp: Date.now(),
+        attachments,
       }
 
       addMessage(currentConversationId, userMessage)
@@ -240,11 +254,52 @@ function App() {
         }
         
         messages.push(
-          ...conversationMessages.map((m) => ({
-            role: m.role as 'user' | 'assistant',
-            content: m.content,
-          })),
-          { role: 'user' as const, content }
+          ...conversationMessages.map((m) => {
+            let messageContent = m.content
+            
+            // Include file content for messages with attachments
+            if (m.attachments && m.attachments.length > 0) {
+              const fileContexts = m.attachments.map(file => {
+                if (file.content && (file.type.startsWith('text/') || file.type === 'application/json')) {
+                  return `\n\n[File: ${file.name}]\n${file.content}`
+                } else if (file.type.startsWith('image/')) {
+                  return `\n\n[Attached image: ${file.name}]`
+                } else {
+                  return `\n\n[Attached file: ${file.name}]`
+                }
+              }).join('')
+              
+              messageContent = messageContent + fileContexts
+            }
+            
+            return {
+              role: m.role as 'user' | 'assistant',
+              content: messageContent,
+            }
+          }),
+          { 
+            role: 'user' as const, 
+            content: (() => {
+              let finalContent = content
+              
+              // Add file content to the current message
+              if (attachments && attachments.length > 0) {
+                const fileContexts = attachments.map(file => {
+                  if (file.content && (file.type.startsWith('text/') || file.type === 'application/json')) {
+                    return `\n\n[File: ${file.name}]\n${file.content}`
+                  } else if (file.type.startsWith('image/')) {
+                    return `\n\n[Attached image: ${file.name}]`
+                  } else {
+                    return `\n\n[Attached file: ${file.name}]`
+                  }
+                }).join('')
+                
+                finalContent = finalContent + fileContexts
+              }
+              
+              return finalContent
+            })()
+          }
         )
 
         // Use Mistral for roleplay mode, otherwise use selected model
@@ -429,6 +484,22 @@ function App() {
     setPersonas((current = []) => current.filter((p) => p.id !== id))
   }
 
+  // Offline mode handlers
+  const handleOfflineToggle = (enabled: boolean) => {
+    setOfflineSettings((current) => ({
+      ...current,
+      enabled,
+      modelLoaded: enabled,
+    }))
+  }
+
+  const handleOfflineModelSelect = (modelId: string) => {
+    setOfflineSettings((current) => ({
+      ...current,
+      selectedModel: modelId,
+    }))
+  }
+
   // Keyboard shortcuts
   useKeyboardShortcuts([
     { key: 'n', ctrl: true, handler: createNewConversation },
@@ -437,7 +508,7 @@ function App() {
     { key: '/', ctrl: true, handler: () => setShortcutsDialogOpen(true) },
     { key: '1', ctrl: true, handler: () => handleModeChange('chat') },
     { key: '2', ctrl: true, handler: () => handleModeChange('image') },
-  ], !memoryDialogOpen && !personaDialogOpen && !favoritesDialogOpen && !shortcutsDialogOpen)
+  ], !memoryDialogOpen && !personaDialogOpen && !favoritesDialogOpen && !shortcutsDialogOpen && !offlineModeDialogOpen)
 
   const handleModeChange = (newMode: AppMode) => {
     setMode(newMode)
@@ -578,7 +649,8 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden bg-background relative">
+      <LiquidMetalBackground opacity={0.25} />
       <Sidebar
         conversations={conversationsList}
         currentConversationId={currentConversationId}
@@ -594,6 +666,7 @@ function App() {
         onOpenMemory={() => setMemoryDialogOpen(true)}
         onOpenPersonas={() => setPersonaDialogOpen(true)}
         onOpenFavorites={() => setFavoritesDialogOpen(true)}
+        onOpenOfflineMode={() => setOfflineModeDialogOpen(true)}
       />
 
       <div className="flex flex-1 flex-col">
@@ -695,6 +768,15 @@ function App() {
       <KeyboardShortcutsDialog
         open={shortcutsDialogOpen}
         onOpenChange={setShortcutsDialogOpen}
+      />
+
+      <OfflineModeDialog
+        open={offlineModeDialogOpen}
+        onOpenChange={setOfflineModeDialogOpen}
+        offlineEnabled={offlineSettings.enabled}
+        selectedModel={offlineSettings.selectedModel}
+        onOfflineToggle={handleOfflineToggle}
+        onModelSelect={handleOfflineModelSelect}
       />
 
       <Toaster position="top-center" />

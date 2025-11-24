@@ -1,8 +1,33 @@
+import { webLLMService } from './webllm-service'
+
 const API_KEY = 'plln_sk_niDbx9acZfiWE3tdVmrXKyk0wh5GnGdM'
 const BASE_URL = 'https://enter.pollinations.ai/api/generate'
 
 // Development/Mock mode - enables fallback responses when API is unavailable
 const ENABLE_MOCK_MODE = import.meta.env.DEV || import.meta.env.VITE_ENABLE_MOCK_API === 'true'
+
+// Offline mode state (controlled by App component)
+let offlineModeEnabled = false
+
+// Event emitter for offline mode changes
+const offlineModeChangeEvent = new Event('offlineModeChange')
+
+export function setOfflineMode(enabled: boolean) {
+  offlineModeEnabled = enabled
+  // Dispatch event to notify listeners
+  window.dispatchEvent(offlineModeChangeEvent)
+}
+
+export function isOfflineMode(): boolean {
+  return offlineModeEnabled
+}
+
+// Subscribe to offline mode changes
+export function onOfflineModeChange(callback: (enabled: boolean) => void): () => void {
+  const handler = () => callback(offlineModeEnabled)
+  window.addEventListener('offlineModeChange', handler)
+  return () => window.removeEventListener('offlineModeChange', handler)
+}
 
 export interface Message {
   role: 'system' | 'user' | 'assistant'
@@ -152,6 +177,17 @@ export async function generateText(
   onChunk?: (chunk: string) => void,
   options?: GenerateTextOptions
 ): Promise<string> {
+  // Offline mode: Use WebLLM if enabled
+  if (offlineModeEnabled && webLLMService.isModelLoaded()) {
+    console.info('Using offline mode with WebLLM')
+    try {
+      return await webLLMService.generateText(messages, onChunk)
+    } catch (error) {
+      console.error('Offline mode error:', error)
+      throw new Error('Offline generation failed. Please check if the model is loaded correctly.')
+    }
+  }
+
   // Mock mode: Simulate AI response when API is unavailable
   if (ENABLE_MOCK_MODE) {
     console.info('Using mock text generation')
