@@ -10,12 +10,44 @@ import { CreateGroupChatDialog } from '@/components/CreateGroupChatDialog'
 import type { AIPersona, GroupChatParticipant } from '@/lib/memory-types'
 import { PREMADE_PERSONAS, CHARACTER_PERSONAS } from '@/lib/personas-config'
 
+interface PersonaAvatarProps {
+  persona: AIPersona
+  icon: React.ComponentType<{ size: number; weight: string; className: string }>
+}
+
+function PersonaAvatar({ persona, icon: Icon }: PersonaAvatarProps) {
+  const [imageError, setImageError] = useState(false)
+  const showFallback = !persona.avatar || imageError
+
+  return (
+    <>
+      {persona.avatar && !imageError && (
+        <img
+          src={persona.avatar}
+          alt={persona.name}
+          className="w-10 h-10 rounded-full object-cover"
+          onError={() => setImageError(true)}
+        />
+      )}
+      {showFallback && (
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: persona.color }}
+        >
+          <Icon size={20} weight="fill" className="text-white" />
+        </div>
+      )}
+    </>
+  )
+}
+
 interface RoleplayPageProps {
   personas: AIPersona[]
   onOpenPersonaManager: () => void
   onCreateGroupChat: (title: string, participants: GroupChatParticipant[]) => void
   onStartPersonaChat: (persona: AIPersona) => void
 }
+
 
 export function RoleplayPage({
   personas,
@@ -178,12 +210,7 @@ export function RoleplayPage({
                     <Card key={persona.id} className="hover:shadow-md transition-shadow">
                       <CardHeader className="pb-3">
                         <div className="flex items-center gap-3">
-                          <div
-                            className="w-10 h-10 rounded-full flex items-center justify-center"
-                            style={{ backgroundColor: persona.color }}
-                          >
-                            <Robot size={20} weight="fill" className="text-white" />
-                          </div>
+                          <PersonaAvatar persona={persona} icon={Robot} />
                           <div className="flex-1">
                             <CardTitle className="text-lg">{persona.name}</CardTitle>
                           </div>
@@ -227,12 +254,7 @@ export function RoleplayPage({
                     <Card key={persona.id} className="hover:shadow-md transition-shadow">
                       <CardHeader className="pb-3">
                         <div className="flex items-center gap-3">
-                          <div
-                            className="w-10 h-10 rounded-full flex items-center justify-center"
-                            style={{ backgroundColor: persona.color }}
-                          >
-                            <MaskHappy size={20} weight="fill" className="text-white" />
-                          </div>
+                          <PersonaAvatar persona={persona} icon={MaskHappy} />
                           <div className="flex-1">
                             <CardTitle className="text-lg">{persona.name}</CardTitle>
                           </div>
@@ -275,12 +297,7 @@ export function RoleplayPage({
                   <Card key={persona.id} className="hover:shadow-md transition-shadow">
                     <CardHeader className="pb-3">
                       <div className="flex items-center gap-3">
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center"
-                          style={{ backgroundColor: persona.color }}
-                        >
-                          <Robot size={20} weight="fill" className="text-white" />
-                        </div>
+                        <PersonaAvatar persona={persona} icon={Robot} />
                         <div className="flex-1">
                           <CardTitle className="text-lg">{persona.name}</CardTitle>
                         </div>
