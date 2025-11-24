@@ -200,10 +200,18 @@ export function OfflineModeDialog({
               <SelectContent>
                 {OFFLINE_MODELS.map((model) => (
                   <SelectItem key={model.id} value={model.id}>
-                    <div className="flex flex-col items-start py-1">
-                      <div className="font-medium">{model.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {model.description} • {model.size}
+                    <div className="flex flex-col items-start py-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{model.name}</span>
+                        <Badge variant="secondary" className="text-xs">
+                          {model.badge}
+                        </Badge>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {model.description}
+                      </div>
+                      <div className="text-xs font-medium text-foreground mt-1">
+                        💾 {model.size} • ⚡ {model.speed} • ✨ {model.quality}
                       </div>
                     </div>
                   </SelectItem>
@@ -217,11 +225,50 @@ export function OfflineModeDialog({
             <Alert>
               <Info size={20} />
               <AlertDescription>
-                <div className="space-y-1">
-                  <div className="font-medium">{currentModelInfo.name}</div>
-                  <div className="text-sm">{currentModelInfo.description}</div>
-                  <div className="text-sm text-muted-foreground mt-2">
-                    Download size: {currentModelInfo.size}
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-base">{currentModelInfo.name}</span>
+                      <Badge variant="outline" className="text-xs">
+                        {currentModelInfo.badge}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{currentModelInfo.description}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <div className="font-medium text-foreground">Download Size</div>
+                      <div className="text-muted-foreground">{currentModelInfo.downloadSize}</div>
+                    </div>
+                    <div>
+                      <div className="font-medium text-foreground">Parameters</div>
+                      <div className="text-muted-foreground">{currentModelInfo.parameters}</div>
+                    </div>
+                    <div>
+                      <div className="font-medium text-foreground">Speed</div>
+                      <div className="text-muted-foreground">{currentModelInfo.speed}</div>
+                    </div>
+                    <div>
+                      <div className="font-medium text-foreground">Quality</div>
+                      <div className="text-muted-foreground">{currentModelInfo.quality}</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="font-medium text-sm mb-1">Capabilities</div>
+                    <div className="flex flex-wrap gap-1">
+                      {currentModelInfo.capabilities.map((cap, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">
+                          {cap}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t">
+                    <div className="font-medium text-sm mb-1">Best For</div>
+                    <p className="text-sm text-muted-foreground">{currentModelInfo.bestFor}</p>
                   </div>
                 </div>
               </AlertDescription>

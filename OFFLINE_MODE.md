@@ -32,23 +32,49 @@ Offline mode enables you to:
 
 ## Available Models
 
-### Llama 3.2 3B Instruct (Recommended)
+Each model displays comprehensive details to help you make an informed choice:
+
+### Llama 3.2 3B (Recommended)
+- **Badge**: Recommended
 - **Size**: 1.8 GB
-- **Best for**: General conversation, Q&A, creative writing
-- **Speed**: Fast on most GPUs
-- **Quality**: Good balance of speed and quality
+- **Parameters**: 3 billion
+- **Speed**: Fast
+- **Quality**: Good
+- **Capabilities**: 
+  - General conversation
+  - Creative writing
+  - Question answering
+  - Basic coding help
+- **Best For**: Everyday chat, quick responses, and general tasks
+- **Description**: Lightweight, fast model suitable for most tasks
 
-### Llama 3.1 8B Instruct
+### Llama 3.1 8B (Most Capable)
+- **Badge**: Most Capable
 - **Size**: 4.5 GB
-- **Best for**: Complex reasoning, coding, detailed analysis
-- **Speed**: Moderate (requires better GPU)
-- **Quality**: Higher quality responses
+- **Parameters**: 8 billion
+- **Speed**: Moderate
+- **Quality**: Excellent
+- **Capabilities**:
+  - Complex reasoning
+  - Advanced coding
+  - Detailed analysis
+  - Technical writing
+- **Best For**: Professional work, coding, and complex problem-solving
+- **Description**: More powerful model for complex reasoning and detailed responses
 
-### Phi 3.5 Mini
+### Phi 3.5 Mini (Fastest)
+- **Badge**: Fastest
 - **Size**: 2.2 GB
-- **Best for**: Quick responses, simple tasks
-- **Speed**: Very fast
-- **Quality**: Good for general use
+- **Parameters**: 3.8 billion
+- **Speed**: Very Fast
+- **Quality**: Good
+- **Capabilities**:
+  - Quick responses
+  - Simple tasks
+  - Basic Q&A
+  - Light coding
+- **Best For**: Speed-critical tasks and devices with limited resources
+- **Description**: Ultra-compact model optimized for speed and efficiency
 
 ## Setup Instructions
 
@@ -71,11 +97,18 @@ The dialog will automatically check if your browser supports WebGPU:
 ### Step 3: Select a Model
 
 1. Click the **model dropdown** to see available options
-2. Each model shows:
-   - Name and description
-   - Download size
-   - Recommended use cases
-3. Choose based on your needs and available storage
+2. Each model displays comprehensive information:
+   - **Name and badge** (Recommended, Most Capable, or Fastest)
+   - **Description** of the model's purpose
+   - **Download size** (how much storage needed)
+   - **Speed rating** (how fast responses will be)
+   - **Quality rating** (response quality level)
+3. After selecting a model, view detailed information including:
+   - Parameter count (model complexity)
+   - Specific capabilities
+   - Best use cases
+   - Download size confirmation
+4. Choose based on your needs, available storage, and GPU capabilities
 
 ### Step 4: Download and Initialize
 
