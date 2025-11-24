@@ -20,10 +20,11 @@ import { PersonaManager } from './components/PersonaManager'
 import { FavoritesDialog } from './components/FavoritesDialog'
 import { KeyboardShortcutsDialog } from './components/KeyboardShortcutsDialog'
 import { OfflineModeDialog } from './components/OfflineModeDialog'
+import { LiquidMetalBackground } from './components/LiquidMetalBackground'
 import { generateText, generateImage, type Message, setOfflineMode } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
 import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS, ROLEPLAY_ENFORCEMENT_RULES } from './lib/personas-config'
-import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode, OfflineSettings } from './lib/types'
+import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode, OfflineSettings, FileAttachment } from './lib/types'
 import type { MemoryEntry, AIPersona, GroupChatParticipant } from './lib/memory-types'
 
 function App() {
@@ -176,7 +177,7 @@ function App() {
     )
   }, [setConversations])
 
-  const handleSendMessage = useCallback(async (content: string) => {
+  const handleSendMessage = useCallback(async (content: string, attachments?: FileAttachment[]) => {
     if (!currentConversationId) {
       createNewConversation()
       setPendingMessage(content)
@@ -212,6 +213,7 @@ function App() {
         role: 'user',
         content,
         timestamp: Date.now(),
+        attachments,
       }
 
       addMessage(currentConversationId, userMessage)
@@ -252,11 +254,52 @@ function App() {
         }
         
         messages.push(
-          ...conversationMessages.map((m) => ({
-            role: m.role as 'user' | 'assistant',
-            content: m.content,
-          })),
-          { role: 'user' as const, content }
+          ...conversationMessages.map((m) => {
+            let messageContent = m.content
+            
+            // Include file content for messages with attachments
+            if (m.attachments && m.attachments.length > 0) {
+              const fileContexts = m.attachments.map(file => {
+                if (file.content && (file.type.startsWith('text/') || file.type === 'application/json')) {
+                  return `\n\n[File: ${file.name}]\n${file.content}`
+                } else if (file.type.startsWith('image/')) {
+                  return `\n\n[Attached image: ${file.name}]`
+                } else {
+                  return `\n\n[Attached file: ${file.name}]`
+                }
+              }).join('')
+              
+              messageContent = messageContent + fileContexts
+            }
+            
+            return {
+              role: m.role as 'user' | 'assistant',
+              content: messageContent,
+            }
+          }),
+          { 
+            role: 'user' as const, 
+            content: (() => {
+              let finalContent = content
+              
+              // Add file content to the current message
+              if (attachments && attachments.length > 0) {
+                const fileContexts = attachments.map(file => {
+                  if (file.content && (file.type.startsWith('text/') || file.type === 'application/json')) {
+                    return `\n\n[File: ${file.name}]\n${file.content}`
+                  } else if (file.type.startsWith('image/')) {
+                    return `\n\n[Attached image: ${file.name}]`
+                  } else {
+                    return `\n\n[Attached file: ${file.name}]`
+                  }
+                }).join('')
+                
+                finalContent = finalContent + fileContexts
+              }
+              
+              return finalContent
+            })()
+          }
         )
 
         // Use Mistral for roleplay mode, otherwise use selected model
@@ -606,7 +649,8 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden bg-background relative">
+      <LiquidMetalBackground opacity={0.25} />
       <Sidebar
         conversations={conversationsList}
         currentConversationId={currentConversationId}
