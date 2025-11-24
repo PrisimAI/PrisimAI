@@ -72,6 +72,7 @@ export function PersonaManager({
   const [newPersona, setNewPersona] = useState<Omit<AIPersona, 'id'>>({
     name: '',
     systemPrompt: '',
+    scenario: '',
     temperature: 0.7,
     color: '#3b82f6',
     enabled: true,
@@ -87,6 +88,7 @@ export function PersonaManager({
     setNewPersona({
       name: '',
       systemPrompt: '',
+      scenario: '',
       temperature: 0.7,
       color: '#3b82f6',
       enabled: true,
@@ -266,6 +268,16 @@ export function PersonaManager({
               value={newPersona.systemPrompt}
               onChange={(e) => setNewPersona({ ...newPersona, systemPrompt: e.target.value })}
               rows={3}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="persona-scenario">Scenario (Optional)</Label>
+            <Textarea
+              id="persona-scenario"
+              placeholder="Describe the current situation or setting for this character..."
+              value={newPersona.scenario || ''}
+              onChange={(e) => setNewPersona({ ...newPersona, scenario: e.target.value })}
+              rows={2}
             />
           </div>
           <div className="space-y-2">

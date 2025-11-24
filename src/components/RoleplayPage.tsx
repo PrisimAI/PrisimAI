@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { MaskHappy, Plus, Robot, UsersThree, Sparkle, ChatCircle, MagnifyingGlass, SortAscending } from '@phosphor-icons/react'
+import { MaskHappy, Plus, Robot, UsersThree, Sparkle, ChatCircle, MagnifyingGlass, SortAscending, IdentificationCard } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CreateGroupChatDialog } from '@/components/CreateGroupChatDialog'
+import { CharacterCardDialog } from '@/components/CharacterCardDialog'
 import type { AIPersona, GroupChatParticipant } from '@/lib/memory-types'
 import { PREMADE_PERSONAS, CHARACTER_PERSONAS } from '@/lib/personas-config'
 
@@ -56,6 +57,8 @@ export function RoleplayPage({
   onStartPersonaChat,
 }: RoleplayPageProps) {
   const [groupChatDialogOpen, setGroupChatDialogOpen] = useState(false)
+  const [cardDialogOpen, setCardDialogOpen] = useState(false)
+  const [selectedPersona, setSelectedPersona] = useState<AIPersona | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'premade' | 'character' | 'custom'>('all')
   const [sortBy, setSortBy] = useState<'name-asc' | 'name-desc' | 'temp-asc' | 'temp-desc'>('name-asc')
@@ -225,14 +228,26 @@ export function RoleplayPage({
                             Temp: {persona.temperature}
                           </Badge>
                         </div>
-                        <Button 
-                          onClick={() => onStartPersonaChat(persona)} 
-                          className="w-full mt-3"
-                          size="sm"
-                        >
-                          <ChatCircle size={16} className="mr-2" />
-                          Start Chat
-                        </Button>
+                        <div className="flex gap-2 mt-3">
+                          <Button 
+                            onClick={() => onStartPersonaChat(persona)} 
+                            className="flex-1"
+                            size="sm"
+                          >
+                            <ChatCircle size={16} className="mr-2" />
+                            Start Chat
+                          </Button>
+                          <Button 
+                            onClick={() => {
+                              setSelectedPersona(persona)
+                              setCardDialogOpen(true)
+                            }}
+                            variant="outline"
+                            size="sm"
+                          >
+                            <IdentificationCard size={16} />
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -268,15 +283,32 @@ export function RoleplayPage({
                           <Badge variant="secondary" className="text-xs">
                             Temp: {persona.temperature}
                           </Badge>
+                          {persona.scenario && (
+                            <Badge variant="outline" className="text-xs">
+                              Scenario
+                            </Badge>
+                          )}
                         </div>
-                        <Button 
-                          onClick={() => onStartPersonaChat(persona)} 
-                          className="w-full mt-3"
-                          size="sm"
-                        >
-                          <ChatCircle size={16} className="mr-2" />
-                          Start Chat
-                        </Button>
+                        <div className="flex gap-2 mt-3">
+                          <Button 
+                            onClick={() => onStartPersonaChat(persona)} 
+                            className="flex-1"
+                            size="sm"
+                          >
+                            <ChatCircle size={16} className="mr-2" />
+                            Start Chat
+                          </Button>
+                          <Button 
+                            onClick={() => {
+                              setSelectedPersona(persona)
+                              setCardDialogOpen(true)
+                            }}
+                            variant="outline"
+                            size="sm"
+                          >
+                            <IdentificationCard size={16} />
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -356,6 +388,15 @@ export function RoleplayPage({
         currentUserName="You"
         onCreateGroupChat={onCreateGroupChat}
       />
+
+      {/* Character Card Dialog */}
+      {selectedPersona && (
+        <CharacterCardDialog
+          open={cardDialogOpen}
+          onOpenChange={setCardDialogOpen}
+          persona={selectedPersona}
+        />
+      )}
     </div>
   )
 }
