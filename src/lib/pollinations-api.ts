@@ -219,24 +219,31 @@ export async function generateText(
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
     let fullText = ''
+    let buffer = ''
 
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
 
       const chunk = decoder.decode(value, { stream: true })
-      const lines = chunk.split('\n')
+      buffer += chunk
+      const lines = buffer.split('\n')
+      
+      // Keep the last incomplete line in the buffer
+      buffer = lines.pop() || ''
 
       for (const line of lines) {
-        if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+        const trimmedLine = line.trim()
+        if (trimmedLine.startsWith('data: ') && trimmedLine !== 'data: [DONE]') {
           try {
-            const data = JSON.parse(line.slice(6))
+            const data = JSON.parse(trimmedLine.slice(6))
             const content = data.choices?.[0]?.delta?.content || ''
             if (content) {
               fullText += content
               onChunk(content)
             }
           } catch (e) {
+            console.warn('Error parsing chunk:', e)
             continue
           }
         }
@@ -301,7 +308,14 @@ export async function generateImage(
   // Verify we got an image response
   if (!blob.type.startsWith('image/')) {
     console.error('Unexpected response type:', blob.type)
-    throw new Error('Received invalid response from image generation service.')
+    // Try to read text content for error details
+    try {
+      const text = await blob.text()
+      console.error('Response content:', text)
+    } catch (e) {
+      // Ignore
+    }
+    throw new Error('Received invalid response from image generation service. The service might be overloaded or the prompt might be invalid.')
   }
   
   return URL.createObjectURL(blob)

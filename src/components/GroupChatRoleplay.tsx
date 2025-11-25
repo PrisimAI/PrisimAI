@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import type { Conversation, ChatMessage } from '@/lib/types'
 import type { AIPersona } from '@/lib/memory-types'
 import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 import { CharacterCardDialog } from '@/components/CharacterCardDialog'
 
 interface GroupChatRoleplayProps {
@@ -62,7 +63,8 @@ export function GroupChatRoleplay({
     if (isUser) {
       return content
     }
-    return marked.parse(content, { async: false }) as string
+    const html = marked.parse(content, { async: false }) as string
+    return DOMPurify.sanitize(html)
   }
 
   // Get persona for a message (for assistant messages)
