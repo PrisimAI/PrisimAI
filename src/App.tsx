@@ -335,7 +335,12 @@ function App() {
     } else {
       setIsGenerating(true)
       try {
-        const imageUrl = await generateImage(content, imageModel)
+        // Pass default image options for consistent quality
+        const imageUrl = await generateImage(content, imageModel, {
+          width: 1024,
+          height: 1024,
+          nologo: true,
+        })
         const generatedImage: GeneratedImage = {
           id: `img_${Date.now()}`,
           prompt: content,
@@ -355,7 +360,9 @@ function App() {
         toast.success('Image generated successfully!')
       } catch (error) {
         console.error('Error generating image:', error)
-        toast.error('Failed to generate image. Please try again.')
+        // Show specific error message if available
+        const errorMessage = error instanceof Error ? error.message : 'Failed to generate image. Please try again.'
+        toast.error(errorMessage)
       } finally {
         setIsGenerating(false)
       }
