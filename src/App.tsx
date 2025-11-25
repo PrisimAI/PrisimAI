@@ -575,12 +575,8 @@ function App() {
     )
   }
 
-  // Development mode: bypass auth for testing
-  const isDevelopment = import.meta.env.DEV
-  const bypassAuth = isDevelopment && !user
-
-  // Show auth page if not logged in (unless in dev mode bypass)
-  if (!user && !bypassAuth) {
+  // Show auth page if not logged in
+  if (!user) {
     return (
       <>
         <AuthPage />
