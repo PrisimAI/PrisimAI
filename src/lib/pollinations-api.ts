@@ -293,8 +293,7 @@ export async function generateImage(
   if (ENABLE_MOCK_MODE) {
     console.info('Using mock image generation')
     // Truncate prompt BEFORE escaping to prevent incomplete escape sequences
-    const truncatedPrompt = prompt.substring(0, 50)
-    const displayPrompt = prompt.length > 50 ? truncatedPrompt + '...' : truncatedPrompt
+    const displayPrompt = prompt.length > 50 ? prompt.substring(0, 50) + '...' : prompt
     // Escape prompt to prevent XSS in SVG
     const escapedPrompt = displayPrompt
       .replace(/&/g, '&amp;')

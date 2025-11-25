@@ -40,6 +40,20 @@ export function ImageGeneration({ images, onRegenerate }: ImageGenerationProps) 
     }
   }, [])
 
+  // Helper function to get file extension from MIME type
+  const getExtensionFromMimeType = (mimeType: string): string => {
+    const mimeToExtension: Record<string, string> = {
+      'image/svg+xml': 'svg',
+      'image/png': 'png',
+      'image/jpeg': 'jpg',
+      'image/gif': 'gif',
+      'image/webp': 'webp',
+      'image/bmp': 'bmp',
+      'image/tiff': 'tiff',
+    }
+    return mimeToExtension[mimeType] || 'png'
+  }
+
   const handleDownload = async (url: string, imageId: string) => {
     setDownloadingId(imageId)
     try {
@@ -50,8 +64,8 @@ export function ImageGeneration({ images, onRegenerate }: ImageGenerationProps) 
       const blob = await response.blob()
       const blobUrl = URL.createObjectURL(blob)
       
-      // Determine file extension based on blob type
-      const extension = blob.type === 'image/svg+xml' ? 'svg' : 'png'
+      // Determine file extension based on blob MIME type
+      const extension = getExtensionFromMimeType(blob.type)
       
       const link = document.createElement('a')
       link.href = blobUrl
