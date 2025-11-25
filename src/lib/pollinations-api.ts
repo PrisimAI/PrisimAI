@@ -2,6 +2,7 @@ import { webLLMService } from './webllm-service'
 
 const API_KEY = 'plln_sk_niDbx9acZfiWE3tdVmrXKyk0wh5GnGdM'
 const BASE_URL = 'https://enter.pollinations.ai/api/generate'
+const IMAGE_BASE_URL = 'https://enter.pollinations.ai/api/generate/image'
 
 // Mock mode disabled - always use production API
 const ENABLE_MOCK_MODE = false
@@ -135,7 +136,7 @@ const FALLBACK_IMAGE_MODELS: ImageModel[] = [
 
 export async function getImageModels(): Promise<ImageModel[]> {
   try {
-    const response = await fetch(`${BASE_URL}/image/models`, {
+    const response = await fetch(`${IMAGE_BASE_URL}/models`, {
       headers: {
         Authorization: `Bearer ${API_KEY}`,
       },
@@ -271,7 +272,7 @@ export async function generateImage(
   if (options?.height) queryParams.set('height', String(options.height))
   if (options?.nologo !== undefined) queryParams.set('nologo', String(options.nologo))
   
-  const url = `${BASE_URL}/image/${encodedPrompt}?${queryParams.toString()}`
+  const url = `${IMAGE_BASE_URL}/${encodedPrompt}?${queryParams.toString()}`
   
   let response: Response
   try {
