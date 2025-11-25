@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import type { ChatMessage as ChatMessageType } from '@/lib/types'
 import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 import { FavoriteButton } from '@/components/FavoriteButton'
 
 interface ChatMessageProps {
@@ -45,7 +46,7 @@ export function ChatMessage({ message, onRegenerate, onToggleFavorite, onEdit }:
 
   // Parse markdown for assistant messages
   const formattedContent = !isUser && !message.isStreaming
-    ? marked.parse(message.content, { async: false }) as string
+    ? DOMPurify.sanitize(marked.parse(message.content, { async: false }) as string)
     : message.content
 
   const formatFileSize = (bytes: number): string => {

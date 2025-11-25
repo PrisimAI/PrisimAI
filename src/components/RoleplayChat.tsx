@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import type { Conversation, ChatMessage } from '@/lib/types'
 import type { AIPersona } from '@/lib/memory-types'
 import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 import { CharacterCardDialog } from '@/components/CharacterCardDialog'
 
 interface RoleplayChatProps {
@@ -63,7 +64,8 @@ export function RoleplayChat({
       return content
     }
     // Parse markdown for AI messages
-    return marked.parse(content, { async: false }) as string
+    const html = marked.parse(content, { async: false }) as string
+    return DOMPurify.sanitize(html)
   }
 
   return (
