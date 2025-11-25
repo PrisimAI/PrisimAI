@@ -73,6 +73,12 @@ export interface ImageModel {
   aliases?: string[]
 }
 
+export interface GenerateImageOptions {
+  width?: number
+  height?: number
+  nologo?: boolean
+}
+
 const FALLBACK_TEXT_MODELS: TextModel[] = [
   { id: 'openai', description: 'OpenAI GPT-4', tools: true },
   { id: 'mistral', description: 'Mistral Large', tools: true },
@@ -280,29 +286,33 @@ export async function generateText(
 
 export async function generateImage(
   prompt: string,
-  model: string = 'flux'
+  model: string = 'flux',
+  options?: GenerateImageOptions
 ): Promise<string> {
   // Mock mode: Return a placeholder image when API is unavailable
   if (ENABLE_MOCK_MODE) {
     console.info('Using mock image generation')
+    // Truncate prompt BEFORE escaping to prevent incomplete escape sequences
+    const displayPrompt = prompt.length > 50 ? prompt.substring(0, 50) + '...' : prompt
     // Escape prompt to prevent XSS in SVG
-    const escapedPrompt = prompt
+    const escapedPrompt = displayPrompt
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;')
-      .substring(0, 50)
-    const displayPrompt = prompt.length > 50 ? escapedPrompt + '...' : escapedPrompt
+    
+    const width = options?.width || 512
+    const height = options?.height || 512
     
     // Create a simple SVG placeholder image with the prompt text
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-      <rect width="512" height="512" fill="#f0f0f0"/>
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+      <rect width="${width}" height="${height}" fill="#f0f0f0"/>
       <text x="50%" y="45%" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#666">
         Mock Image
       </text>
       <text x="50%" y="55%" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#999">
-        Prompt: ${displayPrompt}
+        Prompt: ${escapedPrompt}
       </text>
     </svg>`
     const blob = new Blob([svg], { type: 'image/svg+xml' })
@@ -310,18 +320,53 @@ export async function generateImage(
   }
 
   const encodedPrompt = encodeURIComponent(prompt)
-  const url = `${BASE_URL}/image/${encodedPrompt}?model=${model}`
   
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${API_KEY}`,
-    },
-  })
+  // Build query parameters
+  const queryParams = new URLSearchParams()
+  queryParams.set('model', model)
+  if (options?.width) queryParams.set('width', String(options.width))
+  if (options?.height) queryParams.set('height', String(options.height))
+  if (options?.nologo !== undefined) queryParams.set('nologo', String(options.nologo))
+  
+  const url = `${BASE_URL}/image/${encodedPrompt}?${queryParams.toString()}`
+  
+  let response: Response
+  try {
+    response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+      },
+    })
+  } catch (error) {
+    console.error('Network error during image generation:', error)
+    throw new Error('Network error: Unable to connect to the image generation service. Please check your internet connection.')
+  }
 
   if (!response.ok) {
-    throw new Error('Failed to generate image')
+    const statusCode = response.status
+    let errorMessage = 'Failed to generate image'
+    
+    if (statusCode === 400) {
+      errorMessage = 'Invalid image request. Please try a different prompt.'
+    } else if (statusCode === 401) {
+      errorMessage = 'Authentication failed. Please check your API credentials.'
+    } else if (statusCode === 429) {
+      errorMessage = 'Rate limit exceeded. Please wait a moment before trying again.'
+    } else if (statusCode >= 500) {
+      errorMessage = 'The image generation service is temporarily unavailable. Please try again later.'
+    }
+    
+    console.error(`Image generation failed with status ${statusCode}`)
+    throw new Error(errorMessage)
   }
 
   const blob = await response.blob()
+  
+  // Verify we got an image response
+  if (!blob.type.startsWith('image/')) {
+    console.error('Unexpected response type:', blob.type)
+    throw new Error('Received invalid response from image generation service.')
+  }
+  
   return URL.createObjectURL(blob)
 }
