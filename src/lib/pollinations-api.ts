@@ -3,8 +3,8 @@ import { webLLMService } from './webllm-service'
 const API_KEY = 'plln_sk_niDbx9acZfiWE3tdVmrXKyk0wh5GnGdM'
 const BASE_URL = 'https://enter.pollinations.ai/api/generate'
 
-// Development/Mock mode - enables fallback responses when API is unavailable
-const ENABLE_MOCK_MODE = import.meta.env.DEV || import.meta.env.VITE_ENABLE_MOCK_API === 'true'
+// Mock mode disabled - always use production API
+const ENABLE_MOCK_MODE = false
 
 // Offline mode state (controlled by App component)
 let offlineModeEnabled = false
@@ -87,12 +87,6 @@ const FALLBACK_TEXT_MODELS: TextModel[] = [
 ]
 
 export async function getTextModels(): Promise<TextModel[]> {
-  // In mock mode or if API is blocked, return fallback models immediately
-  if (ENABLE_MOCK_MODE) {
-    console.info('Using mock/fallback text models')
-    return FALLBACK_TEXT_MODELS
-  }
-
   try {
     const response = await fetch(`${BASE_URL}/v1/models`, {
       headers: {
@@ -140,12 +134,6 @@ const FALLBACK_IMAGE_MODELS: ImageModel[] = [
 ]
 
 export async function getImageModels(): Promise<ImageModel[]> {
-  // In mock mode or if API is blocked, return fallback models immediately
-  if (ENABLE_MOCK_MODE) {
-    console.info('Using mock/fallback image models')
-    return FALLBACK_IMAGE_MODELS
-  }
-
   try {
     const response = await fetch(`${BASE_URL}/image/models`, {
       headers: {
@@ -192,28 +180,6 @@ export async function generateText(
       console.error('Offline mode error:', error)
       throw new Error('Offline generation failed. Please check if the model is loaded correctly.')
     }
-  }
-
-  // Mock mode: Simulate AI response when API is unavailable
-  if (ENABLE_MOCK_MODE) {
-    console.info('Using mock text generation')
-    const lastUserMessage = messages.filter(m => m.role === 'user').pop()
-    const userContent = lastUserMessage?.content || ''
-    
-    // Generate a contextual mock response
-    const mockResponse = `I understand you said: "${userContent}". I'm running in mock mode because the external API is unavailable. In production, I would provide a detailed response to your question. This allows you to test the interface and see how messages are displayed even when the AI service is not accessible.`
-    
-    // Simulate streaming if callback is provided
-    if (onChunk) {
-      const words = mockResponse.split(' ')
-      for (const word of words) {
-        await new Promise(resolve => setTimeout(resolve, 50)) // 50ms delay per word
-        onChunk(word + ' ')
-      }
-      return mockResponse
-    }
-    
-    return mockResponse
   }
 
   const requestBody: any = {
@@ -289,36 +255,6 @@ export async function generateImage(
   model: string = 'flux',
   options?: GenerateImageOptions
 ): Promise<string> {
-  // Mock mode: Return a placeholder image when API is unavailable
-  if (ENABLE_MOCK_MODE) {
-    console.info('Using mock image generation')
-    // Truncate prompt BEFORE escaping to prevent incomplete escape sequences
-    const displayPrompt = prompt.length > 50 ? prompt.substring(0, 50) + '...' : prompt
-    // Escape prompt to prevent XSS in SVG
-    const escapedPrompt = displayPrompt
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;')
-    
-    const width = options?.width || 512
-    const height = options?.height || 512
-    
-    // Create a simple SVG placeholder image with the prompt text
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-      <rect width="${width}" height="${height}" fill="#f0f0f0"/>
-      <text x="50%" y="45%" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#666">
-        Mock Image
-      </text>
-      <text x="50%" y="55%" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#999">
-        Prompt: ${escapedPrompt}
-      </text>
-    </svg>`
-    const blob = new Blob([svg], { type: 'image/svg+xml' })
-    return URL.createObjectURL(blob)
-  }
-
   const encodedPrompt = encodeURIComponent(prompt)
   
   // Build query parameters
