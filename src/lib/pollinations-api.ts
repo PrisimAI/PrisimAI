@@ -80,12 +80,29 @@ export interface GenerateImageOptions {
   nologo?: boolean
 }
 
+const RESTRICTED_TEXT_MODELS = [
+  'midijourney',
+  'claude',
+  'openai-reasoning',
+  'deepseek',
+  'perplexity-reasoning',
+  'claude-large',
+  'gemini-large',
+  'openai-audio',
+  'seedream',
+  'nanobanana-pro'
+]
+
 const FALLBACK_TEXT_MODELS: TextModel[] = [
   { id: 'openai', description: 'OpenAI GPT-4', tools: true },
   { id: 'mistral', description: 'Mistral Large', tools: true },
   { id: 'claude', description: 'Anthropic Claude', tools: true },
   { id: 'llama', description: 'Meta Llama 3', tools: false },
 ]
+
+export function filterRestrictedTextModels(models: TextModel[]): TextModel[] {
+  return models.filter(model => !RESTRICTED_TEXT_MODELS.includes(model.id))
+}
 
 export async function getTextModels(): Promise<TextModel[]> {
   try {
@@ -126,6 +143,8 @@ export async function getTextModels(): Promise<TextModel[]> {
   }
 }
 
+const RESTRICTED_IMAGE_MODELS: string[] = []
+
 const FALLBACK_IMAGE_MODELS: ImageModel[] = [
   { name: 'flux', description: 'Flux' },
   { name: 'flux-realism', description: 'Flux Realism' },
@@ -133,6 +152,10 @@ const FALLBACK_IMAGE_MODELS: ImageModel[] = [
   { name: 'flux-3d', description: 'Flux 3D' },
   { name: 'turbo', description: 'Turbo' },
 ]
+
+export function filterRestrictedImageModels(models: ImageModel[]): ImageModel[] {
+  return models.filter(model => !RESTRICTED_IMAGE_MODELS.includes(model.name))
+}
 
 export async function getImageModels(): Promise<ImageModel[]> {
   try {
