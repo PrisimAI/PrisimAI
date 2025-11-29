@@ -9,13 +9,15 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { Sparkle, CloudSlash } from '@phosphor-icons/react'
-import { 
-  getTextModels, 
-  getImageModels, 
-  type TextModel, 
+import {
+  getTextModels,
+  getImageModels,
+  type TextModel,
   type ImageModel,
   isOfflineMode,
   onOfflineModeChange,
+  filterRestrictedTextModels,
+  filterRestrictedImageModels,
 } from '@/lib/pollinations-api'
 import type { AppMode } from '@/lib/types'
 
@@ -47,10 +49,12 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
       try {
         if (mode === 'chat') {
           const models = await getTextModels()
-          setTextModels(Array.isArray(models) ? models : [])
+          const filteredModels = filterRestrictedTextModels(Array.isArray(models) ? models : [])
+          setTextModels(filteredModels)
         } else {
           const models = await getImageModels()
-          setImageModels(Array.isArray(models) ? models : [])
+          const filteredModels = filterRestrictedImageModels(Array.isArray(models) ? models : [])
+          setImageModels(filteredModels)
         }
       } catch (error) {
         console.error('Failed to load models:', error)
