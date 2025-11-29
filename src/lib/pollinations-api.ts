@@ -90,7 +90,9 @@ const RESTRICTED_TEXT_MODELS = [
   'gemini-large',
   'openai-audio',
   'seedream',
-  'nanobanana-pro'
+  'nanobanana-pro',
+  'claude-fast',
+  'kimi-k2-thinking'
 ]
 
 const FALLBACK_TEXT_MODELS: TextModel[] = [
@@ -143,7 +145,9 @@ export async function getTextModels(): Promise<TextModel[]> {
   }
 }
 
-const RESTRICTED_IMAGE_MODELS: string[] = []
+const RESTRICTED_IMAGE_MODELS: string[] = [
+  'gptimage'
+]
 
 const FALLBACK_IMAGE_MODELS: ImageModel[] = [
   { name: 'flux', description: 'Flux' },
@@ -195,6 +199,11 @@ export async function generateText(
   onChunk?: (chunk: string) => void,
   options?: GenerateTextOptions
 ): Promise<string> {
+  // Check if model is restricted
+  if (RESTRICTED_TEXT_MODELS.includes(model)) {
+    throw new Error('This model is temporarily not available.')
+  }
+
   // Offline mode: Use WebLLM if enabled
   if (offlineModeEnabled && webLLMService.isModelLoaded()) {
     console.info('Using offline mode with WebLLM')
@@ -286,6 +295,11 @@ export async function generateImage(
   model: string = 'flux',
   options?: GenerateImageOptions
 ): Promise<string> {
+  // Check if model is restricted
+  if (RESTRICTED_IMAGE_MODELS.includes(model)) {
+    throw new Error('This model is temporarily not available.')
+  }
+
   const encodedPrompt = encodeURIComponent(prompt)
   
   // Build query parameters
