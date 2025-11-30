@@ -95,8 +95,6 @@ const RESTRICTED_TEXT_MODELS = [
   'claude-large',
   'gemini-large',
   'openai-audio',
-  'seedream',
-  'nanobanana-pro',
   'claude-fast',
   'kimi-k2-thinking'
 ]
@@ -152,7 +150,9 @@ export async function getTextModels(): Promise<TextModel[]> {
 }
 
 const RESTRICTED_IMAGE_MODELS: string[] = [
-  'gptimage'
+  'gptimage',
+  'seedream',
+  'nanobanana-pro'
 ]
 
 const FALLBACK_IMAGE_MODELS: ImageModel[] = [
