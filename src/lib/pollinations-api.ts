@@ -95,7 +95,6 @@ const RESTRICTED_TEXT_MODELS = [
   'claude-large',
   'gemini-large',
   'openai-audio',
-  'claude-fast',
   'kimi-k2-thinking'
 ]
 
