@@ -1,6 +1,12 @@
 import { webLLMService } from './webllm-service'
+import type { Conversation } from './types'
 
-const API_KEY = 'plln_sk_niDbx9acZfiWE3tdVmrXKyk0wh5GnGdM'
+// API Keys - 4 different keys for different usage tiers
+const API_KEY_1 = 'plln_sk_niDbx9acZfiWE3tdVmrXKyk0wh5GnGdM' // Primary key for heavy users
+const API_KEY_2 = 'plln_sk_gQKCYN1GNHUb0b5OGbasEx2dXqyXO364'
+const API_KEY_3 = 'plln_sk_fnpi8FteeCwCDgmXF2A1vciVI73sFxA7'
+const API_KEY_4 = 'plln_sk_wfjz4KCVFGQn4izP4AuYEZajHUkS51Hh'
+
 const BASE_URL = 'https://enter.pollinations.ai/api/generate'
 const IMAGE_BASE_URL = 'https://enter.pollinations.ai/api/generate/image'
 
@@ -110,7 +116,7 @@ export async function getTextModels(): Promise<TextModel[]> {
   try {
     const response = await fetch(`${BASE_URL}/v1/models`, {
       headers: {
-        Authorization: `Bearer ${API_KEY}`,
+        Authorization: `Bearer ${getApiKey()}`,
       },
     })
     
@@ -165,7 +171,7 @@ export async function getImageModels(): Promise<ImageModel[]> {
   try {
     const response = await fetch(`${IMAGE_BASE_URL}/models`, {
       headers: {
-        Authorization: `Bearer ${API_KEY}`,
+        Authorization: `Bearer ${getApiKey()}`,
       },
     })
     
@@ -239,7 +245,7 @@ export async function generateText(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${API_KEY}`,
+      Authorization: `Bearer ${getApiKey()}`,
     },
     body: JSON.stringify(requestBody),
   })
@@ -315,7 +321,7 @@ export async function generateImage(
   try {
     response = await fetch(url, {
       headers: {
-        Authorization: `Bearer ${API_KEY}`,
+        Authorization: `Bearer ${getApiKey()}`,
       },
     })
   } catch (error) {
@@ -357,4 +363,51 @@ export async function generateImage(
   }
   
   return URL.createObjectURL(blob)
+}
+
+// Function to determine which API key to use based on user activity
+export function getApiKey(): string {
+  // Get user activity metrics from localStorage
+  const conversationsJson = localStorage.getItem('conversations');
+  let conversations: Conversation[] = [];
+  
+  if (conversationsJson) {
+    try {
+      conversations = JSON.parse(conversationsJson);
+    } catch (e) {
+      console.warn('Failed to parse conversations from localStorage', e);
+    }
+  }
+  
+  // Count total chats and messages
+  let totalChats = 0;
+  let totalMessages = 0;
+  
+  // Count conversations that are not image mode (since image generations don't count as chats)
+  for (const conversation of conversations) {
+    if (conversation.mode !== 'image') {
+      totalChats++;
+      totalMessages += conversation.messages.length;
+    }
+  }
+  
+  // Determine API key tier based on usage:
+  // Tier 1 (heavy users): More than 10 chats or 50 messages
+  // Tier 2 (medium users): More than 5 chats or 20 messages
+  // Tier 3 (light users): More than 1 chat or 5 messages
+  // Tier 4 (new users): Default to lowest tier
+  
+  if (totalChats > 10 || totalMessages > 50) {
+    // Heavy user - use primary API key
+    return API_KEY_1;
+  } else if (totalChats > 5 || totalMessages > 20) {
+    // Medium user - use second API key
+    return API_KEY_2;
+  } else if (totalChats > 1 || totalMessages > 5) {
+    // Light user - use third API key
+    return API_KEY_3;
+  } else {
+    // New user or very light user - use fourth API key
+    return API_KEY_4;
+  }
 }
