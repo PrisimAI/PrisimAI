@@ -150,7 +150,6 @@ export async function getTextModels(): Promise<TextModel[]> {
 }
 
 const RESTRICTED_IMAGE_MODELS: string[] = [
-  'gptimage',
   'seedream',
   'nanobanana-pro'
 ]
