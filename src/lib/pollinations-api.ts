@@ -126,7 +126,8 @@ export const PREMIUM_ACCESS_EMAILS: string[] = [
   'man79577957@gmail.com',
   'wizium123@gmail.com',
   'vaibhavsharma42011@gmail.com',
-  'emily.jensen2029@gmail.com'
+  'emily.jensen2029@gmail.com',
+  '9001202@rochesterschools.org'
 ]
 
 // Check if a user email has premium access
