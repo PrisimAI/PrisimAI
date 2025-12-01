@@ -109,6 +109,7 @@ export interface GenerateImageOptions {
   height?: number
   nologo?: boolean
   userEmail?: string | null
+  image?: string // Base64 data URL for image-to-image generation
 }
 
 export interface GenerateVideoOptions {
@@ -369,6 +370,7 @@ export async function generateImage(
   if (options?.width) queryParams.set('width', String(options.width))
   if (options?.height) queryParams.set('height', String(options.height))
   if (options?.nologo !== undefined) queryParams.set('nologo', String(options.nologo))
+  if (options?.image) queryParams.set('image', options.image)
   
   const url = `${IMAGE_BASE_URL}/${encodedPrompt}?${queryParams.toString()}`
   
