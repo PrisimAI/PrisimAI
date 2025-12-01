@@ -23,7 +23,7 @@ import { OfflineModeDialog } from './components/OfflineModeDialog'
 import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { PremiumAccessDialog } from './components/PremiumAccessDialog'
 import { LiquidMetalBackground } from './components/LiquidMetalBackground'
-import { generateText, generateImage, type Message, type MessageContent, setOfflineMode, hasPremiumAccess } from './lib/pollinations-api'
+import { generateText, generateImage, type Message, type MessageContent, type TextContent, type ImageUrlContent, setOfflineMode, hasPremiumAccess } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
 import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS, ROLEPLAY_ENFORCEMENT_RULES } from './lib/personas-config'
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode, OfflineSettings, FileAttachment } from './lib/types'
@@ -235,7 +235,7 @@ function App() {
         // Helper function to build message content with attachments
         const buildMessageContent = (text: string, attachments?: FileAttachment[]): MessageContent => {
           // If no attachments with images, return simple text content
-          const hasImages = attachments?.some(f => f.type.startsWith('image/') && f.content)
+          const hasImages = attachments?.some(f => f.type.startsWith('image/') && f.content) ?? false
           
           if (!attachments || attachments.length === 0 || !hasImages) {
             // Include text file content in the message
@@ -255,7 +255,7 @@ function App() {
           }
           
           // Build multi-modal content array
-          const contentParts: (import('./lib/pollinations-api').TextContent | import('./lib/pollinations-api').ImageUrlContent)[] = []
+          const contentParts: (TextContent | ImageUrlContent)[] = []
           
           // Add text content (including text file content)
           let textContent = text

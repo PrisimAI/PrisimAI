@@ -1,5 +1,5 @@
 import * as webllm from "@mlc-ai/web-llm";
-import type { Message, MessageContent } from './pollinations-api';
+import type { Message, MessageContent, TextContent } from './pollinations-api';
 
 // Helper function to extract text content from MessageContent
 function extractTextContent(content: MessageContent): string {
@@ -8,7 +8,7 @@ function extractTextContent(content: MessageContent): string {
   }
   // For array content, extract only text parts (WebLLM doesn't support images)
   return content
-    .filter((part): part is { type: 'text'; text: string } => part.type === 'text')
+    .filter((part): part is TextContent => part.type === 'text')
     .map(part => part.text)
     .join('\n');
 }
