@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, ChatCircle, Image, Trash, Sparkle, PushPin, TrashSimple, UsersThree, MaskHappy } from '@phosphor-icons/react'
+import { Plus, ChatCircle, Image, Trash, Sparkle, PushPin, TrashSimple, UsersThree, MaskHappy, VideoCamera } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
@@ -52,9 +52,10 @@ export function Sidebar({
 
   const chatConversations = conversations.filter((c) => c.mode === 'chat')
   const imageConversations = conversations.filter((c) => c.mode === 'image')
+  const videoConversations = conversations.filter((c) => c.mode === 'video')
   const roleplayConversations = conversations.filter((c) => c.mode === 'roleplay')
   
-  const currentModeConversations = mode === 'chat' ? chatConversations : mode === 'image' ? imageConversations : roleplayConversations
+  const currentModeConversations = mode === 'chat' ? chatConversations : mode === 'image' ? imageConversations : mode === 'video' ? videoConversations : roleplayConversations
   
   // Filter conversations based on search query
   const filteredConversations = currentModeConversations.filter((c) => {
@@ -138,6 +139,15 @@ export function Sidebar({
           <Image size={16} />
           Image
         </Button>
+        <Button
+          onClick={() => onModeChange('video')}
+          variant={mode === 'video' ? 'secondary' : 'ghost'}
+          className="flex-1 gap-2"
+          size="sm"
+        >
+          <VideoCamera size={16} />
+          Video
+        </Button>
       </div>
 
       <Separator />
@@ -150,7 +160,7 @@ export function Sidebar({
         <div className="space-y-1 p-3">
           {currentModeConversations.length === 0 && (
             <p className="px-3 py-2 text-sm text-muted-foreground">
-              {mode === 'chat' ? 'No conversations yet' : mode === 'image' ? 'No image generations yet' : 'No group chats yet'}
+              {mode === 'chat' ? 'No conversations yet' : mode === 'image' ? 'No image generations yet' : mode === 'video' ? 'No video generations yet' : 'No group chats yet'}
             </p>
           )}
           

@@ -12,8 +12,10 @@ import { Sparkle, CloudSlash, Crown } from '@phosphor-icons/react'
 import {
   getTextModels,
   getImageModels,
+  getVideoModels,
   type TextModel,
   type ImageModel,
+  type VideoModel,
   isOfflineMode,
   onOfflineModeChange,
   filterRestrictedTextModels,
@@ -33,6 +35,7 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
   const { user } = useAuth()
   const [textModels, setTextModels] = useState<TextModel[]>([])
   const [imageModels, setImageModels] = useState<ImageModel[]>([])
+  const [videoModels, setVideoModels] = useState<VideoModel[]>([])
   const [loading, setLoading] = useState(true)
   const [offlineMode, setOfflineMode] = useState(isOfflineMode())
 
@@ -57,15 +60,19 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
           const models = await getTextModels()
           const filteredModels = filterRestrictedTextModels(Array.isArray(models) ? models : [], userEmail)
           setTextModels(filteredModels)
-        } else {
+        } else if (mode === 'image') {
           const models = await getImageModels()
           const filteredModels = filterRestrictedImageModels(Array.isArray(models) ? models : [], userEmail)
           setImageModels(filteredModels)
+        } else if (mode === 'video') {
+          const models = await getVideoModels()
+          setVideoModels(Array.isArray(models) ? models : [])
         }
       } catch (error) {
         console.error('Failed to load models:', error)
         if (mode === 'chat') setTextModels([])
-        else setImageModels([])
+        else if (mode === 'image') setImageModels([])
+        else if (mode === 'video') setVideoModels([])
       } finally {
         setLoading(false)
       }
@@ -75,7 +82,7 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
   }, [mode, userEmail])
 
   // Pick correct model list
-  const models = mode === 'chat' ? textModels : imageModels
+  const models = mode === 'chat' ? textModels : mode === 'image' ? imageModels : videoModels
   const displayModels = Array.isArray(models) ? models : []
 
   const currentModel = displayModels.find(
