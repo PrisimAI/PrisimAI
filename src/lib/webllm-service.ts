@@ -1,5 +1,17 @@
 import * as webllm from "@mlc-ai/web-llm";
-import type { Message } from './pollinations-api';
+import type { Message, MessageContent } from './pollinations-api';
+
+// Helper function to extract text content from MessageContent
+function extractTextContent(content: MessageContent): string {
+  if (typeof content === 'string') {
+    return content;
+  }
+  // For array content, extract only text parts (WebLLM doesn't support images)
+  return content
+    .filter((part): part is { type: 'text'; text: string } => part.type === 'text')
+    .map(part => part.text)
+    .join('\n');
+}
 
 // Available models for offline use
 export const OFFLINE_MODELS = [
@@ -180,7 +192,7 @@ class WebLLMService {
 
     const webllmMessages: WebLLMMessage[] = messages.map(msg => ({
       role: msg.role === 'system' ? 'system' : msg.role === 'user' ? 'user' : 'assistant',
-      content: msg.content,
+      content: extractTextContent(msg.content),
     }));
 
     if (onChunk) {

@@ -23,7 +23,7 @@ import { OfflineModeDialog } from './components/OfflineModeDialog'
 import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { PremiumAccessDialog } from './components/PremiumAccessDialog'
 import { LiquidMetalBackground } from './components/LiquidMetalBackground'
-import { generateText, generateImage, type Message, setOfflineMode, hasPremiumAccess } from './lib/pollinations-api'
+import { generateText, generateImage, type Message, type MessageContent, setOfflineMode, hasPremiumAccess } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
 import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS, ROLEPLAY_ENFORCEMENT_RULES } from './lib/personas-config'
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode, OfflineSettings, FileAttachment } from './lib/types'
@@ -232,6 +232,64 @@ function App() {
       setIsGenerating(true)
 
       try {
+        // Helper function to build message content with attachments
+        const buildMessageContent = (text: string, attachments?: FileAttachment[]): MessageContent => {
+          // If no attachments with images, return simple text content
+          const hasImages = attachments?.some(f => f.type.startsWith('image/') && f.content)
+          
+          if (!attachments || attachments.length === 0 || !hasImages) {
+            // Include text file content in the message
+            if (attachments && attachments.length > 0) {
+              const textFileContexts = attachments.map(file => {
+                if (file.content && (file.type.startsWith('text/') || file.type === 'application/json')) {
+                  return `\n\n[File: ${file.name}]\n${file.content}`
+                } else if (file.type.startsWith('image/')) {
+                  return `\n\n[Attached image: ${file.name}]`
+                } else {
+                  return `\n\n[Attached file: ${file.name}]`
+                }
+              }).join('')
+              return text + textFileContexts
+            }
+            return text
+          }
+          
+          // Build multi-modal content array
+          const contentParts: (import('./lib/pollinations-api').TextContent | import('./lib/pollinations-api').ImageUrlContent)[] = []
+          
+          // Add text content (including text file content)
+          let textContent = text
+          for (const file of attachments) {
+            if (file.content && (file.type.startsWith('text/') || file.type === 'application/json')) {
+              textContent += `\n\n[File: ${file.name}]\n${file.content}`
+            } else if (!file.type.startsWith('image/')) {
+              textContent += `\n\n[Attached file: ${file.name}]`
+            }
+          }
+          
+          if (textContent) {
+            contentParts.push({
+              type: 'text',
+              text: textContent,
+            })
+          }
+          
+          // Add image content
+          for (const file of attachments) {
+            if (file.type.startsWith('image/') && file.content) {
+              contentParts.push({
+                type: 'image_url',
+                image_url: {
+                  url: file.content, // This is the base64 data URL
+                  detail: 'auto',
+                },
+              })
+            }
+          }
+          
+          return contentParts
+        }
+        
         // Build message history from the conversation messages before we added the new ones
         const messages: Message[] = []
         
@@ -257,50 +315,14 @@ function App() {
         
         messages.push(
           ...conversationMessages.map((m) => {
-            let messageContent = m.content
-            
-            // Include file content for messages with attachments
-            if (m.attachments && m.attachments.length > 0) {
-              const fileContexts = m.attachments.map(file => {
-                if (file.content && (file.type.startsWith('text/') || file.type === 'application/json')) {
-                  return `\n\n[File: ${file.name}]\n${file.content}`
-                } else if (file.type.startsWith('image/')) {
-                  return `\n\n[Attached image: ${file.name}]`
-                } else {
-                  return `\n\n[Attached file: ${file.name}]`
-                }
-              }).join('')
-              
-              messageContent = messageContent + fileContexts
-            }
-            
             return {
               role: m.role as 'user' | 'assistant',
-              content: messageContent,
+              content: buildMessageContent(m.content, m.attachments),
             }
           }),
           { 
             role: 'user' as const, 
-            content: (() => {
-              let finalContent = content
-              
-              // Add file content to the current message
-              if (attachments && attachments.length > 0) {
-                const fileContexts = attachments.map(file => {
-                  if (file.content && (file.type.startsWith('text/') || file.type === 'application/json')) {
-                    return `\n\n[File: ${file.name}]\n${file.content}`
-                  } else if (file.type.startsWith('image/')) {
-                    return `\n\n[Attached image: ${file.name}]`
-                  } else {
-                    return `\n\n[Attached file: ${file.name}]`
-                  }
-                }).join('')
-                
-                finalContent = finalContent + fileContexts
-              }
-              
-              return finalContent
-            })()
+            content: buildMessageContent(content, attachments),
           }
         )
 
