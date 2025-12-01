@@ -106,6 +106,11 @@ export const PREMIUM_ACCESS_EMAILS: string[] = [
   'example@example.com',
   'christopherhauser1234@gmail.com',
   'dev@example.com', // Development mock user
+  'vdireck@gmail.com',
+  'man79577957@gmail.com',
+  'wizium123@gmail.com',
+  'vaibhavsharma42011@gmail.com',
+  'emily.jensen2029@gmail.com'
 ]
 
 // Check if a user email has premium access
