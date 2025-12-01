@@ -37,7 +37,15 @@ export interface GeneratedImage {
   model: string
 }
 
-export type AppMode = 'chat' | 'image' | 'roleplay'
+export interface GeneratedVideo {
+  id: string
+  prompt: string
+  url: string
+  timestamp: number
+  model: string
+}
+
+export type AppMode = 'chat' | 'image' | 'video' | 'roleplay'
 
 export interface OfflineSettings {
   enabled: boolean

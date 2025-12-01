@@ -9,6 +9,7 @@ const API_KEY_4 = 'plln_sk_wfjz4KCVFGQn4izP4AuYEZajHUkS51Hh'
 
 const BASE_URL = 'https://enter.pollinations.ai/api/generate'
 const IMAGE_BASE_URL = 'https://enter.pollinations.ai/api/generate/image'
+const VIDEO_BASE_URL = 'https://enter.pollinations.ai/api/generate/image' // Video uses same endpoint with video model
 
 // Mock mode disabled - always use production API
 const ENABLE_MOCK_MODE = false
@@ -97,12 +98,22 @@ export interface ImageModel {
   aliases?: string[]
 }
 
+export interface VideoModel {
+  name: string
+  description?: string
+  aliases?: string[]
+}
+
 export interface GenerateImageOptions {
   width?: number
   height?: number
   nologo?: boolean
   userEmail?: string | null
   image?: string // Base64 data URL for image-to-image generation
+}
+
+export interface GenerateVideoOptions {
+  userEmail?: string | null
 }
 
 const RESTRICTED_TEXT_MODELS = [
@@ -406,6 +417,113 @@ export async function generateImage(
       // Ignore
     }
     throw new Error('Received invalid response from image generation service. The service might be overloaded or the prompt might be invalid.')
+  }
+  
+  return URL.createObjectURL(blob)
+}
+
+// Video models - retrieved from image models endpoint (filter by video output modality)
+const FALLBACK_VIDEO_MODELS: VideoModel[] = [
+  { name: 'veo', description: 'Veo 3.1 Fast - Google\'s video generation model' },
+  { name: 'seedance', description: 'Seedance - BytePlus video generation' },
+]
+
+export async function getVideoModels(): Promise<VideoModel[]> {
+  try {
+    // Video models are part of the image models endpoint but with video output modality
+    const response = await fetch(`${IMAGE_BASE_URL}/models`, {
+      headers: {
+        Authorization: `Bearer ${API_KEY_1}`,
+      },
+    })
+    
+    if (!response.ok) {
+      console.warn('API call failed, using fallback video models')
+      return FALLBACK_VIDEO_MODELS
+    }
+    
+    const data = await response.json()
+    let models = Array.isArray(data) ? data : data.data || []
+    
+    // Filter models that have video output modality
+    models = models.filter((m: any) => 
+      m && m.name && m.output_modalities?.includes('video')
+    ).map((m: any) => ({
+      name: m.name,
+      description: m.description,
+      aliases: m.aliases,
+    }))
+    
+    // If no valid video models, use fallback
+    if (models.length === 0) {
+      console.warn('No valid video models returned, using fallback models')
+      return FALLBACK_VIDEO_MODELS
+    }
+    
+    return models
+  } catch (error) {
+    console.error('Error fetching video models:', error)
+    return FALLBACK_VIDEO_MODELS
+  }
+}
+
+export async function generateVideo(
+  prompt: string,
+  model: string = 'veo',
+  options?: GenerateVideoOptions
+): Promise<string> {
+  const encodedPrompt = encodeURIComponent(prompt)
+  
+  // Build query parameters
+  const queryParams = new URLSearchParams()
+  queryParams.set('model', model)
+  
+  const url = `${VIDEO_BASE_URL}/${encodedPrompt}?${queryParams.toString()}`
+  
+  let response: Response
+  try {
+    // Always use API_KEY_1 for video generation as per requirement
+    response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${API_KEY_1}`,
+      },
+    })
+  } catch (error) {
+    console.error('Network error during video generation:', error)
+    throw new Error('Network error: Unable to connect to the video generation service. Please check your internet connection.')
+  }
+
+  if (!response.ok) {
+    const statusCode = response.status
+    let errorMessage = 'Failed to generate video'
+    
+    if (statusCode === 400) {
+      errorMessage = 'Invalid video request. Please try a different prompt.'
+    } else if (statusCode === 401) {
+      errorMessage = 'Authentication failed. Please check your API credentials.'
+    } else if (statusCode === 429) {
+      errorMessage = 'Rate limit exceeded. Please wait a moment before trying again.'
+    } else if (statusCode >= 500) {
+      errorMessage = 'The video generation service is temporarily unavailable. Please try again later.'
+    }
+    
+    console.error(`Video generation failed with status ${statusCode}`)
+    throw new Error(errorMessage)
+  }
+
+  const blob = await response.blob()
+  
+  // Verify we got a video response
+  if (!blob.type.startsWith('video/')) {
+    console.error('Unexpected response type:', blob.type)
+    // Try to read text content for error details
+    try {
+      const text = await blob.text()
+      console.error('Response content:', text)
+    } catch (e) {
+      // Ignore
+    }
+    throw new Error('Received invalid response from video generation service. The service might be overloaded or the prompt might be invalid.')
   }
   
   return URL.createObjectURL(blob)
