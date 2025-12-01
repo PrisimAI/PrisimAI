@@ -10,10 +10,10 @@ A comprehensive list of bugs, security vulnerabilities, and code issues found in
 - **File**: `src/lib/pollinations-api.ts` (lines 5-8)
 - **Description**: Four API keys are hardcoded directly in the source code:
   ```typescript
-  const API_KEY_1 = 'plln_sk_niDbx9acZfiWE3tdVmrXKyk0wh5GnGdM'
-  const API_KEY_2 = 'plln_sk_gQKCYN1GNHUb0b5OGbasEx2dXqyXO364'
-  const API_KEY_3 = 'plln_sk_fnpi8FteeCwCDgmXF2A1vciVI73sFxA7'
-  const API_KEY_4 = 'plln_sk_wfjz4KCVFGQn4izP4AuYEZajHUkS51Hh'
+  const API_KEY_1 = 'plln_sk_REDACTED...'
+  const API_KEY_2 = 'plln_sk_REDACTED...'
+  const API_KEY_3 = 'plln_sk_REDACTED...'
+  const API_KEY_4 = 'plln_sk_REDACTED...'
   ```
 - **Impact**: Anyone who views the source code can access these API keys, potentially leading to abuse, unauthorized usage, and billing issues.
 - **Recommendation**: Use environment variables and a backend proxy to handle API requests securely.
@@ -23,8 +23,8 @@ A comprehensive list of bugs, security vulnerabilities, and code issues found in
 - **Description**: Firebase configuration including API key and project details are hardcoded:
   ```typescript
   const firebaseConfig = {
-    apiKey: "AIzaSyCU5oNtSXp8VZYn_ow1cChrWPgXg9ccfyA",
-    authDomain: "prisimai-9a06c.firebaseapp.com",
+    apiKey: "REDACTED...",
+    authDomain: "prisimai-XXXXX.firebaseapp.com",
     ...
   }
   ```
@@ -36,8 +36,8 @@ A comprehensive list of bugs, security vulnerabilities, and code issues found in
 - **Description**: Premium user emails are hardcoded in the source code:
   ```typescript
   export const PREMIUM_ACCESS_EMAILS: string[] = [
-    'example@example.com',
-    'christopherhauser1234@gmail.com',
+    'user1@example.com',
+    'user2@example.com',
     // ...more emails
   ]
   ```
