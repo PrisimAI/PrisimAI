@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
-import { Sparkle, CloudSlash } from '@phosphor-icons/react'
+import { Sparkle, CloudSlash, Crown } from '@phosphor-icons/react'
 import {
   getTextModels,
   getImageModels,
@@ -18,7 +18,9 @@ import {
   onOfflineModeChange,
   filterRestrictedTextModels,
   filterRestrictedImageModels,
+  hasPremiumAccess,
 } from '@/lib/pollinations-api'
+import { useAuth } from '@/contexts/AuthContext'
 import type { AppMode } from '@/lib/types'
 
 interface ModelSelectorProps {
@@ -28,10 +30,14 @@ interface ModelSelectorProps {
 }
 
 export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelectorProps) {
+  const { user } = useAuth()
   const [textModels, setTextModels] = useState<TextModel[]>([])
   const [imageModels, setImageModels] = useState<ImageModel[]>([])
   const [loading, setLoading] = useState(true)
   const [offlineMode, setOfflineMode] = useState(isOfflineMode())
+
+  const userEmail = user?.email
+  const isPremium = hasPremiumAccess(userEmail)
 
   // Subscribe to offline mode changes
   useEffect(() => {
@@ -49,11 +55,11 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
       try {
         if (mode === 'chat') {
           const models = await getTextModels()
-          const filteredModels = filterRestrictedTextModels(Array.isArray(models) ? models : [])
+          const filteredModels = filterRestrictedTextModels(Array.isArray(models) ? models : [], userEmail)
           setTextModels(filteredModels)
         } else {
           const models = await getImageModels()
-          const filteredModels = filterRestrictedImageModels(Array.isArray(models) ? models : [])
+          const filteredModels = filterRestrictedImageModels(Array.isArray(models) ? models : [], userEmail)
           setImageModels(filteredModels)
         }
       } catch (error) {
@@ -66,7 +72,7 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
     }
 
     loadModels()
-  }, [mode])
+  }, [mode, userEmail])
 
   // Pick correct model list
   const models = mode === 'chat' ? textModels : imageModels
@@ -90,6 +96,13 @@ export function ModelSelector({ mode, selectedModel, onModelChange }: ModelSelec
         <Sparkle size={18} className="text-primary" weight="fill" />
         <span className="text-sm font-medium">Model:</span>
       </div>
+
+      {isPremium && (
+        <Badge variant="default" className="gap-1 bg-gradient-to-r from-yellow-500 to-amber-500 text-white">
+          <Crown size={14} weight="fill" />
+          Premium
+        </Badge>
+      )}
 
       {offlineMode && (
         <Badge variant="secondary" className="gap-1">
