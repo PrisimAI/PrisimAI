@@ -36,9 +36,25 @@ export function onOfflineModeChange(callback: (enabled: boolean) => void): () =>
   return () => window.removeEventListener('offlineModeChange', handler)
 }
 
+// Content types for multi-modal messages
+export interface TextContent {
+  type: 'text'
+  text: string
+}
+
+export interface ImageUrlContent {
+  type: 'image_url'
+  image_url: {
+    url: string
+    detail?: 'auto' | 'low' | 'high'
+  }
+}
+
+export type MessageContent = string | (TextContent | ImageUrlContent)[]
+
 export interface Message {
   role: 'system' | 'user' | 'assistant'
-  content: string
+  content: MessageContent
   tool_calls?: ToolCall[]
 }
 
