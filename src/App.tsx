@@ -359,12 +359,16 @@ function App() {
     } else {
       setIsGenerating(true)
       try {
+        // Extract image attachment for image-to-image generation
+        const imageAttachment = attachments?.find(f => f.type.startsWith('image/') && f.content)
+        
         // Pass default image options for consistent quality
         const imageUrl = await generateImage(content, imageModel, {
           width: 1024,
           height: 1024,
           nologo: true,
           userEmail: user?.email,
+          image: imageAttachment?.content, // Pass reference image if provided
         })
         const generatedImage: GeneratedImage = {
           id: `img_${Date.now()}`,
@@ -392,7 +396,7 @@ function App() {
         setIsGenerating(false)
       }
     }
-  }, [currentConversationId, isGenerating, mode, textModel, imageModel, createNewConversation, setConversations, updateConversationTitle, addMessage, updateLastMessage, user?.email])
+  }, [currentConversationId, isGenerating, mode, textModel, imageModel, createNewConversation, setConversations, updateConversationTitle, addMessage, updateLastMessage, user?.email, personas])
 
   useEffect(() => {
     if (pendingMessage && currentConversationId) {
@@ -715,7 +719,7 @@ function App() {
               onCreateGroupChat={handleCreateGroupChatWithPersonas}
               onStartPersonaChat={handleStartPersonaChat}
             />
-          ) : showEmpty ? (
+          ) : showEmpty && !isGenerating ? (
             <EmptyState mode={mode} onExampleClick={handleExampleClick} />
           ) : mode === 'chat' ? (
             <ScrollArea ref={scrollAreaRef} className="h-full">
