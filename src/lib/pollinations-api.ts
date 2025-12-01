@@ -104,6 +104,7 @@ const RESTRICTED_TEXT_MODELS = [
 export const PREMIUM_ACCESS_EMAILS: string[] = [
   // Add emails here that should have access to all models
   'example@example.com',
+  'christopherhauser1234@gmail.com',
   'dev@example.com', // Development mock user
 ]
 
