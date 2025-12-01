@@ -65,6 +65,7 @@ export interface GenerateTextOptions {
   tool_choice?: 'auto' | 'none' | { type: 'function'; function: { name: string } }
   temperature?: number
   max_tokens?: number
+  userEmail?: string | null
 }
 
 export interface TextModel {
@@ -84,6 +85,7 @@ export interface GenerateImageOptions {
   width?: number
   height?: number
   nologo?: boolean
+  userEmail?: string | null
 }
 
 const RESTRICTED_TEXT_MODELS = [
@@ -98,6 +100,18 @@ const RESTRICTED_TEXT_MODELS = [
   'kimi-k2-thinking'
 ]
 
+// Hardcoded list of emails with premium access to all models
+export const PREMIUM_ACCESS_EMAILS: string[] = [
+  // Add emails here that should have access to all models
+  // Example: 'premium@example.com'
+]
+
+// Check if a user email has premium access
+export function hasPremiumAccess(email: string | null | undefined): boolean {
+  if (!email) return false
+  return PREMIUM_ACCESS_EMAILS.includes(email.toLowerCase())
+}
+
 const FALLBACK_TEXT_MODELS: TextModel[] = [
   { id: 'openai', description: 'OpenAI GPT-4', tools: true },
   { id: 'mistral', description: 'Mistral Large', tools: true },
@@ -105,7 +119,11 @@ const FALLBACK_TEXT_MODELS: TextModel[] = [
   { id: 'llama', description: 'Meta Llama 3', tools: false },
 ]
 
-export function filterRestrictedTextModels(models: TextModel[]): TextModel[] {
+export function filterRestrictedTextModels(models: TextModel[], userEmail?: string | null): TextModel[] {
+  // Premium users get access to all models
+  if (hasPremiumAccess(userEmail)) {
+    return models
+  }
   return models.filter(model => !RESTRICTED_TEXT_MODELS.includes(model.id))
 }
 
@@ -161,7 +179,11 @@ const FALLBACK_IMAGE_MODELS: ImageModel[] = [
   { name: 'turbo', description: 'Turbo' },
 ]
 
-export function filterRestrictedImageModels(models: ImageModel[]): ImageModel[] {
+export function filterRestrictedImageModels(models: ImageModel[], userEmail?: string | null): ImageModel[] {
+  // Premium users get access to all models
+  if (hasPremiumAccess(userEmail)) {
+    return models
+  }
   return models.filter(model => !RESTRICTED_IMAGE_MODELS.includes(model.name))
 }
 
@@ -203,8 +225,8 @@ export async function generateText(
   onChunk?: (chunk: string) => void,
   options?: GenerateTextOptions
 ): Promise<string> {
-  // Check if model is restricted
-  if (RESTRICTED_TEXT_MODELS.includes(model)) {
+  // Check if model is restricted (premium users bypass this check)
+  if (RESTRICTED_TEXT_MODELS.includes(model) && !hasPremiumAccess(options?.userEmail)) {
     throw new Error('This model is temporarily not available.')
   }
 
@@ -299,8 +321,8 @@ export async function generateImage(
   model: string = 'flux',
   options?: GenerateImageOptions
 ): Promise<string> {
-  // Check if model is restricted
-  if (RESTRICTED_IMAGE_MODELS.includes(model)) {
+  // Check if model is restricted (premium users bypass this check)
+  if (RESTRICTED_IMAGE_MODELS.includes(model) && !hasPremiumAccess(options?.userEmail)) {
     throw new Error('This model is temporarily not available.')
   }
 

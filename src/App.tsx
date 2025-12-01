@@ -21,8 +21,9 @@ import { FavoritesDialog } from './components/FavoritesDialog'
 import { KeyboardShortcutsDialog } from './components/KeyboardShortcutsDialog'
 import { OfflineModeDialog } from './components/OfflineModeDialog'
 import { PWAInstallPrompt } from './components/PWAInstallPrompt'
+import { PremiumAccessDialog } from './components/PremiumAccessDialog'
 import { LiquidMetalBackground } from './components/LiquidMetalBackground'
-import { generateText, generateImage, type Message, setOfflineMode } from './lib/pollinations-api'
+import { generateText, generateImage, type Message, setOfflineMode, hasPremiumAccess } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
 import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS, ROLEPLAY_ENFORCEMENT_RULES } from './lib/personas-config'
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode, OfflineSettings, FileAttachment } from './lib/types'
@@ -316,6 +317,7 @@ function App() {
         }, {
           tools: mode === 'roleplay' || currentConversation?.isGroupChat ? undefined : AI_TOOLS,
           tool_choice: mode === 'roleplay' || currentConversation?.isGroupChat ? undefined : 'auto',
+          userEmail: user?.email,
         })
 
         updateLastMessage(currentConversationId, assistantMessage.content, false)
@@ -340,6 +342,7 @@ function App() {
           width: 1024,
           height: 1024,
           nologo: true,
+          userEmail: user?.email,
         })
         const generatedImage: GeneratedImage = {
           id: `img_${Date.now()}`,
@@ -367,7 +370,7 @@ function App() {
         setIsGenerating(false)
       }
     }
-  }, [currentConversationId, isGenerating, mode, textModel, imageModel, createNewConversation, setConversations, updateConversationTitle, addMessage, updateLastMessage])
+  }, [currentConversationId, isGenerating, mode, textModel, imageModel, createNewConversation, setConversations, updateConversationTitle, addMessage, updateLastMessage, user?.email])
 
   useEffect(() => {
     if (pendingMessage && currentConversationId) {
@@ -784,6 +787,9 @@ function App() {
       />
 
       <PWAInstallPrompt />
+      {user?.email && hasPremiumAccess(user.email) && (
+        <PremiumAccessDialog userEmail={user.email} />
+      )}
       <Toaster position="top-center" />
     </div>
   )
