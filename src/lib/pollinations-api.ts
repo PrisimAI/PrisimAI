@@ -103,7 +103,8 @@ const RESTRICTED_TEXT_MODELS = [
 // Hardcoded list of emails with premium access to all models
 export const PREMIUM_ACCESS_EMAILS: string[] = [
   // Add emails here that should have access to all models
-  // Example: 'premium@example.com'
+  'example@example.com',
+  'dev@example.com', // Development mock user
 ]
 
 // Check if a user email has premium access

@@ -21,15 +21,24 @@ export function PremiumAccessDialog({ userEmail }: PremiumAccessDialogProps) {
 
   useEffect(() => {
     // Check if we've already shown the dialog for this user
-    const shownEmails = localStorage.getItem(PREMIUM_DIALOG_SHOWN_KEY)
-    const shownEmailsList = shownEmails ? JSON.parse(shownEmails) : []
-    
-    if (!shownEmailsList.includes(userEmail.toLowerCase())) {
-      // Show the dialog
+    try {
+      const shownEmails = localStorage.getItem(PREMIUM_DIALOG_SHOWN_KEY)
+      const shownEmailsList: string[] = shownEmails ? JSON.parse(shownEmails) : []
+      
+      // Use a simple hash of the email to avoid storing actual emails
+      const emailHash = btoa(userEmail.toLowerCase())
+      
+      if (!shownEmailsList.includes(emailHash)) {
+        // Show the dialog
+        setOpen(true)
+        // Mark as shown for this email (store hash, not actual email)
+        const updatedList = [...shownEmailsList, emailHash]
+        localStorage.setItem(PREMIUM_DIALOG_SHOWN_KEY, JSON.stringify(updatedList))
+      }
+    } catch (error) {
+      // If there's an error parsing localStorage, show the dialog
+      console.warn('Error reading premium dialog state:', error)
       setOpen(true)
-      // Mark as shown for this email
-      const updatedList = [...shownEmailsList, userEmail.toLowerCase()]
-      localStorage.setItem(PREMIUM_DIALOG_SHOWN_KEY, JSON.stringify(updatedList))
     }
   }, [userEmail])
 
