@@ -3,6 +3,7 @@ import { Plus, ChatCircle, Image, Trash, Sparkle, PushPin, TrashSimple, UsersThr
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import type { Conversation, AppMode } from '@/lib/types'
 import { UserMenu } from '@/components/UserMenu'
@@ -10,6 +11,7 @@ import { SearchBar } from '@/components/SearchBar'
 import { ClearAllDialog } from '@/components/ClearAllDialog'
 import { ConversationActions } from '@/components/ConversationActions'
 import { RenameConversationDialog } from '@/components/RenameConversationDialog'
+import { TagsDisplay } from '@/components/TagsManager'
 
 interface SidebarProps {
   conversations: Conversation[]
@@ -23,6 +25,7 @@ interface SidebarProps {
   onPinConversation?: (id: string) => void
   onClearAll?: () => void
   onRenameConversation?: (id: string, newTitle: string) => void
+  onUpdateConversationTags?: (id: string, tags: string[]) => void
   onOpenMemory?: () => void
   onOpenPersonas?: () => void
   onOpenFavorites?: () => void
@@ -41,12 +44,14 @@ export function Sidebar({
   onPinConversation,
   onClearAll,
   onRenameConversation,
+  onUpdateConversationTags,
   onOpenMemory,
   onOpenPersonas,
   onOpenFavorites,
   onOpenOfflineMode,
 }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [clearAllOpen, setClearAllOpen] = useState(false)
   const [renameConvId, setRenameConvId] = useState<string | null>(null)
 
@@ -57,13 +62,23 @@ export function Sidebar({
   
   const currentModeConversations = mode === 'chat' ? chatConversations : mode === 'image' ? imageConversations : mode === 'video' ? videoConversations : roleplayConversations
   
-  // Filter conversations based on search query
+  // Get all unique tags from conversations
+  const allTags = [...new Set(currentModeConversations.flatMap(c => c.tags || []))].sort()
+  
+  // Filter conversations based on search query and selected tag
   const filteredConversations = currentModeConversations.filter((c) => {
+    // Filter by tag if selected
+    if (selectedTag && (!c.tags || !c.tags.includes(selectedTag))) {
+      return false
+    }
+    
+    // Filter by search query
     if (!searchQuery) return true
     const query = searchQuery.toLowerCase()
     return (
       c.title.toLowerCase().includes(query) ||
-      c.messages.some(m => m.content.toLowerCase().includes(query))
+      c.messages.some(m => m.content.toLowerCase().includes(query)) ||
+      (c.tags && c.tags.some(tag => tag.toLowerCase().includes(query)))
     )
   })
   
@@ -156,6 +171,33 @@ export function Sidebar({
         <SearchBar onSearch={setSearchQuery} />
       </div>
 
+      {/* Tag filter */}
+      {allTags.length > 0 && (
+        <div className="px-3 pb-3">
+          <div className="flex flex-wrap gap-1">
+            <Button
+              variant={selectedTag === null ? 'secondary' : 'ghost'}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => setSelectedTag(null)}
+            >
+              All
+            </Button>
+            {allTags.map((tag) => (
+              <Button
+                key={tag}
+                variant={selectedTag === tag ? 'secondary' : 'ghost'}
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => setSelectedTag(tag)}
+              >
+                {tag}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <ScrollArea className="flex-1">
         <div className="space-y-1 p-3">
           {currentModeConversations.length === 0 && (
@@ -174,27 +216,36 @@ export function Sidebar({
             <div
               key={conversation.id}
               className={cn(
-                'group relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-muted',
+                'group relative flex flex-col gap-1 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-muted',
                 currentConversationId === conversation.id && 'bg-muted'
               )}
             >
-              {conversation.isPinned && (
-                <PushPin size={12} className="text-muted-foreground shrink-0" weight="fill" />
-              )}
-              <button
-                onClick={() => onSelectConversation(conversation.id)}
-                className="flex-1 truncate text-left"
-              >
-                {conversation.title}
-              </button>
-              <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                <ConversationActions
-                  conversation={conversation}
-                  onPin={onPinConversation ? () => onPinConversation(conversation.id) : undefined}
-                  onDelete={() => onDeleteConversation(conversation.id)}
-                  onRename={onRenameConversation ? () => setRenameConvId(conversation.id) : undefined}
-                />
+              <div className="flex items-center gap-2">
+                {conversation.isPinned && (
+                  <PushPin size={12} className="text-muted-foreground shrink-0" weight="fill" />
+                )}
+                <button
+                  onClick={() => onSelectConversation(conversation.id)}
+                  className="flex-1 truncate text-left"
+                >
+                  {conversation.title}
+                </button>
+                <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                  <ConversationActions
+                    conversation={conversation}
+                    onPin={onPinConversation ? () => onPinConversation(conversation.id) : undefined}
+                    onDelete={() => onDeleteConversation(conversation.id)}
+                    onRename={onRenameConversation ? () => setRenameConvId(conversation.id) : undefined}
+                    onTagsChange={onUpdateConversationTags ? (tags) => onUpdateConversationTags(conversation.id, tags) : undefined}
+                    allTags={allTags}
+                  />
+                </div>
               </div>
+              {conversation.tags && conversation.tags.length > 0 && (
+                <div className="ml-5">
+                  <TagsDisplay tags={conversation.tags} maxDisplay={2} />
+                </div>
+              )}
             </div>
           ))}
         </div>

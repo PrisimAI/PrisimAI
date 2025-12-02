@@ -24,17 +24,20 @@ import { OfflineModeDialog } from './components/OfflineModeDialog'
 import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { PremiumAccessDialog } from './components/PremiumAccessDialog'
 import { LiquidMetalBackground } from './components/LiquidMetalBackground'
+import { MessageTemplatesDialog } from './components/MessageTemplatesDialog'
 import { generateText, generateImage, generateVideo, type Message, type MessageContent, type TextContent, type ImageUrlContent, setOfflineMode, hasPremiumAccess } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
 import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS, ROLEPLAY_ENFORCEMENT_RULES } from './lib/personas-config'
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, GeneratedVideo, AppMode, OfflineSettings, FileAttachment } from './lib/types'
 import type { MemoryEntry, AIPersona, GroupChatParticipant } from './lib/memory-types'
+import type { MessageTemplate } from './lib/template-types'
 
 function App() {
   const { user, loading: authLoading } = useAuth()
   const [conversations, setConversations] = useLocalStorage<Conversation[]>('conversations', [])
   const [memories, setMemories] = useLocalStorage<MemoryEntry[]>('memories', [])
   const [personas, setPersonas] = useLocalStorage<AIPersona[]>('personas', [])
+  const [templates, setTemplates] = useLocalStorage<MessageTemplate[]>('message-templates', [])
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const [mode, setMode] = useState<AppMode>('chat')
   const [textModel, setTextModel] = useState('openai')
@@ -42,11 +45,13 @@ function App() {
   const [videoModel, setVideoModel] = useState('veo')
   const [isGenerating, setIsGenerating] = useState(false)
   const [pendingMessage, setPendingMessage] = useState<string | null>(null)
+  const [chatInputValue, setChatInputValue] = useState('')
   const [memoryDialogOpen, setMemoryDialogOpen] = useState(false)
   const [personaDialogOpen, setPersonaDialogOpen] = useState(false)
   const [favoritesDialogOpen, setFavoritesDialogOpen] = useState(false)
   const [shortcutsDialogOpen, setShortcutsDialogOpen] = useState(false)
   const [offlineModeDialogOpen, setOfflineModeDialogOpen] = useState(false)
+  const [templatesDialogOpen, setTemplatesDialogOpen] = useState(false)
   const [offlineSettings, setOfflineSettings] = useLocalStorage<OfflineSettings>('offline-settings', {
     enabled: false,
     selectedModel: null,
@@ -460,6 +465,41 @@ function App() {
     toast.success('Conversation renamed')
   }
 
+  const handleUpdateConversationTags = (id: string, tags: string[]) => {
+    setConversations((current = []) =>
+      current.map((c) =>
+        c.id === id ? { ...c, tags, updatedAt: Date.now() } : c
+      )
+    )
+    toast.success('Tags updated')
+  }
+
+  const handleSaveTemplate = (template: Omit<MessageTemplate, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newTemplate: MessageTemplate = {
+      ...template,
+      id: `tpl_${Date.now()}`,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    }
+    setTemplates((current = []) => [...current, newTemplate])
+  }
+
+  const handleUpdateTemplate = (id: string, template: Omit<MessageTemplate, 'id' | 'createdAt' | 'updatedAt'>) => {
+    setTemplates((current = []) =>
+      current.map((t) =>
+        t.id === id ? { ...t, ...template, updatedAt: Date.now() } : t
+      )
+    )
+  }
+
+  const handleDeleteTemplate = (id: string) => {
+    setTemplates((current = []) => current.filter((t) => t.id !== id))
+  }
+
+  const handleUseTemplate = (template: MessageTemplate) => {
+    setChatInputValue(template.content)
+  }
+
   const handleClearAllConversations = () => {
     setConversations((current = []) => current.filter((c) => c.mode !== mode))
     setCurrentConversationId(null)
@@ -745,6 +785,7 @@ function App() {
         onModeChange={handleModeChange}
         onPinConversation={handlePinConversation}
         onRenameConversation={handleRenameConversation}
+        onUpdateConversationTags={handleUpdateConversationTags}
         onClearAll={handleClearAllConversations}
         onOpenMemory={() => setMemoryDialogOpen(true)}
         onOpenPersonas={() => setPersonaDialogOpen(true)}
@@ -835,6 +876,9 @@ function App() {
             onSend={handleSendMessage}
             disabled={isGenerating}
             placeholder={mode === 'chat' ? 'Ask anything' : mode === 'image' ? 'Describe the image you want to create' : 'Describe the video you want to generate'}
+            onOpenTemplates={() => setTemplatesDialogOpen(true)}
+            value={chatInputValue}
+            onValueChange={setChatInputValue}
           />
         )}
       </div>
@@ -862,6 +906,16 @@ function App() {
         onOpenChange={setFavoritesDialogOpen}
         conversations={conversationsList}
         onUnfavorite={handleUnfavoriteMessage}
+      />
+
+      <MessageTemplatesDialog
+        open={templatesDialogOpen}
+        onOpenChange={setTemplatesDialogOpen}
+        templates={templates || []}
+        onSaveTemplate={handleSaveTemplate}
+        onUpdateTemplate={handleUpdateTemplate}
+        onDeleteTemplate={handleDeleteTemplate}
+        onUseTemplate={handleUseTemplate}
       />
 
       <KeyboardShortcutsDialog

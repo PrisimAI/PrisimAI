@@ -20,6 +20,7 @@ import {
   File,
   FileCode,
   PencilSimple,
+  Tag,
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import type { Conversation } from '@/lib/types'
@@ -30,15 +31,18 @@ import {
   downloadFile,
   getConversationStats 
 } from '@/lib/export-utils'
+import { TagsManager } from '@/components/TagsManager'
 
 interface ConversationActionsProps {
   conversation: Conversation
   onPin?: () => void
   onDelete?: () => void
   onRename?: () => void
+  onTagsChange?: (tags: string[]) => void
+  allTags?: string[]
 }
 
-export function ConversationActions({ conversation, onPin, onDelete, onRename }: ConversationActionsProps) {
+export function ConversationActions({ conversation, onPin, onDelete, onRename, onTagsChange, allTags }: ConversationActionsProps) {
 
   const handleExportText = () => {
     const content = exportAsText(conversation)
@@ -104,6 +108,19 @@ export function ConversationActions({ conversation, onPin, onDelete, onRename }:
               <PushPin className="mr-2 h-4 w-4" />
               {conversation.isPinned ? 'Unpin' : 'Pin'} Conversation
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+
+        {onTagsChange && (
+          <>
+            <div className="px-2 py-1.5">
+              <TagsManager 
+                tags={conversation.tags} 
+                onTagsChange={onTagsChange}
+                allTags={allTags}
+              />
+            </div>
             <DropdownMenuSeparator />
           </>
         )}
