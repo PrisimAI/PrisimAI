@@ -6,43 +6,6 @@ A comprehensive list of bugs, security vulnerabilities, and code issues found in
 
 ## 🔴 Critical Security Issues
 
-### 1. **Hardcoded API Keys Exposed in Source Code**
-- **File**: `src/lib/pollinations-api.ts` (lines 5-8)
-- **Description**: Four API keys are hardcoded directly in the source code:
-  ```typescript
-  const API_KEY_1 = 'plln_sk_REDACTED...'
-  const API_KEY_2 = 'plln_sk_REDACTED...'
-  const API_KEY_3 = 'plln_sk_REDACTED...'
-  const API_KEY_4 = 'plln_sk_REDACTED...'
-  ```
-- **Impact**: Anyone who views the source code can access these API keys, potentially leading to abuse, unauthorized usage, and billing issues.
-- **Recommendation**: Use environment variables and a backend proxy to handle API requests securely.
-
-### 2. **Hardcoded Firebase Configuration in Source Code**
-- **File**: `src/lib/firebase.ts` (lines 6-14)
-- **Description**: Firebase configuration including API key and project details are hardcoded:
-  ```typescript
-  const firebaseConfig = {
-    apiKey: "REDACTED...",
-    authDomain: "prisimai-XXXXX.firebaseapp.com",
-    ...
-  }
-  ```
-- **Impact**: While Firebase API keys in frontend are semi-public, the configuration should use environment variables for easier rotation and security hygiene.
-- **Recommendation**: Move to environment variables.
-
-### 3. **Hardcoded Premium User Email List**
-- **File**: `src/lib/pollinations-api.ts` (lines 120-130)
-- **Description**: Premium user emails are hardcoded in the source code:
-  ```typescript
-  export const PREMIUM_ACCESS_EMAILS: string[] = [
-    'user1@example.com',
-    'user2@example.com',
-    // ...more emails
-  ]
-  ```
-- **Impact**: User emails are exposed, and anyone can see who has premium access. Users could also potentially manipulate their email to match the list.
-- **Recommendation**: Store premium status in a secure database with proper authentication.
 
 ### 4. **Unsafe Code Evaluation in AI Tools**
 - **File**: `src/lib/ai-tools.ts` (lines 86-91)
@@ -107,6 +70,9 @@ A comprehensive list of bugs, security vulnerabilities, and code issues found in
 - **Impact**: No linting enforcement, potential code quality issues.
 - **Recommendation**: Add proper ESLint configuration.
 
+### 10. Persona Functions in Group Chats
+
+**Impact: Group chats should simulate a real multiperson conversation, where interactions feel natural and dynamic—as if multiple distinct people are participating at once. This enhances realism and engagement, making the chat experience feel authentic rather than one-sided.**
 ---
 
 ## 🟡 Medium Priority Bugs
@@ -376,8 +342,8 @@ A comprehensive list of bugs, security vulnerabilities, and code issues found in
 
 | Severity | Count |
 |----------|-------|
-| 🔴 Critical | 4 |
-| 🟠 High | 5 |
+| 🔴 Critical | 1 |
+| 🟠 High | 6 |
 | 🟡 Medium | 10 |
 | 🔵 Low | 25 |
 | **Total** | **44** |
