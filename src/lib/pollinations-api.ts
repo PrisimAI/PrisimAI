@@ -139,13 +139,34 @@ export const PREMIUM_ACCESS_EMAILS: string[] = [
   'wizium123@gmail.com',
   'vaibhavsharma42011@gmail.com',
   'emily.jensen2029@gmail.com',
-  '9001202@rochesterschools.org'
+  '9001202@rochesterschools.org',
+  'scottdavis8192@gmail.com',
+  'armandbeqiri588@gmail.com',
+  'wendelin.bacher@gmail.com'
+]
+
+// Domain list for premium access
+export const PREMIUM_ACCESS_DOMAINS: string[] = [
+  'rochesterschools.org'
 ]
 
 // Check if a user email has premium access
 export function hasPremiumAccess(email: string | null | undefined): boolean {
   if (!email) return false
-  return PREMIUM_ACCESS_EMAILS.includes(email.toLowerCase())
+  const lowerEmail = email.toLowerCase()
+  
+  // Check if email is in the premium access list
+  if (PREMIUM_ACCESS_EMAILS.includes(lowerEmail)) {
+    return true
+  }
+  
+  // Check if email domain is in the premium access domains list
+  const emailDomain = lowerEmail.split('@')[1]
+  if (emailDomain && PREMIUM_ACCESS_DOMAINS.includes(emailDomain)) {
+    return true
+  }
+  
+  return false
 }
 
 const FALLBACK_TEXT_MODELS: TextModel[] = [
