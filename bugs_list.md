@@ -294,6 +294,82 @@ A comprehensive list of bugs, security vulnerabilities, and code issues found in
 - **Impact**: Single error could crash entire app.
 - **Recommendation**: Add error boundaries around critical sections.
 
+### 36. **Unused `showStats` State in ConversationActions**
+- **File**: `src/components/ConversationActions.tsx` (line 43)
+- **Description**: `showStats` state is declared but never used:
+  ```typescript
+  const [showStats, setShowStats] = useState(false)
+  ```
+- **Impact**: Dead code, unused state variable.
+- **Recommendation**: Remove unused state or implement intended functionality.
+
+### 37. **RenameConversationDialog Does Not Sync Title State**
+- **File**: `src/components/RenameConversationDialog.tsx` (line 27)
+- **Description**: The dialog initializes `title` state with `currentTitle` but doesn't update when `currentTitle` prop changes:
+  ```typescript
+  const [title, setTitle] = useState(currentTitle)
+  ```
+- **Impact**: If the dialog is opened for different conversations without unmounting, the title won't update.
+- **Recommendation**: Add a `useEffect` to sync state with props when they change.
+
+### 38. **Non-null Assertion in Group Chat Persona Lookup (Line 167)**
+- **File**: `src/components/CreateGroupChatDialog.tsx` (line 167)
+- **Description**: Another non-null assertion when mapping over selected personas:
+  ```typescript
+  const persona = personas.find(p => p.id === personaId)!
+  ```
+- **Impact**: Runtime error if persona is not found.
+- **Recommendation**: Add null check with fallback.
+
+### 39. **Missing Cleanup for Resize Event Listener in LiquidMetalBackground**
+- **File**: `src/components/LiquidMetalBackground.tsx`
+- **Description**: While cleanup does remove the listener and cancel animation frame, there's no handling for the case where the component unmounts during animation.
+- **Impact**: Potential memory leak in edge cases.
+- **Recommendation**: Add a flag to prevent state updates after unmount.
+
+### 40. **handleEditMessage Triggers Regeneration Without Removing Previous Response**
+- **File**: `src/App.tsx` (lines 451-464)
+- **Description**: When editing a user message, `handleEditMessage` calls `handleSendMessage` which adds a new AI response, but the old AI response for the original message isn't removed:
+  ```typescript
+  const handleEditMessage = (messageId: string, newContent: string) => {
+    // ...updates message...
+    // Then triggers new response without cleaning up old one
+    handleSendMessage(newContent)
+  }
+  ```
+- **Impact**: Duplicate AI responses could accumulate after message edits.
+- **Recommendation**: Remove subsequent messages before regenerating.
+
+### 41. **Potential Double Message on New Conversation**
+- **File**: `src/App.tsx` (lines 182-187)
+- **Description**: When `handleSendMessage` is called without a `currentConversationId`, it creates a new conversation and sets `pendingMessage`, but if the user clicks send again quickly, they could send multiple messages.
+- **Impact**: Duplicate messages could be sent.
+- **Recommendation**: Add a debounce or disable the input during conversation creation.
+
+### 42. **Missing Loading State for enabledPersonas in CreateGroupChatDialog**
+- **File**: `src/components/CreateGroupChatDialog.tsx` (line 86)
+- **Description**: `enabledPersonas` filters personas without checking if personas array is loaded, could show "No personas available" incorrectly during loading.
+- **Impact**: Poor UX during data loading.
+- **Recommendation**: Add loading state check.
+
+### 43. **assistantMessage.content Mutation During Streaming**
+- **File**: `src/App.tsx` (lines 332-338)
+- **Description**: During text streaming, `assistantMessage.content` is directly mutated:
+  ```typescript
+  assistantMessage.content += chunk
+  ```
+- **Impact**: Direct mutation of objects used in state is an anti-pattern and could cause issues with React's rendering.
+- **Recommendation**: Use proper state updates instead of mutation.
+
+### 44. **getPersonaForMessage Uses Simple Cycling Logic**
+- **File**: `src/components/GroupChatRoleplay.tsx` (lines 71-76)
+- **Description**: The function uses a simple modulo cycling to assign personas to messages, which doesn't account for actual conversation flow:
+  ```typescript
+  const personaIndex = (assistantMessages.length - 1) % personas.length
+  ```
+- **Impact**: Personas may not match the actual message context.
+- **Recommendation**: Store persona ID with each message for accurate attribution.
+
 ---
 
 ## 📋 Summary
@@ -303,8 +379,8 @@ A comprehensive list of bugs, security vulnerabilities, and code issues found in
 | 🔴 Critical | 4 |
 | 🟠 High | 5 |
 | 🟡 Medium | 10 |
-| 🔵 Low | 16 |
-| **Total** | **35** |
+| 🔵 Low | 25 |
+| **Total** | **44** |
 
 ---
 
