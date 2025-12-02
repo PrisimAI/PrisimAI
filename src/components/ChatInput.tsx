@@ -1,5 +1,5 @@
 import { useState, KeyboardEvent, useRef } from 'react'
-import { PaperPlaneRight, Microphone, Paperclip, X } from '@phosphor-icons/react'
+import { PaperPlaneRight, Microphone, Paperclip, X, FileText } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
@@ -15,12 +15,32 @@ interface ChatInputProps {
   onSend: (message: string, attachments?: FileAttachment[]) => void
   disabled?: boolean
   placeholder?: string
+  onOpenTemplates?: () => void
+  value?: string
+  onValueChange?: (value: string) => void
 }
 
-export function ChatInput({ onSend, disabled, placeholder = 'Ask anything' }: ChatInputProps) {
-  const [input, setInput] = useState('')
+export function ChatInput({ 
+  onSend, 
+  disabled, 
+  placeholder = 'Ask anything', 
+  onOpenTemplates,
+  value: externalValue,
+  onValueChange,
+}: ChatInputProps) {
+  const [internalValue, setInternalValue] = useState('')
   const [attachments, setAttachments] = useState<FileAttachment[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Use external value if provided, otherwise use internal state
+  const input = externalValue !== undefined ? externalValue : internalValue
+  const setInput = (value: string) => {
+    if (onValueChange) {
+      onValueChange(value)
+    } else {
+      setInternalValue(value)
+    }
+  }
 
   const handleSend = () => {
     if ((input.trim() || attachments.length > 0) && !disabled) {
@@ -177,6 +197,19 @@ export function ChatInput({ onSend, disabled, placeholder = 'Ask anything' }: Ch
               onChange={handleFileSelect}
               accept={ACCEPTED_FILE_TYPES}
             />
+            {onOpenTemplates && (
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="h-8 w-8 p-0"
+                disabled={disabled}
+                onClick={onOpenTemplates}
+                title="Message templates"
+              >
+                <FileText size={18} />
+              </Button>
+            )}
             <Button
               type="button"
               size="sm"

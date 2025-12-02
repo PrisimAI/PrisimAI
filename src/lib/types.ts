@@ -27,6 +27,7 @@ export interface Conversation {
   isPinned?: boolean
   isGroupChat?: boolean
   participants?: string[] // IDs of personas participating in group chat
+  tags?: string[] // User-defined tags for organization
 }
 
 export interface GeneratedImage {
