@@ -138,14 +138,12 @@ export const PREMIUM_ACCESS_EMAILS: string[] = [
   'man79577957@gmail.com',
   'wizium123@gmail.com',
   'vaibhavsharma42011@gmail.com',
-  'emily.jensen2029@gmail.com'
-].map(email => email.toLowerCase())
   'emily.jensen2029@gmail.com',
   '9001202@rochesterschools.org',
   'scottdavis8192@gmail.com',
   'armandbeqiri588@gmail.com',
   'wendelin.bacher@gmail.com'
-]
+].map(email => email.toLowerCase())
 
 // Domain list for premium access
 export const PREMIUM_ACCESS_DOMAINS: string[] = [
