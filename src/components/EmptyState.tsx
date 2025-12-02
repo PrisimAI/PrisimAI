@@ -1,4 +1,4 @@
-import { ChatCircle, Image, Lightbulb, Code } from '@phosphor-icons/react'
+import { ChatCircle, Image, Lightbulb, Code, VideoCamera } from '@phosphor-icons/react'
 import { Card } from '@/components/ui/card'
 import type { AppMode } from '@/lib/types'
 
@@ -43,20 +43,40 @@ const imageExamples = [
   },
 ]
 
+const videoExamples = [
+  {
+    icon: VideoCamera,
+    title: 'Create animations',
+    prompt: 'A flying bird soaring through colorful clouds at sunset',
+  },
+  {
+    icon: Lightbulb,
+    title: 'Motion graphics',
+    prompt: 'Abstract geometric shapes morphing and transforming smoothly',
+  },
+  {
+    icon: VideoCamera,
+    title: 'Dynamic scenes',
+    prompt: 'Ocean waves crashing on a beach with golden sunlight reflecting',
+  },
+]
+
 export function EmptyState({ mode, onExampleClick }: EmptyStateProps) {
-  const examples = mode === 'chat' ? chatExamples : imageExamples
+  const examples = mode === 'chat' ? chatExamples : mode === 'image' ? imageExamples : videoExamples
 
   return (
     <div className="flex h-full flex-col items-center justify-center px-6 py-12">
       <div className="max-w-2xl space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-semibold tracking-tight">
-            {mode === 'chat' ? 'What are you working on?' : 'What would you like to create?'}
+            {mode === 'chat' ? 'What are you working on?' : mode === 'image' ? 'What would you like to create?' : 'What video would you like to generate?'}
           </h2>
           <p className="mt-2 text-muted-foreground">
             {mode === 'chat'
               ? 'Ask questions, get creative help, or just have a conversation'
-              : 'Describe an image and watch AI bring it to life'}
+              : mode === 'image'
+              ? 'Describe an image and watch AI bring it to life'
+              : 'Describe a video scene and AI will generate it for you'}
           </p>
         </div>
 

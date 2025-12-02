@@ -8,6 +8,7 @@ import { ChatMessage } from './components/ChatMessage'
 import { ChatInput } from './components/ChatInput'
 import { EmptyState } from './components/EmptyState'
 import { ImageGeneration } from './components/ImageGeneration'
+import { VideoGeneration } from './components/VideoGeneration'
 import { ModelSelector } from './components/ModelSelector'
 import { AuthPage } from './components/AuthPage'
 import { RoleplayPage } from './components/RoleplayPage'
@@ -23,10 +24,10 @@ import { OfflineModeDialog } from './components/OfflineModeDialog'
 import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { PremiumAccessDialog } from './components/PremiumAccessDialog'
 import { LiquidMetalBackground } from './components/LiquidMetalBackground'
-import { generateText, generateImage, type Message, type MessageContent, type TextContent, type ImageUrlContent, setOfflineMode, hasPremiumAccess } from './lib/pollinations-api'
+import { generateText, generateImage, generateVideo, type Message, type MessageContent, type TextContent, type ImageUrlContent, setOfflineMode, hasPremiumAccess } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
 import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS, ROLEPLAY_ENFORCEMENT_RULES } from './lib/personas-config'
-import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, AppMode, OfflineSettings, FileAttachment } from './lib/types'
+import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, GeneratedVideo, AppMode, OfflineSettings, FileAttachment } from './lib/types'
 import type { MemoryEntry, AIPersona, GroupChatParticipant } from './lib/memory-types'
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
   const [mode, setMode] = useState<AppMode>('chat')
   const [textModel, setTextModel] = useState('openai')
   const [imageModel, setImageModel] = useState('flux')
+  const [videoModel, setVideoModel] = useState('veo')
   const [isGenerating, setIsGenerating] = useState(false)
   const [pendingMessage, setPendingMessage] = useState<string | null>(null)
   const [memoryDialogOpen, setMemoryDialogOpen] = useState(false)
@@ -79,7 +81,7 @@ function App() {
   const createNewConversation = useCallback(() => {
     const newConversation: Conversation = {
       id: `conv_${Date.now()}`,
-      title: mode === 'chat' ? 'New Chat' : 'New Image Generation',
+      title: mode === 'chat' ? 'New Chat' : mode === 'image' ? 'New Image Generation' : 'New Video Generation',
       messages: [],
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -350,15 +352,19 @@ function App() {
       } finally {
         setIsGenerating(false)
       }
-    } else {
+    } else if (mode === 'image') {
       setIsGenerating(true)
       try {
+        // Extract image attachment for image-to-image generation
+        const imageAttachment = attachments?.find(f => f.type.startsWith('image/') && f.content)
+        
         // Pass default image options for consistent quality
         const imageUrl = await generateImage(content, imageModel, {
           width: 1024,
           height: 1024,
           nologo: true,
           userEmail: user?.email,
+          image: imageAttachment?.content, // Pass reference image if provided
         })
         const generatedImage: GeneratedImage = {
           id: `img_${Date.now()}`,
@@ -385,8 +391,39 @@ function App() {
       } finally {
         setIsGenerating(false)
       }
+    } else if (mode === 'video') {
+      setIsGenerating(true)
+      try {
+        const videoUrl = await generateVideo(content, videoModel, {
+          userEmail: user?.email,
+        })
+        const generatedVideo: GeneratedVideo = {
+          id: `vid_${Date.now()}`,
+          prompt: content,
+          url: videoUrl,
+          timestamp: Date.now(),
+          model: videoModel,
+        }
+
+        const videoMessage: ChatMessageType = {
+          id: `msg_${Date.now()}`,
+          role: 'assistant',
+          content: JSON.stringify(generatedVideo),
+          timestamp: Date.now(),
+        }
+
+        addMessage(currentConversationId, videoMessage)
+        toast.success('Video generated successfully!')
+      } catch (error) {
+        console.error('Error generating video:', error)
+        // Show specific error message if available
+        const errorMessage = error instanceof Error ? error.message : 'Failed to generate video. Please try again.'
+        toast.error(errorMessage)
+      } finally {
+        setIsGenerating(false)
+      }
     }
-  }, [currentConversationId, isGenerating, mode, textModel, imageModel, createNewConversation, setConversations, updateConversationTitle, addMessage, updateLastMessage, user?.email, conversationsList, currentConversation])
+  }, [currentConversationId, isGenerating, mode, textModel, imageModel, videoModel, createNewConversation, setConversations, updateConversationTitle, addMessage, updateLastMessage, user?.email])
 
   useEffect(() => {
     if (pendingMessage && currentConversationId) {
@@ -545,6 +582,7 @@ function App() {
     { key: '/', ctrl: true, handler: () => setShortcutsDialogOpen(true) },
     { key: '1', ctrl: true, handler: () => handleModeChange('chat') },
     { key: '2', ctrl: true, handler: () => handleModeChange('image') },
+    { key: '3', ctrl: true, handler: () => handleModeChange('video') },
   ], !memoryDialogOpen && !personaDialogOpen && !favoritesDialogOpen && !shortcutsDialogOpen && !offlineModeDialogOpen)
 
   const handleModeChange = (newMode: AppMode) => {
@@ -589,6 +627,18 @@ function App() {
         }
       })
       .filter((img): img is GeneratedImage => img !== null) || []
+
+  const currentVideos: GeneratedVideo[] =
+    currentConversation?.messages
+      .filter((m) => m.role === 'assistant')
+      .map((m) => {
+        try {
+          return JSON.parse(m.content) as GeneratedVideo
+        } catch {
+          return null
+        }
+      })
+      .filter((vid): vid is GeneratedVideo => vid !== null) || []
 
   const showEmpty = !currentConversation || currentConversation.messages.length === 0
 
@@ -706,8 +756,8 @@ function App() {
         {mode !== 'roleplay' && (
           <ModelSelector
             mode={mode}
-            selectedModel={mode === 'chat' ? textModel : imageModel}
-            onModelChange={mode === 'chat' ? setTextModel : setImageModel}
+            selectedModel={mode === 'chat' ? textModel : mode === 'image' ? imageModel : videoModel}
+            onModelChange={mode === 'chat' ? setTextModel : mode === 'image' ? setImageModel : setVideoModel}
           />
         )}
 
@@ -719,7 +769,7 @@ function App() {
               onCreateGroupChat={handleCreateGroupChatWithPersonas}
               onStartPersonaChat={handleStartPersonaChat}
             />
-          ) : showEmpty ? (
+          ) : showEmpty && !isGenerating ? (
             <EmptyState mode={mode} onExampleClick={handleExampleClick} />
           ) : mode === 'chat' ? (
             <ScrollArea ref={scrollAreaRef} className="h-full">
@@ -745,7 +795,7 @@ function App() {
                 )}
               </div>
             </ScrollArea>
-          ) : (
+          ) : mode === 'image' ? (
             <ScrollArea className="h-full">
               <div className="mx-auto max-w-4xl">
                 {isGenerating && (
@@ -761,6 +811,22 @@ function App() {
                 <ImageGeneration images={currentImages} onRegenerate={handleRegenerate} />
               </div>
             </ScrollArea>
+          ) : (
+            <ScrollArea className="h-full">
+              <div className="mx-auto max-w-4xl">
+                {isGenerating && (
+                  <div className="p-6">
+                    <div className="overflow-hidden rounded-lg border">
+                      <Skeleton className="aspect-video w-full" />
+                    </div>
+                    <p className="mt-4 text-center text-sm text-muted-foreground">
+                      Generating your video... This may take a moment.
+                    </p>
+                  </div>
+                )}
+                <VideoGeneration videos={currentVideos} onRegenerate={handleRegenerate} />
+              </div>
+            </ScrollArea>
           )}
         </div>
 
@@ -768,7 +834,7 @@ function App() {
           <ChatInput
             onSend={handleSendMessage}
             disabled={isGenerating}
-            placeholder={mode === 'chat' ? 'Ask anything' : 'Describe the image you want to create'}
+            placeholder={mode === 'chat' ? 'Ask anything' : mode === 'image' ? 'Describe the image you want to create' : 'Describe the video you want to generate'}
           />
         )}
       </div>
