@@ -13,6 +13,16 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -52,6 +62,8 @@ export function MessageTemplatesDialog({
   })
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [isCreating, setIsCreating] = useState(false)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [templateToDelete, setTemplateToDelete] = useState<string | null>(null)
 
   const categories = ['All', ...DEFAULT_CATEGORIES]
   const filteredTemplates = selectedCategory === 'All'
@@ -87,10 +99,18 @@ export function MessageTemplatesDialog({
   }
 
   const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this template?')) {
-      onDeleteTemplate(id)
+    setTemplateToDelete(id)
+    setDeleteConfirmOpen(true)
+  }
+
+  const confirmDelete = () => {
+    if (templateToDelete) {
+      onDeleteTemplate(templateToDelete)
+      setEditingTemplate(null)
+      setTemplateToDelete(null)
       toast.success('Template deleted')
     }
+    setDeleteConfirmOpen(false)
   }
 
   const handleUse = (template: MessageTemplate) => {
@@ -311,6 +331,23 @@ export function MessageTemplatesDialog({
           </div>
         </div>
       </DialogContent>
+
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Template</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this template? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   )
 }

@@ -88,8 +88,10 @@ export function TagsManager({ tags = [], onTagsChange, allTags = [] }: TagsManag
                 <Badge key={tag} variant="secondary" className="gap-1">
                   {tag}
                   <button
+                    type="button"
                     onClick={() => removeTag(tag)}
                     className="ml-1 hover:text-destructive"
+                    aria-label={`Remove tag ${tag}`}
                   >
                     <X size={12} />
                   </button>

@@ -4,10 +4,25 @@ A modern, minimalist AI platform that enables users to interact with advanced la
 
 ## 🚀 Features
 
+### Core Capabilities
 - **Text Chat Interface**: Real-time conversation with AI models, supporting multi-turn dialogues with context preservation
 - **Image Generation**: Generate images from text descriptions using AI models
-- **Conversation History**: Persistent storage of chat conversations with ability to view and continue previous sessions
-- **Model Selection**: Choose between different AI models for text and image generation
+- **Video Generation**: Create videos from text prompts using advanced AI models
+- **AI Roleplay**: Create and interact with custom AI personas in solo or group chats
+- **Model Selection**: Choose between different AI models for text, image, and video generation
+
+### Organization & Productivity
+- **🏷️ Conversation Tags**: Organize conversations with custom tags for easy filtering and search
+- **🔍 Enhanced Search**: Search across conversation titles, messages, and tags
+- **📝 Message Templates**: Save and reuse frequently used prompts with categories (Code, Writing, Analysis, etc.)
+- **📌 Pin Conversations**: Keep important conversations at the top of your list
+- **⭐ Favorites**: Mark and quickly access favorite messages
+- **📤 Export Options**: Export conversations as Text, Markdown, or JSON
+
+### Advanced Features
+- **🧠 Memory System**: Store persistent facts and preferences that AI can recall across conversations
+- **🎭 Custom Personas**: Create and manage AI personas with unique personalities and behaviors
+- **👥 Group Chats**: Multi-persona conversations with dynamic interactions
 - **🔐 User Authentication**: Secure account creation and login powered by Firebase
 - **💎 Subscription Tiers**: Three-tier system (Free, Pro, Deluxe) with different model access and usage limits
 - **🔌 Offline Mode** *(Experimental)*: Run AI models locally in your browser using WebLLM and WebGPU
@@ -111,8 +126,48 @@ PrisimAI now supports running AI models directly in your browser without an inte
 - Offline mode only works for text chat, not image generation
 - You can disable offline mode at any time to switch back to online models
 
+## 🎯 Using Key Features
+
+### Organizing Conversations with Tags
+
+1. **Add Tags to Conversations**:
+   - Click the three-dot menu (⋮) on any conversation
+   - Click "Tags" button
+   - Add tags from suggestions or create custom ones
+   - Tags appear as colored badges below conversation titles
+
+2. **Filter by Tags**:
+   - Tag filter buttons appear in the sidebar when you have tagged conversations
+   - Click a tag to show only conversations with that tag
+   - Click "All" to clear the filter
+
+3. **Search with Tags**:
+   - Use the search bar to find conversations by tag name, title, or content
+   - Matches are highlighted across all fields
+
+### Creating Message Templates
+
+1. **Save a Template**:
+   - Click the template icon (📄) in the chat input area
+   - Click "New Template"
+   - Enter a title, select a category, and paste your prompt
+   - Click "Save Template"
+
+2. **Use a Template**:
+   - Click the template icon in the chat input
+   - Select a template from the list or search by category
+   - Click "Use Template" to insert the content into your chat
+   - Edit as needed before sending
+
+3. **Manage Templates**:
+   - Edit existing templates by clicking on them in the template dialog
+   - Copy template content to clipboard
+   - Delete templates you no longer need
+   - Organize templates into categories (Code, Writing, Analysis, etc.)
+
 ## 📚 Documentation
 
+- **[Feature Roadmap](./FEATURES.md)**: Comprehensive list of current and planned features with priorities
 - **[PWA Guide](./PWA_GUIDE.md)**: Complete guide for Progressive Web App features, installation, and offline capabilities
 - **[Offline Mode Guide](./OFFLINE_MODE.md)**: Detailed user guide for WebLLM offline mode
 - **[Firebase Setup Guide](./FIREBASE_CREDENTIAL_LOCATIONS.md)**: Complete guide for setting up authentication with Firebase
