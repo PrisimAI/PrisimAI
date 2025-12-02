@@ -116,7 +116,7 @@ const RESTRICTED_TEXT_MODELS = [
   'kimi-k2-thinking'
 ]
 
-// Hardcoded list of emails with premium access to all models
+// Hardcoded list of emails with premium access to all models (normalized to lowercase)
 export const PREMIUM_ACCESS_EMAILS: string[] = [
   // Add emails here that should have access to all models
   'example@example.com',
@@ -127,7 +127,7 @@ export const PREMIUM_ACCESS_EMAILS: string[] = [
   'wizium123@gmail.com',
   'vaibhavsharma42011@gmail.com',
   'emily.jensen2029@gmail.com'
-]
+].map(email => email.toLowerCase())
 
 // Check if a user email has premium access
 export function hasPremiumAccess(email: string | null | undefined): boolean {

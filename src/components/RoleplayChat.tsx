@@ -30,7 +30,6 @@ export function RoleplayChat({
   const [input, setInput] = useState('')
   const [cardDialogOpen, setCardDialogOpen] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -59,7 +58,7 @@ export function RoleplayChat({
     }
   }
 
-  const formatMessage = (content: string, isUser: boolean) => {
+  const formatMessage = (content: string, isUser: boolean): string => {
     if (isUser) {
       return content
     }
@@ -201,7 +200,6 @@ export function RoleplayChat({
                   </div>
                 </div>
               )}
-              <div ref={messagesEndRef} />
             </>
           )}
         </div>

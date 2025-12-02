@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Brain, Plus, Trash, Pencil } from '@phosphor-icons/react'
+import { Brain, Plus, Trash } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import type { MemoryEntry } from '@/lib/memory-types'
 
@@ -42,7 +42,6 @@ export function MemoryManager({
   onUpdateMemory,
   onDeleteMemory,
 }: MemoryManagerProps) {
-  const [editingId, setEditingId] = useState<string | null>(null)
   const [newMemory, setNewMemory] = useState({
     key: '',
     value: '',
@@ -103,14 +102,6 @@ export function MemoryManager({
           </p>
         </div>
         <div className="flex gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0"
-            onClick={() => setEditingId(memory.id)}
-          >
-            <Pencil size={14} />
-          </Button>
           <Button
             variant="ghost"
             size="sm"
