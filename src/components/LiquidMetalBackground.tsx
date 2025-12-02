@@ -15,8 +15,12 @@ export function LiquidMetalBackground({ className = '', opacity = 0.3 }: LiquidM
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    // Flag to track if component is still mounted (Bug #39)
+    let isMounted = true
+
     // Set canvas size
     const setSize = () => {
+      if (!isMounted) return
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
     }
@@ -122,13 +126,18 @@ export function LiquidMetalBackground({ className = '', opacity = 0.3 }: LiquidM
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       time += 0.015 // Slightly faster animation
-      animationId = requestAnimationFrame(animate)
+      
+      // Only continue animation if still mounted
+      if (isMounted) {
+        animationId = requestAnimationFrame(animate)
+      }
     }
 
     // Start animation
     animationId = requestAnimationFrame(animate)
 
     return () => {
+      isMounted = false
       window.removeEventListener('resize', setSize)
       cancelAnimationFrame(animationId)
     }

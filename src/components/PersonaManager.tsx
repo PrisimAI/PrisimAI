@@ -16,7 +16,7 @@ import { Switch } from '@/components/ui/switch'
 import { Slider } from '@/components/ui/slider'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Users, Plus, Trash, Pencil, Robot } from '@phosphor-icons/react'
+import { Plus, Trash, Robot } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import type { AIPersona } from '@/lib/memory-types'
 
@@ -68,7 +68,6 @@ export function PersonaManager({
   onUpdatePersona,
   onDeletePersona,
 }: PersonaManagerProps) {
-  const [editingId, setEditingId] = useState<string | null>(null)
   const [newPersona, setNewPersona] = useState<Omit<AIPersona, 'id'>>({
     name: '',
     systemPrompt: '',
@@ -213,14 +212,6 @@ export function PersonaManager({
                             checked={persona.enabled}
                             onCheckedChange={(checked) => handleToggleEnabled(persona.id, checked)}
                           />
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => setEditingId(persona.id)}
-                          >
-                            <Pencil size={14} />
-                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"

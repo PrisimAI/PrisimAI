@@ -65,16 +65,19 @@ export function CreateGroupChatDialog({
         name: currentUserName,
         color: '#3b82f6',
       },
-      ...Array.from(selectedPersonas).map((personaId) => {
-        const persona = personas.find(p => p.id === personaId)!
-        return {
-          id: `ai_${personaId}`,
-          type: 'ai' as const,
-          personaId,
-          name: persona.name,
-          color: persona.color,
-        }
-      }),
+      ...Array.from(selectedPersonas)
+        .map((personaId) => {
+          const persona = personas.find(p => p.id === personaId)
+          if (!persona) return null
+          return {
+            id: `ai_${personaId}`,
+            type: 'ai' as const,
+            personaId,
+            name: persona.name,
+            color: persona.color,
+          }
+        })
+        .filter((p): p is NonNullable<typeof p> => p !== null),
     ]
 
     onCreateGroupChat(title, participants)
@@ -164,7 +167,8 @@ export function CreateGroupChatDialog({
                   You
                 </Badge>
                 {Array.from(selectedPersonas).map((personaId) => {
-                  const persona = personas.find(p => p.id === personaId)!
+                  const persona = personas.find(p => p.id === personaId)
+                  if (!persona) return null
                   return (
                     <Badge
                       key={personaId}

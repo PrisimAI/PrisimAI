@@ -128,7 +128,7 @@ const RESTRICTED_TEXT_MODELS = [
   'kimi-k2-thinking'
 ]
 
-// Hardcoded list of emails with premium access to all models
+// Hardcoded list of emails with premium access to all models (normalized to lowercase)
 export const PREMIUM_ACCESS_EMAILS: string[] = [
   // Add emails here that should have access to all models
   'example@example.com',
@@ -138,6 +138,8 @@ export const PREMIUM_ACCESS_EMAILS: string[] = [
   'man79577957@gmail.com',
   'wizium123@gmail.com',
   'vaibhavsharma42011@gmail.com',
+  'emily.jensen2029@gmail.com'
+].map(email => email.toLowerCase())
   'emily.jensen2029@gmail.com',
   '9001202@rochesterschools.org',
   'scottdavis8192@gmail.com',

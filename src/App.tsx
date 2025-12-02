@@ -190,22 +190,13 @@ function App() {
 
     if (isGenerating) return
 
-    // Get the current conversation messages before adding new ones
-    let conversationMessages: ChatMessageType[] = []
-    let conversationExists = false
-    setConversations((current = []) => {
-      const conversation = current.find((c) => c.id === currentConversationId)
-      if (conversation) {
-        conversationMessages = conversation.messages
-        conversationExists = true
-      }
-      return current
-    })
-
-    if (!conversationExists) {
+    // Get the current conversation messages using direct access instead of misusing setState
+    const currentConv = conversationsList.find((c) => c.id === currentConversationId)
+    if (!currentConv) {
       console.warn('Conversation not found:', currentConversationId)
       return
     }
+    const conversationMessages = currentConv.messages
 
     if (conversationMessages.length === 0) {
       updateConversationTitle(currentConversationId, content)
@@ -331,20 +322,23 @@ function App() {
         // Use Mistral for roleplay mode, otherwise use selected model
         const modelToUse = mode === 'roleplay' || currentConversation?.isGroupChat ? ROLEPLAY_MODEL : textModel
 
+        // Track accumulated content without mutating the original object
+        let accumulatedContent = ''
+        
         await generateText(messages, modelToUse, (chunk) => {
+          accumulatedContent += chunk
           updateLastMessage(
             currentConversationId,
-            assistantMessage.content + chunk,
+            accumulatedContent,
             true
           )
-          assistantMessage.content += chunk
         }, {
           tools: mode === 'roleplay' || currentConversation?.isGroupChat ? undefined : AI_TOOLS,
           tool_choice: mode === 'roleplay' || currentConversation?.isGroupChat ? undefined : 'auto',
           userEmail: user?.email,
         })
 
-        updateLastMessage(currentConversationId, assistantMessage.content, false)
+        updateLastMessage(currentConversationId, accumulatedContent, false)
       } catch (error) {
         console.error('Error generating text:', error)
         toast.error('Failed to generate response. Please try again.')
@@ -487,15 +481,25 @@ function App() {
 
   const handleEditMessage = (messageId: string, newContent: string) => {
     if (!currentConversationId) return
+    
+    // First, find the message index and remove all subsequent messages (including AI responses)
     setConversations((current = []) =>
       current.map((c) => {
         if (c.id !== currentConversationId) return c
-        const messages = c.messages.map((m) =>
+        
+        // Find the index of the edited message
+        const messageIndex = c.messages.findIndex(m => m.id === messageId)
+        if (messageIndex === -1) return c
+        
+        // Keep only messages up to and including the edited one, update the content
+        const messages = c.messages.slice(0, messageIndex + 1).map((m) =>
           m.id === messageId ? { ...m, content: newContent } : m
         )
+        
         return { ...c, messages, updatedAt: Date.now() }
       })
     )
+    
     // Regenerate response after edit
     handleSendMessage(newContent)
   }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -25,6 +25,11 @@ export function RenameConversationDialog({
   onRename 
 }: RenameConversationDialogProps) {
   const [title, setTitle] = useState(currentTitle)
+
+  // Sync title state when currentTitle prop changes (Bug #37)
+  useEffect(() => {
+    setTitle(currentTitle)
+  }, [currentTitle])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

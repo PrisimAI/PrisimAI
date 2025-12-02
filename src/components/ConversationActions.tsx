@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,7 +39,6 @@ interface ConversationActionsProps {
 }
 
 export function ConversationActions({ conversation, onPin, onDelete, onRename }: ConversationActionsProps) {
-  const [showStats, setShowStats] = useState(false)
 
   const handleExportText = () => {
     const content = exportAsText(conversation)

@@ -5,7 +5,12 @@ export function useLocalStorage<T>(
   initialValue: T
 ): [T, (value: T | ((val: T) => T)) => void] {
   // Get initial value from localStorage or use provided initialValue
+  // Use SSR-safe check for window
   const [storedValue, setStoredValue] = useState<T>(() => {
+    // Check for SSR environment
+    if (typeof window === 'undefined') {
+      return initialValue
+    }
     try {
       const item = window.localStorage.getItem(key)
       return item ? JSON.parse(item) : initialValue

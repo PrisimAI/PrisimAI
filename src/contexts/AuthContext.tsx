@@ -35,7 +35,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Auth listener
   useEffect(() => {
-    const devTimeout = setTimeout(() => {
+    // Only enable mock user fallback in development mode to prevent accidental bypass in production
+    const enableMockUserFallback = import.meta.env.DEV
+    
+    const devTimeout = enableMockUserFallback ? setTimeout(() => {
       if (loading) {
         console.warn('Firebase auth timeout - using development mock user')
         const mockUser = {
@@ -61,16 +64,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(mockUser)
         setLoading(false)
       }
-    }, 3000)
+    }, 3000) : null
 
     const unsubscribe = onAuthStateChanged(auth, async (usr) => {
-      clearTimeout(devTimeout)
+      if (devTimeout) clearTimeout(devTimeout)
       setUser(usr)
       setLoading(false)
     })
 
     return () => {
-      clearTimeout(devTimeout)
+      if (devTimeout) clearTimeout(devTimeout)
       unsubscribe()
     }
   }, [])
@@ -117,8 +120,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
-    await firebaseSignOut(auth)
-    setUser(null)
+    try {
+      await firebaseSignOut(auth)
+      setUser(null)
+    } catch (error) {
+      console.error('Error signing out:', error)
+      // Still clear the local user state even if Firebase sign out fails
+      setUser(null)
+      throw error
+    }
   }
 
   return (

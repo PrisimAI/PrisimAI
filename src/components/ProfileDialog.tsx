@@ -14,28 +14,56 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { Conversation } from '@/lib/types'
 
 interface ProfileDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-interface FeedbackPopupProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+// Helper function to get conversation stats from localStorage
+function getConversationStats(): { totalConversations: number; totalMessages: number } {
+  if (typeof window === 'undefined') {
+    return { totalConversations: 0, totalMessages: 0 }
+  }
+  try {
+    const stored = localStorage.getItem('conversations')
+    if (stored) {
+      const conversations: Conversation[] = JSON.parse(stored)
+      const totalConversations = conversations.length
+      const totalMessages = conversations.reduce((sum, conv) => 
+        sum + conv.messages.filter(m => m.role === 'user').length, 0
+      )
+      return { totalConversations, totalMessages }
+    }
+  } catch (e) {
+    console.error('Error loading conversation stats:', e)
+  }
+  return { totalConversations: 0, totalMessages: 0 }
 }
 
 export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
   const { user } = useAuth()
   const [showFeedbackPopup, setShowFeedbackPopup] = useState(false)
+  const [stats, setStats] = useState({ totalConversations: 0, totalMessages: 0 })
 
-  // Check if feedback popup should be shown
+  // Load stats when dialog opens
+  useEffect(() => {
+    if (open) {
+      setStats(getConversationStats())
+    }
+  }, [open])
+
+  // Check if feedback popup should be shown and reset when dialog closes (Bug #19)
   useEffect(() => {
     if (open && user?.uid) {
       const feedbackShown = localStorage.getItem(`feedback_shown_${user.uid}`)
       if (!feedbackShown) {
         setShowFeedbackPopup(true)
       }
+    } else {
+      // Reset feedback popup state when dialog closes
+      setShowFeedbackPopup(false)
     }
   }, [open, user?.uid])
 
@@ -102,11 +130,11 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <div className="text-muted-foreground">Conversations</div>
-                  <div className="text-2xl font-semibold">0</div>
+                  <div className="text-2xl font-semibold">{stats.totalConversations}</div>
                 </div>
                 <div>
                   <div className="text-muted-foreground">Messages Sent</div>
-                  <div className="text-2xl font-semibold">0</div>
+                  <div className="text-2xl font-semibold">{stats.totalMessages}</div>
                 </div>
               </div>
             </div>

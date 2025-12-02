@@ -59,7 +59,7 @@ export function GroupChatRoleplay({
     }
   }
 
-  const formatMessage = (content: string, isUser: boolean) => {
+  const formatMessage = (content: string, isUser: boolean): string => {
     if (isUser) {
       return content
     }
@@ -68,9 +68,20 @@ export function GroupChatRoleplay({
   }
 
   // Get persona for a message (for assistant messages)
+  // Defensive check to prevent runtime errors when:
+  // 1. No personas exist in the array (would cause modulo by zero)
+  // 2. Personas array is empty during initial load
   const getPersonaForMessage = (messageIndex: number): AIPersona | undefined => {
+    // Return undefined if no personas available to prevent runtime errors
+    if (!personas || personas.length === 0) {
+      return undefined
+    }
+    
     // Simple logic: cycle through personas for assistant messages
     const assistantMessages = conversation.messages.slice(0, messageIndex + 1).filter(m => m.role === 'assistant')
+    if (assistantMessages.length === 0) {
+      return personas[0]
+    }
     const personaIndex = (assistantMessages.length - 1) % personas.length
     return personas[personaIndex]
   }

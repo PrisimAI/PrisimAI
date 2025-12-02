@@ -24,6 +24,12 @@ export function ChatInput({ onSend, disabled, placeholder = 'Ask anything' }: Ch
 
   const handleSend = () => {
     if ((input.trim() || attachments.length > 0) && !disabled) {
+      // Revoke Object URLs before sending to prevent memory leaks
+      attachments.forEach(attachment => {
+        if (attachment.url) {
+          URL.revokeObjectURL(attachment.url)
+        }
+      })
       onSend(input.trim(), attachments.length > 0 ? attachments : undefined)
       setInput('')
       setAttachments([])

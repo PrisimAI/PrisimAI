@@ -23,7 +23,13 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-createRoot(document.getElementById('root')!).render(
+// Get root element with null check (Bug #34)
+const rootElement = document.getElementById('root')
+if (!rootElement) {
+  throw new Error('Root element not found. Make sure there is a div with id="root" in the HTML.')
+}
+
+createRoot(rootElement).render(
   <ErrorBoundary FallbackComponent={ErrorFallback}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AuthProvider>

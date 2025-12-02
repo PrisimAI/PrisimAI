@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { MaskHappy, Plus, Robot, UsersThree, Sparkle, ChatCircle, MagnifyingGlass, SortAscending, IdentificationCard } from '@phosphor-icons/react'
+import { MaskHappy, Plus, Robot, UsersThree, Sparkle, ChatCircle, MagnifyingGlass, IdentificationCard } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CreateGroupChatDialog } from '@/components/CreateGroupChatDialog'
 import { CharacterCardDialog } from '@/components/CharacterCardDialog'
+import { useAuth } from '@/contexts/AuthContext'
 import type { AIPersona, GroupChatParticipant } from '@/lib/memory-types'
 import { PREMADE_PERSONAS, CHARACTER_PERSONAS } from '@/lib/personas-config'
 
@@ -56,6 +57,7 @@ export function RoleplayPage({
   onCreateGroupChat,
   onStartPersonaChat,
 }: RoleplayPageProps) {
+  const { user } = useAuth()
   const [groupChatDialogOpen, setGroupChatDialogOpen] = useState(false)
   const [cardDialogOpen, setCardDialogOpen] = useState(false)
   const [selectedPersona, setSelectedPersona] = useState<AIPersona | null>(null)
@@ -72,9 +74,9 @@ export function RoleplayPage({
 
   // Filter and sort personas
   const filteredPersonas = useMemo(() => {
-    let premade = PREMADE_PERSONAS.map((p, idx) => ({ ...p, id: `premade_${idx}`, category: 'premade' as const }))
-    let character = CHARACTER_PERSONAS.map((p, idx) => ({ ...p, id: `character_${idx}`, category: 'character' as const }))
-    let custom = personas.filter(p => p.enabled).map(p => ({ ...p, category: 'custom' as const }))
+    const premade = PREMADE_PERSONAS.map((p, idx) => ({ ...p, id: `premade_${idx}`, category: 'premade' as const }))
+    const character = CHARACTER_PERSONAS.map((p, idx) => ({ ...p, id: `character_${idx}`, category: 'character' as const }))
+    const custom = personas.filter(p => p.enabled).map(p => ({ ...p, category: 'custom' as const }))
 
     // Apply category filter
     let filtered = categoryFilter === 'all' 
@@ -384,8 +386,8 @@ export function RoleplayPage({
         open={groupChatDialogOpen}
         onOpenChange={setGroupChatDialogOpen}
         personas={allPersonas}
-        currentUserId="user_1"
-        currentUserName="You"
+        currentUserId={user?.uid || 'user_1'}
+        currentUserName={user?.displayName || user?.email || 'You'}
         onCreateGroupChat={onCreateGroupChat}
       />
 

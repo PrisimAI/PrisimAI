@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTheme } from 'next-themes'
 import {
   Dialog,
@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { Slider } from '@/components/ui/slider'
 import {
   Select,
   SelectContent,
@@ -21,17 +22,77 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { toast } from 'sonner'
 
 interface SettingsDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
+// Default settings values - shared between localStorage loading and state initialization
+const DEFAULT_SETTINGS = {
+  streamingEnabled: true,
+  toolsEnabled: true,
+  systemMessage: '',
+  temperature: 1.0,
+  maxTokens: 4096,
+  contextWindow: 10,
+}
+
+// Helper function to safely get from localStorage
+function getStoredSettings() {
+  if (typeof window === 'undefined') {
+    return DEFAULT_SETTINGS
+  }
+  try {
+    const stored = localStorage.getItem('app-settings')
+    if (stored) {
+      return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) }
+    }
+  } catch (e) {
+    console.error('Error loading settings:', e)
+  }
+  return DEFAULT_SETTINGS
+}
+
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const { theme, setTheme } = useTheme()
-  const [streamingEnabled, setStreamingEnabled] = useState(true)
-  const [toolsEnabled, setToolsEnabled] = useState(true)
-  const [systemMessage, setSystemMessage] = useState('')
+  const [streamingEnabled, setStreamingEnabled] = useState(DEFAULT_SETTINGS.streamingEnabled)
+  const [toolsEnabled, setToolsEnabled] = useState(DEFAULT_SETTINGS.toolsEnabled)
+  const [systemMessage, setSystemMessage] = useState(DEFAULT_SETTINGS.systemMessage)
+  const [temperature, setTemperature] = useState(DEFAULT_SETTINGS.temperature)
+  const [maxTokens, setMaxTokens] = useState(DEFAULT_SETTINGS.maxTokens)
+  const [contextWindow, setContextWindow] = useState(DEFAULT_SETTINGS.contextWindow)
+
+  // Load settings from localStorage on mount
+  useEffect(() => {
+    const settings = getStoredSettings()
+    setStreamingEnabled(settings.streamingEnabled ?? true)
+    setToolsEnabled(settings.toolsEnabled ?? true)
+    setSystemMessage(settings.systemMessage ?? '')
+    setTemperature(settings.temperature ?? 1.0)
+    setMaxTokens(settings.maxTokens ?? 4096)
+    setContextWindow(settings.contextWindow ?? 10)
+  }, [])
+
+  const handleSave = () => {
+    try {
+      const settings = {
+        streamingEnabled,
+        toolsEnabled,
+        systemMessage,
+        temperature,
+        maxTokens,
+        contextWindow,
+      }
+      localStorage.setItem('app-settings', JSON.stringify(settings))
+      toast.success('Settings saved')
+      onOpenChange(false)
+    } catch (e) {
+      console.error('Error saving settings:', e)
+      toast.error('Failed to save settings')
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -126,8 +187,15 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               <div className="space-y-2">
                 <Label>Temperature</Label>
                 <div className="flex items-center gap-4">
-                  <Input type="range" min="0" max="2" step="0.1" defaultValue="1" className="flex-1" />
-                  <span className="text-sm font-medium w-12 text-right">1.0</span>
+                  <Slider
+                    min={0}
+                    max={2}
+                    step={0.1}
+                    value={[temperature]}
+                    onValueChange={(value) => setTemperature(value[0])}
+                    className="flex-1"
+                  />
+                  <span className="text-sm font-medium w-12 text-right">{temperature.toFixed(1)}</span>
                 </div>
                 <div className="text-sm text-muted-foreground">
                   Controls randomness: Lower is more focused, higher is more creative
@@ -144,7 +212,8 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   id="max-tokens"
                   type="number"
                   placeholder="4096"
-                  defaultValue="4096"
+                  value={maxTokens}
+                  onChange={(e) => setMaxTokens(parseInt(e.target.value) || 4096)}
                 />
                 <div className="text-sm text-muted-foreground">
                   Maximum length of the response
@@ -159,7 +228,8 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   id="context-window"
                   type="number"
                   placeholder="10"
-                  defaultValue="10"
+                  value={contextWindow}
+                  onChange={(e) => setContextWindow(parseInt(e.target.value) || 10)}
                 />
                 <div className="text-sm text-muted-foreground">
                   Number of previous messages to include in context
@@ -173,7 +243,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={() => onOpenChange(false)}>
+          <Button onClick={handleSave}>
             Save Changes
           </Button>
         </div>
