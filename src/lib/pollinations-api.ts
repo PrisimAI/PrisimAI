@@ -161,9 +161,12 @@ export function hasPremiumAccess(email: string | null | undefined): boolean {
   }
   
   // Check if email domain is in the premium access domains list
-  const emailDomain = lowerEmail.split('@')[1]
-  if (emailDomain && PREMIUM_ACCESS_DOMAINS.includes(emailDomain)) {
-    return true
+  const atIndex = lowerEmail.lastIndexOf('@')
+  if (atIndex > 0) {
+    const emailDomain = lowerEmail.substring(atIndex + 1)
+    if (emailDomain && PREMIUM_ACCESS_DOMAINS.includes(emailDomain)) {
+      return true
+    }
   }
   
   return false
