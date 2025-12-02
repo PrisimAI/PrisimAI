@@ -112,7 +112,15 @@ function tokenize(expression: string): string[] {
     } else if (/[0-9.]/.test(char)) {
       // Parse number (including decimals)
       let num = ''
+      let hasDecimal = false
       while (i < expression.length && /[0-9.]/.test(expression[i])) {
+        // Validate no multiple decimal points
+        if (expression[i] === '.') {
+          if (hasDecimal) {
+            throw new Error('Invalid number: multiple decimal points')
+          }
+          hasDecimal = true
+        }
         num += expression[i]
         i++
       }

@@ -35,10 +35,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Auth listener
   useEffect(() => {
-    // Only enable mock user fallback in development mode (Bug #27)
-    const isDevelopment = import.meta.env.DEV
+    // Only enable mock user fallback in development mode to prevent accidental bypass in production
+    const enableMockUserFallback = import.meta.env.DEV
     
-    const devTimeout = isDevelopment ? setTimeout(() => {
+    const devTimeout = enableMockUserFallback ? setTimeout(() => {
       if (loading) {
         console.warn('Firebase auth timeout - using development mock user')
         const mockUser = {

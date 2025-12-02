@@ -29,44 +29,40 @@ interface SettingsDialogProps {
   onOpenChange: (open: boolean) => void
 }
 
+// Default settings values - shared between localStorage loading and state initialization
+const DEFAULT_SETTINGS = {
+  streamingEnabled: true,
+  toolsEnabled: true,
+  systemMessage: '',
+  temperature: 1.0,
+  maxTokens: 4096,
+  contextWindow: 10,
+}
+
 // Helper function to safely get from localStorage
 function getStoredSettings() {
   if (typeof window === 'undefined') {
-    return {
-      streamingEnabled: true,
-      toolsEnabled: true,
-      systemMessage: '',
-      temperature: 1.0,
-      maxTokens: 4096,
-      contextWindow: 10,
-    }
+    return DEFAULT_SETTINGS
   }
   try {
     const stored = localStorage.getItem('app-settings')
     if (stored) {
-      return JSON.parse(stored)
+      return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) }
     }
   } catch (e) {
     console.error('Error loading settings:', e)
   }
-  return {
-    streamingEnabled: true,
-    toolsEnabled: true,
-    systemMessage: '',
-    temperature: 1.0,
-    maxTokens: 4096,
-    contextWindow: 10,
-  }
+  return DEFAULT_SETTINGS
 }
 
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const { theme, setTheme } = useTheme()
-  const [streamingEnabled, setStreamingEnabled] = useState(true)
-  const [toolsEnabled, setToolsEnabled] = useState(true)
-  const [systemMessage, setSystemMessage] = useState('')
-  const [temperature, setTemperature] = useState(1.0)
-  const [maxTokens, setMaxTokens] = useState(4096)
-  const [contextWindow, setContextWindow] = useState(10)
+  const [streamingEnabled, setStreamingEnabled] = useState(DEFAULT_SETTINGS.streamingEnabled)
+  const [toolsEnabled, setToolsEnabled] = useState(DEFAULT_SETTINGS.toolsEnabled)
+  const [systemMessage, setSystemMessage] = useState(DEFAULT_SETTINGS.systemMessage)
+  const [temperature, setTemperature] = useState(DEFAULT_SETTINGS.temperature)
+  const [maxTokens, setMaxTokens] = useState(DEFAULT_SETTINGS.maxTokens)
+  const [contextWindow, setContextWindow] = useState(DEFAULT_SETTINGS.contextWindow)
 
   // Load settings from localStorage on mount
   useEffect(() => {

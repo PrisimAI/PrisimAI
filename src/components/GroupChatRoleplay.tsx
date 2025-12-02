@@ -68,9 +68,11 @@ export function GroupChatRoleplay({
   }
 
   // Get persona for a message (for assistant messages)
-  // Bug #22 & #44: Add defensive check and store persona ID with messages
+  // Defensive check to prevent runtime errors when:
+  // 1. No personas exist in the array (would cause modulo by zero)
+  // 2. Personas array is empty during initial load
   const getPersonaForMessage = (messageIndex: number): AIPersona | undefined => {
-    // Defensive check: return undefined if no personas
+    // Return undefined if no personas available to prevent runtime errors
     if (!personas || personas.length === 0) {
       return undefined
     }
