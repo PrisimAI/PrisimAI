@@ -25,6 +25,7 @@ import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { PremiumAccessDialog } from './components/PremiumAccessDialog'
 import { LiquidMetalBackground } from './components/LiquidMetalBackground'
 import { MessageTemplatesDialog } from './components/MessageTemplatesDialog'
+import { FeedbackPopup } from './components/FeedbackPopup'
 import { generateText, generateImage, generateVideo, type Message, type MessageContent, type TextContent, type ImageUrlContent, setOfflineMode, hasPremiumAccess } from './lib/pollinations-api'
 import { AI_TOOLS } from './lib/ai-tools'
 import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS, ROLEPLAY_ENFORCEMENT_RULES } from './lib/personas-config'
@@ -699,6 +700,7 @@ function App() {
     return (
       <>
         <AuthPage />
+        <FeedbackPopup />
         <Toaster position="top-center" />
       </>
     )
@@ -936,6 +938,7 @@ function App() {
       {user?.email && hasPremiumAccess(user.email) && (
         <PremiumAccessDialog userEmail={user.email} />
       )}
+      <FeedbackPopup />
       <Toaster position="top-center" />
     </div>
   )
