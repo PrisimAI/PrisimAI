@@ -181,6 +181,10 @@ PrisimAI now supports running AI models directly in your browser without an inte
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 
+### For Developers
+
+- **[GitHub Copilot Agent](./.github/agents/my-agent.agent.md)**: Comprehensive guide for GitHub Copilot agents with project structure, code style guidelines, and mandatory changelog update instructions
+
 ## 📄 License
 
 This project is licensed under the MIT License.

@@ -149,6 +149,10 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start">
                       <span className="inline-block w-2 h-2 rounded-full bg-blue-500 mt-2 mr-2 flex-shrink-0"></span>
+                      <span><strong>v1.2.6</strong> - Added GitHub Copilot agent configuration for automated development</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="inline-block w-2 h-2 rounded-full bg-blue-500 mt-2 mr-2 flex-shrink-0"></span>
                       <span><strong>v1.2.5</strong> - Added restriction for seedream and nanobanana-pro models</span>
                     </li>
                     <li className="flex items-start">
@@ -174,10 +178,6 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
                     <li className="flex items-start">
                       <span className="inline-block w-2 h-2 rounded-full bg-blue-500 mt-2 mr-2 flex-shrink-0"></span>
                       <span><strong>v1.1.9</strong> - Fixed security vulnerabilities</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="inline-block w-2 h-2 rounded-full bg-blue-500 mt-2 mr-2 flex-shrink-0"></span>
-                      <span><strong>v1.1.8</strong> - Performance optimizations</span>
                     </li>
                   </ul>
                 </div>
