@@ -167,13 +167,13 @@
     --size-80: calc(20rem * var(--size-scale));
     --size-96: calc(24rem * var(--size-scale));
 
-    /* Border radii */
-    --radius-factor: 1;
-    --radius-sm: calc(2px * var(--radius-factor) * var(--size-scale));
-    --radius-md: calc(6px * var(--radius-factor) * var(--size-scale));
-    --radius-lg: calc(8px * var(--radius-factor) * var(--size-scale));
-    --radius-xl: calc(12px * var(--radius-factor) * var(--size-scale));
-    --radius-2xl: calc(16px * var(--radius-factor) * var(--size-scale));
+    /* Border radii - more rounded for liquid glass look */
+    --radius-factor: 1.5;
+    --radius-sm: calc(6px * var(--radius-factor) * var(--size-scale));
+    --radius-md: calc(12px * var(--radius-factor) * var(--size-scale));
+    --radius-lg: calc(16px * var(--radius-factor) * var(--size-scale));
+    --radius-xl: calc(20px * var(--radius-factor) * var(--size-scale));
+    --radius-2xl: calc(28px * var(--radius-factor) * var(--size-scale));
     --radius-full: 9999px;
 
     /* Neutral colors */
@@ -203,46 +203,46 @@
     --color-neutral-a12: var(--slate-a12);
     --color-neutral-contrast: var(--slate-contrast);
 
-    /* Accent colors */
-    --color-accent-1: var(--blue-1);
-    --color-accent-2: var(--blue-2);
-    --color-accent-3: var(--blue-3);
-    --color-accent-4: var(--blue-4);
-    --color-accent-5: var(--blue-5);
-    --color-accent-6: var(--blue-6);
-    --color-accent-7: var(--blue-7);
-    --color-accent-8: var(--blue-8);
-    --color-accent-9: var(--blue-9);
-    --color-accent-10: var(--blue-10);
-    --color-accent-11: var(--blue-11);
-    --color-accent-12: var(--blue-12);
-    --color-accent-contrast: var(--blue-contrast);
+    /* Accent colors - Vibrant cyan/blue for liquid glass */
+    --color-accent-1: var(--cyan-1);
+    --color-accent-2: var(--cyan-2);
+    --color-accent-3: var(--cyan-3);
+    --color-accent-4: var(--cyan-4);
+    --color-accent-5: var(--cyan-5);
+    --color-accent-6: var(--cyan-6);
+    --color-accent-7: var(--cyan-7);
+    --color-accent-8: var(--cyan-8);
+    --color-accent-9: var(--cyan-9);
+    --color-accent-10: var(--cyan-10);
+    --color-accent-11: var(--cyan-11);
+    --color-accent-12: var(--cyan-12);
+    --color-accent-contrast: var(--cyan-contrast);
 
-    /* Secondary accent colors */
-    --color-accent-secondary-1: var(--violet-1);
-    --color-accent-secondary-2: var(--violet-2);
-    --color-accent-secondary-3: var(--violet-3);
-    --color-accent-secondary-4: var(--violet-4);
-    --color-accent-secondary-5: var(--violet-5);
-    --color-accent-secondary-6: var(--violet-6);
-    --color-accent-secondary-7: var(--violet-7);
-    --color-accent-secondary-8: var(--violet-8);
-    --color-accent-secondary-9: var(--violet-9);
-    --color-accent-secondary-10: var(--violet-10);
-    --color-accent-secondary-11: var(--violet-11);
-    --color-accent-secondary-12: var(--violet-12);
-    --color-accent-secondary-contrast: var(--violet-contrast);
+    /* Secondary accent colors - Sky blue for liquid glass */
+    --color-accent-secondary-1: var(--sky-1);
+    --color-accent-secondary-2: var(--sky-2);
+    --color-accent-secondary-3: var(--sky-3);
+    --color-accent-secondary-4: var(--sky-4);
+    --color-accent-secondary-5: var(--sky-5);
+    --color-accent-secondary-6: var(--sky-6);
+    --color-accent-secondary-7: var(--sky-7);
+    --color-accent-secondary-8: var(--sky-8);
+    --color-accent-secondary-9: var(--sky-9);
+    --color-accent-secondary-10: var(--sky-10);
+    --color-accent-secondary-11: var(--sky-11);
+    --color-accent-secondary-12: var(--sky-12);
+    --color-accent-secondary-contrast: var(--sky-contrast);
 
     /* Foreground colors */
     --color-fg: var(--color-neutral-12);
     --color-fg-secondary: var(--color-neutral-a11);
 
-    /* Background colors */
-    --color-bg: #ffffff;
-    --color-bg-inset: var(--color-neutral-2);
-    --color-bg-overlay: #ffffff;
+    /* Background colors - Glass effect */
+    --color-bg: rgba(255, 255, 255, 0.05);
+    --color-bg-inset: rgba(255, 255, 255, 0.08);
+    --color-bg-overlay: rgba(255, 255, 255, 0.12);
 
-    /* Focus ring */
+    /* Focus ring - Bright cyan */
     --color-focus-ring: var(--color-accent-9);
 
     /* Fonts */
@@ -255,8 +255,8 @@
   }
 
   #spark-app.dark-theme {
-    --color-bg: var(--color-neutral-1);
-    --color-bg-inset: #000000;
-    --color-bg-overlay: var(--color-neutral-3);
+    --color-bg: rgba(0, 0, 0, 0.2);
+    --color-bg-inset: rgba(0, 0, 0, 0.35);
+    --color-bg-overlay: rgba(255, 255, 255, 0.05);
   }
 }
