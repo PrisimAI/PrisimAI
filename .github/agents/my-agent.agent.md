@@ -109,7 +109,7 @@ The changelog is displayed to users in the ProfileDialog component and MUST be u
 
 ### Changelog Location
 File: `/src/components/ProfileDialog.tsx`
-Lines: 142-185 (within the `<Card>` component titled "Recent Changes")
+Lines: 143-185 (within the `<Card>` component titled "Recent Changes")
 
 ### How to Update the Changelog
 
