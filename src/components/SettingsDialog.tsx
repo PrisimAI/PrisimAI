@@ -37,6 +37,7 @@ const DEFAULT_SETTINGS = {
   temperature: 1.0,
   maxTokens: 4096,
   contextWindow: 10,
+  experimentalSearchEnabled: false,
 }
 
 // Helper function to safely get from localStorage
@@ -63,6 +64,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const [temperature, setTemperature] = useState(DEFAULT_SETTINGS.temperature)
   const [maxTokens, setMaxTokens] = useState(DEFAULT_SETTINGS.maxTokens)
   const [contextWindow, setContextWindow] = useState(DEFAULT_SETTINGS.contextWindow)
+  const [experimentalSearchEnabled, setExperimentalSearchEnabled] = useState(DEFAULT_SETTINGS.experimentalSearchEnabled)
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -73,6 +75,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     setTemperature(settings.temperature ?? 1.0)
     setMaxTokens(settings.maxTokens ?? 4096)
     setContextWindow(settings.contextWindow ?? 10)
+    setExperimentalSearchEnabled(settings.experimentalSearchEnabled ?? false)
   }, [])
 
   const handleSave = () => {
@@ -84,6 +87,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
         temperature,
         maxTokens,
         contextWindow,
+        experimentalSearchEnabled,
       }
       localStorage.setItem('app-settings', JSON.stringify(settings))
       toast.success('Settings saved')
@@ -161,6 +165,22 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   id="tools"
                   checked={toolsEnabled}
                   onCheckedChange={setToolsEnabled}
+                />
+              </div>
+              
+              <Separator />
+              
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="experimental-search">Experimental Search Engine</Label>
+                  <div className="text-sm text-muted-foreground">
+                    Enable Gemini Search model for web search capabilities
+                  </div>
+                </div>
+                <Switch
+                  id="experimental-search"
+                  checked={experimentalSearchEnabled}
+                  onCheckedChange={setExperimentalSearchEnabled}
                 />
               </div>
             </div>

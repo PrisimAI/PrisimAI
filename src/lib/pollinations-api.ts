@@ -11,6 +11,9 @@ const BASE_URL = 'https://enter.pollinations.ai/api/generate'
 const IMAGE_BASE_URL = 'https://enter.pollinations.ai/api/generate/image'
 const VIDEO_BASE_URL = 'https://enter.pollinations.ai/api/generate/image' // Video uses same endpoint with video model
 
+// System prompt for experimental search engine mode
+const SEARCH_ENGINE_SYSTEM_PROMPT = 'You are a search engine assistant. Provide comprehensive, fact-based answers to user queries by searching and synthesizing information. Format your responses with clear citations and sources when possible. Focus on accuracy and up-to-date information.'
+
 // Mock mode disabled - always use production API
 const ENABLE_MOCK_MODE = false
 
@@ -35,6 +38,20 @@ export function onOfflineModeChange(callback: (enabled: boolean) => void): () =>
   const handler = () => callback(offlineModeEnabled)
   window.addEventListener('offlineModeChange', handler)
   return () => window.removeEventListener('offlineModeChange', handler)
+}
+
+// Helper function to check if experimental search engine is enabled
+export function isExperimentalSearchEnabled(): boolean {
+  try {
+    const settings = localStorage.getItem('app-settings')
+    if (settings) {
+      const parsed = JSON.parse(settings)
+      return parsed.experimentalSearchEnabled === true
+    }
+  } catch (e) {
+    console.error('Error reading experimental search setting:', e)
+  }
+  return false
 }
 
 // Content types for multi-modal messages
@@ -107,12 +124,25 @@ export interface VideoModel {
 export interface GenerateImageOptions {
   width?: number
   height?: number
+  seed?: number
+  enhance?: boolean
+  negative_prompt?: string
+  private?: boolean
   nologo?: boolean
+  nofeed?: boolean
+  safe?: boolean
+  quality?: 'low' | 'medium' | 'high' | 'hd'
+  image?: string // Reference image URL(s) for image-to-image. Examples: 'data:image/png;base64,...' or 'url1,url2' or 'url1|url2'
+  transparent?: boolean
+  guidance_scale?: number
   userEmail?: string | null
-  image?: string // Base64 data URL for image-to-image generation
 }
 
 export interface GenerateVideoOptions {
+  duration?: number // Video duration in seconds. veo: 4, 6, or 8. seedance: 2-10
+  aspectRatio?: '16:9' | '9:16' // Video aspect ratio
+  audio?: boolean // Enable audio generation for video (veo only)
+  image?: string // Reference image URL for image-to-video (seedance)
   userEmail?: string | null
 }
 
@@ -177,6 +207,7 @@ const FALLBACK_TEXT_MODELS: TextModel[] = [
   { id: 'mistral', description: 'Mistral Large', tools: true },
   { id: 'claude', description: 'Anthropic Claude', tools: true },
   { id: 'llama', description: 'Meta Llama 3', tools: false },
+  { id: 'gemini-search', description: 'Gemini Search (Experimental)', tools: false },
 ]
 
 export function filterRestrictedTextModels(models: TextModel[], userEmail?: string | null): TextModel[] {
@@ -232,11 +263,13 @@ const RESTRICTED_IMAGE_MODELS: string[] = [
 ]
 
 const FALLBACK_IMAGE_MODELS: ImageModel[] = [
-  { name: 'flux', description: 'Flux' },
-  { name: 'flux-realism', description: 'Flux Realism' },
-  { name: 'flux-anime', description: 'Flux Anime' },
-  { name: 'flux-3d', description: 'Flux 3D' },
+  { name: 'flux', description: 'Flux (Default)' },
   { name: 'turbo', description: 'Turbo' },
+  { name: 'gptimage', description: 'GPT Image' },
+  { name: 'kontext', description: 'Kontext' },
+  { name: 'seedream', description: 'Seedream' },
+  { name: 'nanobanana', description: 'Nanobanana' },
+  { name: 'nanobanana-pro', description: 'Nanobanana Pro' },
 ]
 
 export function filterRestrictedImageModels(models: ImageModel[], userEmail?: string | null): ImageModel[] {
@@ -285,6 +318,22 @@ export async function generateText(
   onChunk?: (chunk: string) => void,
   options?: GenerateTextOptions
 ): Promise<string> {
+  // Check if experimental search engine is enabled and override model
+  if (isExperimentalSearchEnabled()) {
+    model = 'gemini-search'
+    // Add a system message to make the model act like a search engine
+    const searchSystemMessage: Message = {
+      role: 'system',
+      content: SEARCH_ENGINE_SYSTEM_PROMPT,
+    }
+    
+    // Check if there's already a system message
+    const hasSystemMessage = messages.some(m => m.role === 'system')
+    if (!hasSystemMessage) {
+      messages = [searchSystemMessage, ...messages]
+    }
+  }
+  
   // Check if model is restricted (premium users bypass this check)
   if (RESTRICTED_TEXT_MODELS.includes(model) && !hasPremiumAccess(options?.userEmail)) {
     throw new Error('This model is temporarily not available.')
@@ -393,8 +442,17 @@ export async function generateImage(
   queryParams.set('model', model)
   if (options?.width) queryParams.set('width', String(options.width))
   if (options?.height) queryParams.set('height', String(options.height))
+  if (options?.seed !== undefined) queryParams.set('seed', String(options.seed))
+  if (options?.enhance !== undefined) queryParams.set('enhance', String(options.enhance))
+  if (options?.negative_prompt) queryParams.set('negative_prompt', options.negative_prompt)
+  if (options?.private !== undefined) queryParams.set('private', String(options.private))
   if (options?.nologo !== undefined) queryParams.set('nologo', String(options.nologo))
+  if (options?.nofeed !== undefined) queryParams.set('nofeed', String(options.nofeed))
+  if (options?.safe !== undefined) queryParams.set('safe', String(options.safe))
+  if (options?.quality) queryParams.set('quality', options.quality)
   if (options?.image) queryParams.set('image', options.image)
+  if (options?.transparent !== undefined) queryParams.set('transparent', String(options.transparent))
+  if (options?.guidance_scale !== undefined) queryParams.set('guidance_scale', String(options.guidance_scale))
   
   const url = `${IMAGE_BASE_URL}/${encodedPrompt}?${queryParams.toString()}`
   
@@ -501,6 +559,10 @@ export async function generateVideo(
   // Build query parameters
   const queryParams = new URLSearchParams()
   queryParams.set('model', model)
+  if (options?.duration !== undefined) queryParams.set('duration', String(options.duration))
+  if (options?.aspectRatio) queryParams.set('aspectRatio', options.aspectRatio)
+  if (options?.audio !== undefined) queryParams.set('audio', String(options.audio))
+  if (options?.image) queryParams.set('image', options.image)
   
   const url = `${VIDEO_BASE_URL}/${encodedPrompt}?${queryParams.toString()}`
   
