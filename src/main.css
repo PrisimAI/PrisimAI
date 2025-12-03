@@ -33,8 +33,10 @@
 */
 :root {
   --radius: 1.25rem;
+  --liquid-glass-gradient: linear-gradient(135deg, #4A90E2 0%, #50C9E9 50%, #7DD3FC 100%);
+  --liquid-glass-gradient-dark: linear-gradient(135deg, #1e3a8a 0%, #0e7490 50%, #0891b2 100%);
   /* Liquid Glass Theme */
-  --background: linear-gradient(135deg, #4A90E2 0%, #50C9E9 50%, #7DD3FC 100%);
+  --background: var(--liquid-glass-gradient);
   --foreground: oklch(0.98 0 0);
   --card: oklch(0.95 0.02 220 / 0.25);
   --card-foreground: oklch(0.15 0 0);
@@ -72,7 +74,7 @@
 */
 .dark {
   /* Dark mode with glass effects */
-  --background: linear-gradient(135deg, #1e3a8a 0%, #0e7490 50%, #0891b2 100%);
+  --background: var(--liquid-glass-gradient-dark);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.25 0.02 220 / 0.3);
   --card-foreground: oklch(0.985 0 0);
@@ -184,7 +186,7 @@
 
   body {
     @apply text-foreground;
-    background: linear-gradient(135deg, #4A90E2 0%, #50C9E9 50%, #7DD3FC 100%);
+    background: var(--liquid-glass-gradient);
     background-attachment: fixed;
     min-height: 100vh;
   }
