@@ -11,6 +11,9 @@ const BASE_URL = 'https://enter.pollinations.ai/api/generate'
 const IMAGE_BASE_URL = 'https://enter.pollinations.ai/api/generate/image'
 const VIDEO_BASE_URL = 'https://enter.pollinations.ai/api/generate/image' // Video uses same endpoint with video model
 
+// System prompt for experimental search engine mode
+const SEARCH_ENGINE_SYSTEM_PROMPT = 'You are a search engine assistant. Provide comprehensive, fact-based answers to user queries by searching and synthesizing information. Format your responses with clear citations and sources when possible. Focus on accuracy and up-to-date information.'
+
 // Mock mode disabled - always use production API
 const ENABLE_MOCK_MODE = false
 
@@ -129,7 +132,7 @@ export interface GenerateImageOptions {
   nofeed?: boolean
   safe?: boolean
   quality?: 'low' | 'medium' | 'high' | 'hd'
-  image?: string // Reference image URL(s) for image-to-image. Base64 data URL or comma/pipe separated URLs
+  image?: string // Reference image URL(s) for image-to-image. Examples: 'data:image/png;base64,...' or 'url1,url2' or 'url1|url2'
   transparent?: boolean
   guidance_scale?: number
   userEmail?: string | null
@@ -321,7 +324,7 @@ export async function generateText(
     // Add a system message to make the model act like a search engine
     const searchSystemMessage: Message = {
       role: 'system',
-      content: 'You are a search engine assistant. Provide comprehensive, fact-based answers to user queries by searching and synthesizing information. Format your responses with clear citations and sources when possible. Focus on accuracy and up-to-date information.',
+      content: SEARCH_ENGINE_SYSTEM_PROMPT,
     }
     
     // Check if there's already a system message
