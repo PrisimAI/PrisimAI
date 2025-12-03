@@ -773,7 +773,7 @@ function App() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background relative">
-      <LiquidMetalBackground opacity={0.6} />
+      <LiquidMetalBackground opacity={0.2} />
       <Sidebar
         conversations={conversationsList}
         currentConversationId={currentConversationId}

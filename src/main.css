@@ -186,8 +186,7 @@
 
   body {
     @apply text-foreground;
-    background: var(--liquid-glass-gradient);
-    background-attachment: fixed;
+    background: url('/3d-abstract-background-with-liquid-glass-wave_476363-8029.avif') center/cover no-repeat fixed;
     min-height: 100vh;
   }
   
