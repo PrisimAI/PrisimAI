@@ -5,6 +5,7 @@ import { ThemeProvider } from 'next-themes'
 import App from './App.tsx'
 import { ErrorFallback } from './ErrorFallback.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
+import './i18n'
 
 import "./main.css"
 import "./styles/theme.css"
