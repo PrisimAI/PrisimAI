@@ -10,24 +10,37 @@ import {
 import { Button } from '@/components/ui/button'
 import { MessageSquare } from 'lucide-react'
 import { useLocalStorage } from '@/hooks/use-local-storage'
+import type { User } from 'firebase/auth'
+import type { Conversation } from '@/lib/types'
 
-export function FeedbackPopup() {
+interface FeedbackPopupProps {
+  user: User | null
+  conversations: Conversation[]
+}
+
+export function FeedbackPopup({ user, conversations }: FeedbackPopupProps) {
   const [feedbackFormOpened, setFeedbackFormOpened] = useLocalStorage<boolean>(
     'feedback-form-opened',
     false
   )
   const [showPopup, setShowPopup] = useState(false)
 
-  // Show popup on initial load if form hasn't been opened yet
+  // Check if user has sent at least one message
+  const hasChattedAtLeastOnce = conversations.some(
+    (conversation) => conversation.messages.length > 0
+  )
+
+  // Show popup on initial load if form hasn't been opened yet,
+  // user is logged in, and user has chatted at least once
   useEffect(() => {
-    if (!feedbackFormOpened) {
+    if (!feedbackFormOpened && user && hasChattedAtLeastOnce) {
       // Small delay for better UX
       const timer = setTimeout(() => {
         setShowPopup(true)
       }, 1000)
       return () => clearTimeout(timer)
     }
-  }, [feedbackFormOpened])
+  }, [feedbackFormOpened, user, hasChattedAtLeastOnce])
 
   const handleOpenForm = () => {
     // Open the feedback form in a new tab
@@ -38,8 +51,8 @@ export function FeedbackPopup() {
     setShowPopup(false)
   }
 
-  // Don't render if already opened before
-  if (feedbackFormOpened) {
+  // Don't render if already opened before, user is not logged in, or hasn't chatted yet
+  if (feedbackFormOpened || !user || !hasChattedAtLeastOnce) {
     return null
   }
 
