@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -26,8 +26,9 @@ export function FeedbackPopup({ user, conversations }: FeedbackPopupProps) {
   const [showPopup, setShowPopup] = useState(false)
 
   // Check if user has sent at least one message
-  const hasChattedAtLeastOnce = conversations.some(
-    (conversation) => conversation.messages.length > 0
+  const hasChattedAtLeastOnce = useMemo(
+    () => conversations.some((conversation) => conversation.messages.length > 0),
+    [conversations]
   )
 
   // Show popup on initial load if form hasn't been opened yet,
