@@ -102,8 +102,8 @@ export function AuthForm({ onToggleMode, mode }: AuthFormProps) {
         <CardTitle>{mode === 'signin' ? t('auth.signIn') : t('auth.signUp')}</CardTitle>
         <CardDescription>
           {mode === 'signin'
-            ? 'Enter your credentials to access your account'
-            : 'Create a new account to get started'}
+            ? t('auth.signInDescription')
+            : t('auth.signUpDescription')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -116,7 +116,7 @@ export function AuthForm({ onToggleMode, mode }: AuthFormProps) {
             disabled={loading || googleLoading || githubLoading}
           >
             <GoogleLogo size={18} className="mr-2" />
-            {googleLoading ? 'Redirecting...' : mode === 'signin' ? t('auth.signInWithGoogle') : t('auth.signUpWithGoogle')}
+            {googleLoading ? t('auth.redirecting') : mode === 'signin' ? t('auth.signInWithGoogle') : t('auth.signUpWithGoogle')}
           </Button>
 
           <Button
@@ -127,7 +127,7 @@ export function AuthForm({ onToggleMode, mode }: AuthFormProps) {
             disabled={loading || googleLoading || githubLoading}
           >
             <GithubLogo size={18} className="mr-2" />
-            {githubLoading ? 'Redirecting...' : `Continue with GitHub`}
+            {githubLoading ? t('auth.redirecting') : t('auth.continueWithGitHub')}
           </Button>
 
           <div className="relative">
@@ -135,7 +135,7 @@ export function AuthForm({ onToggleMode, mode }: AuthFormProps) {
               <Separator className="w-full" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">Or continue with email</span>
+              <span className="bg-card px-2 text-muted-foreground">{t('auth.orContinueWithEmail')}</span>
             </div>
           </div>
 
@@ -165,14 +165,14 @@ export function AuthForm({ onToggleMode, mode }: AuthFormProps) {
             />
             {mode === 'signup' && (
               <p className="text-xs text-muted-foreground">
-                Must be at least 6 characters long
+                {t('auth.passwordMinLength')}
               </p>
             )}
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Please wait...' : mode === 'signin' ? t('auth.signIn') : t('auth.signUp')}
+            {loading ? t('auth.pleaseWait') : mode === 'signin' ? t('auth.signIn') : t('auth.signUp')}
           </Button>
           <p className="text-sm text-center text-muted-foreground">
             {mode === 'signin' ? t('auth.dontHaveAccount') : t('auth.alreadyHaveAccount')}

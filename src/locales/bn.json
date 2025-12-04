@@ -12,7 +12,14 @@
     "signInHere": "এখানে সাইন ইন করুন",
     "signUpHere": "এখানে সাইন আপ করুন",
     "forgotPassword": "পাসওয়ার্ড ভুলে গেছেন?",
-    "passwordsMustMatch": "পাসওয়ার্ড মিলতে হবে"
+    "passwordsMustMatch": "পাসওয়ার্ড মিলতে হবে",
+    "signInDescription": "আপনার অ্যাকাউন্ট অ্যাক্সেস করতে আপনার শংসাপত্র লিখুন",
+    "signUpDescription": "শুরু করতে একটি নতুন অ্যাকাউন্ট তৈরি করুন",
+    "redirecting": "পুনঃনির্দেশিত হচ্ছে...",
+    "continueWithGitHub": "GitHub দিয়ে চালিয়ে যান",
+    "orContinueWithEmail": "অথবা ইমেল দিয়ে চালিয়ে যান",
+    "passwordMinLength": "কমপক্ষে 6 অক্ষর দীর্ঘ হতে হবে",
+    "pleaseWait": "অনুগ্রহপূর্বক অপেক্ষা করুন..."
   },
   "app": {
     "title": "PrisimAI",

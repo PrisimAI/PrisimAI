@@ -12,7 +12,14 @@
     "signInHere": "Войдите здесь",
     "signUpHere": "Зарегистрируйтесь здесь",
     "forgotPassword": "Забыли пароль?",
-    "passwordsMustMatch": "Пароли должны совпадать"
+    "passwordsMustMatch": "Пароли должны совпадать",
+    "signInDescription": "Введите свои учетные данные для доступа к вашей учетной записи",
+    "signUpDescription": "Создайте новую учетную запись, чтобы начать",
+    "redirecting": "Перенаправление...",
+    "continueWithGitHub": "Продолжить с GitHub",
+    "orContinueWithEmail": "Или продолжите с электронной почтой",
+    "passwordMinLength": "Должно быть не менее 6 символов",
+    "pleaseWait": "Пожалуйста, подождите..."
   },
   "app": {
     "title": "PrisimAI",

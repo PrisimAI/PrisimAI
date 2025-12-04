@@ -12,7 +12,14 @@
     "signInHere": "在这里登录",
     "signUpHere": "在这里注册",
     "forgotPassword": "忘记密码？",
-    "passwordsMustMatch": "密码必须匹配"
+    "passwordsMustMatch": "密码必须匹配",
+    "signInDescription": "输入您的凭据以访问您的帐户",
+    "signUpDescription": "创建新帐户以开始使用",
+    "redirecting": "重定向中...",
+    "continueWithGitHub": "使用 GitHub 继续",
+    "orContinueWithEmail": "或使用电子邮件继续",
+    "passwordMinLength": "必须至少为 6 个字符",
+    "pleaseWait": "请稍候..."
   },
   "app": {
     "title": "PrisimAI",

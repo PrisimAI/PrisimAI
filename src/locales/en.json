@@ -12,7 +12,14 @@
     "signInHere": "Sign in here",
     "signUpHere": "Sign up here",
     "forgotPassword": "Forgot password?",
-    "passwordsMustMatch": "Passwords must match"
+    "passwordsMustMatch": "Passwords must match",
+    "signInDescription": "Enter your credentials to access your account",
+    "signUpDescription": "Create a new account to get started",
+    "redirecting": "Redirecting...",
+    "continueWithGitHub": "Continue with GitHub",
+    "orContinueWithEmail": "Or continue with email",
+    "passwordMinLength": "Must be at least 6 characters long",
+    "pleaseWait": "Please wait..."
   },
   "app": {
     "title": "PrisimAI",
