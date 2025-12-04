@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useLocalStorage } from './hooks/use-local-storage'
 import { useKeyboardShortcuts } from './hooks/use-keyboard-shortcuts'
 import { useAuth } from './contexts/AuthContext'
@@ -32,9 +33,11 @@ import { ROLEPLAY_MODEL, PREMADE_PERSONAS, CHARACTER_PERSONAS, ROLEPLAY_ENFORCEM
 import type { Conversation, ChatMessage as ChatMessageType, GeneratedImage, GeneratedVideo, AppMode, OfflineSettings, FileAttachment } from './lib/types'
 import type { MemoryEntry, AIPersona, GroupChatParticipant } from './lib/memory-types'
 import type { MessageTemplate } from './lib/template-types'
+import { languages } from './i18n'
 
 function App() {
   const { user, loading: authLoading } = useAuth()
+  const { i18n } = useTranslation()
   const [conversations, setConversations] = useLocalStorage<Conversation[]>('conversations', [])
   const [memories, setMemories] = useLocalStorage<MemoryEntry[]>('memories', [])
   const [personas, setPersonas] = useLocalStorage<AIPersona[]>('personas', [])
@@ -292,6 +295,17 @@ function App() {
         // Build message history from the conversation messages before we added the new ones
         const messages: Message[] = []
         
+        // Get current language name for system prompt
+        const currentLanguage = languages[i18n.language as keyof typeof languages]?.name || 'English'
+        
+        // Add system prompt for regular chat mode with language instruction
+        if (mode === 'chat' && !currentConversation?.isGroupChat) {
+          messages.push({
+            role: 'system' as const,
+            content: `You are a helpful AI assistant. Please respond in ${currentLanguage}. All your responses should be in ${currentLanguage} unless the user explicitly requests a different language.`,
+          })
+        }
+        
         // Add system prompt for persona chats
         if (mode === 'roleplay' && currentConversation?.participants && currentConversation.participants.length === 1) {
           const personaId = currentConversation.participants[0]
@@ -302,8 +316,8 @@ function App() {
           ]
           const persona = allPersonas.find(p => p.id === personaId)
           if (persona) {
-            // Combine character-specific prompt with roleplay enforcement rules
-            const enhancedSystemPrompt = `${persona.systemPrompt}\n\n${ROLEPLAY_ENFORCEMENT_RULES}`
+            // Combine character-specific prompt with roleplay enforcement rules and language instruction
+            const enhancedSystemPrompt = `${persona.systemPrompt}\n\n${ROLEPLAY_ENFORCEMENT_RULES}\n\nPlease respond in ${currentLanguage}.`
             
             messages.push({
               role: 'system' as const,

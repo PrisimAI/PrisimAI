@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTheme } from 'next-themes'
+import { useTranslation } from 'react-i18next'
 import {
   Dialog,
   DialogContent,
@@ -23,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { languages, type Language } from '@/i18n'
 
 interface SettingsDialogProps {
   open: boolean
@@ -58,6 +60,7 @@ function getStoredSettings() {
 
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const { theme, setTheme } = useTheme()
+  const { t, i18n } = useTranslation()
   const [streamingEnabled, setStreamingEnabled] = useState(DEFAULT_SETTINGS.streamingEnabled)
   const [toolsEnabled, setToolsEnabled] = useState(DEFAULT_SETTINGS.toolsEnabled)
   const [systemMessage, setSystemMessage] = useState(DEFAULT_SETTINGS.systemMessage)
@@ -90,11 +93,11 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
         experimentalSearchEnabled,
       }
       localStorage.setItem('app-settings', JSON.stringify(settings))
-      toast.success('Settings saved')
+      toast.success(t('settings.settingsSaved'))
       onOpenChange(false)
     } catch (e) {
       console.error('Error saving settings:', e)
-      toast.error('Failed to save settings')
+      toast.error(t('settings.failedToSave'))
     }
   }
 
@@ -102,26 +105,26 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Settings</DialogTitle>
+          <DialogTitle>{t('settings.title')}</DialogTitle>
           <DialogDescription>
-            Customize your AI chat experience
+            {t('settings.description')}
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="general" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="chat">Chat</TabsTrigger>
-            <TabsTrigger value="advanced">Advanced</TabsTrigger>
+            <TabsTrigger value="general">{t('settings.general')}</TabsTrigger>
+            <TabsTrigger value="chat">{t('settings.chat')}</TabsTrigger>
+            <TabsTrigger value="advanced">{t('settings.advanced')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="general" className="space-y-4">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="theme">Theme</Label>
+                  <Label htmlFor="theme">{t('settings.theme')}</Label>
                   <div className="text-sm text-muted-foreground">
-                    Choose your preferred color theme
+                    {t('settings.themeDescription')}
                   </div>
                 </div>
                 <Select value={theme} onValueChange={setTheme}>
@@ -129,9 +132,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <SelectValue placeholder="Select theme" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="light">Light</SelectItem>
-                    <SelectItem value="dark">Dark</SelectItem>
-                    <SelectItem value="system">System</SelectItem>
+                    <SelectItem value="light">{t('settings.light')}</SelectItem>
+                    <SelectItem value="dark">{t('settings.dark')}</SelectItem>
+                    <SelectItem value="system">{t('settings.system')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -140,9 +143,32 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="streaming">Enable Streaming</Label>
+                  <Label htmlFor="language">{t('settings.language')}</Label>
                   <div className="text-sm text-muted-foreground">
-                    Stream responses in real-time
+                    {t('settings.languageDescription')}
+                  </div>
+                </div>
+                <Select value={i18n.language as Language} onValueChange={(value: Language) => i18n.changeLanguage(value)}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(languages).map(([code, { nativeName }]) => (
+                      <SelectItem key={code} value={code}>
+                        {nativeName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="streaming">{t('settings.enableStreaming')}</Label>
+                  <div className="text-sm text-muted-foreground">
+                    {t('settings.streamingDescription')}
                   </div>
                 </div>
                 <Switch
@@ -156,9 +182,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="tools">Enable AI Tools</Label>
+                  <Label htmlFor="tools">{t('settings.enableTools')}</Label>
                   <div className="text-sm text-muted-foreground">
-                    Allow AI to use built-in tools and functions
+                    {t('settings.toolsDescription')}
                   </div>
                 </div>
                 <Switch
@@ -172,9 +198,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="experimental-search">Experimental Search Engine</Label>
+                  <Label htmlFor="experimental-search">{t('settings.experimentalSearch')}</Label>
                   <div className="text-sm text-muted-foreground">
-                    Enable Gemini Search model for web search capabilities
+                    {t('settings.experimentalSearchDescription')}
                   </div>
                 </div>
                 <Switch
@@ -189,23 +215,23 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
           <TabsContent value="chat" className="space-y-4">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="system-message">System Message</Label>
+                <Label htmlFor="system-message">{t('settings.systemMessage')}</Label>
                 <Textarea
                   id="system-message"
-                  placeholder="You are a helpful assistant..."
+                  placeholder={t('settings.systemMessagePlaceholder')}
                   value={systemMessage}
                   onChange={(e) => setSystemMessage(e.target.value)}
                   rows={4}
                 />
                 <div className="text-sm text-muted-foreground">
-                  Set a custom system message to guide the AI's behavior
+                  {t('settings.systemMessageDescription')}
                 </div>
               </div>
               
               <Separator />
               
               <div className="space-y-2">
-                <Label>Temperature</Label>
+                <Label>{t('settings.temperature')}</Label>
                 <div className="flex items-center gap-4">
                   <Slider
                     min={0}
@@ -218,7 +244,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   <span className="text-sm font-medium w-12 text-right">{temperature.toFixed(1)}</span>
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Controls randomness: Lower is more focused, higher is more creative
+                  {t('settings.temperatureDescription')}
                 </div>
               </div>
             </div>
@@ -227,7 +253,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
           <TabsContent value="advanced" className="space-y-4">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="max-tokens">Max Tokens</Label>
+                <Label htmlFor="max-tokens">{t('settings.maxTokens')}</Label>
                 <Input
                   id="max-tokens"
                   type="number"
@@ -236,14 +262,14 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   onChange={(e) => setMaxTokens(parseInt(e.target.value) || 4096)}
                 />
                 <div className="text-sm text-muted-foreground">
-                  Maximum length of the response
+                  {t('settings.maxTokensDescription')}
                 </div>
               </div>
               
               <Separator />
               
               <div className="space-y-2">
-                <Label htmlFor="context-window">Context Window</Label>
+                <Label htmlFor="context-window">{t('settings.contextWindow')}</Label>
                 <Input
                   id="context-window"
                   type="number"
@@ -252,7 +278,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   onChange={(e) => setContextWindow(parseInt(e.target.value) || 10)}
                 />
                 <div className="text-sm text-muted-foreground">
-                  Number of previous messages to include in context
+                  {t('settings.contextWindowDescription')}
                 </div>
               </div>
             </div>
@@ -261,10 +287,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
         <div className="flex justify-end gap-2 pt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t('settings.cancel')}
           </Button>
           <Button onClick={handleSave}>
-            Save Changes
+            {t('settings.saveChanges')}
           </Button>
         </div>
       </DialogContent>
