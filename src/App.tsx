@@ -700,7 +700,7 @@ function App() {
     return (
       <>
         <AuthPage />
-        <FeedbackPopup />
+        <FeedbackPopup user={user} conversations={conversationsList} />
         <Toaster position="top-center" />
       </>
     )
@@ -938,7 +938,7 @@ function App() {
       {user?.email && hasPremiumAccess(user.email) && (
         <PremiumAccessDialog userEmail={user.email} />
       )}
-      <FeedbackPopup />
+      <FeedbackPopup user={user} conversations={conversationsList} />
       <Toaster position="top-center" />
     </div>
   )
