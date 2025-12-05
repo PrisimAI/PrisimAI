@@ -105,7 +105,7 @@ export function Sidebar({
   }
 
   return (
-    <div className="flex h-full w-64 flex-col border-r bg-card">
+    <div className="flex h-full w-64 flex-col border-r bg-white/60 backdrop-blur-xl border-white/30 shadow-lg">
       <div className="flex items-center justify-between gap-2 p-6">
         <div className="flex items-center gap-2">
           <div className="prism-gradient rounded-lg p-2">
