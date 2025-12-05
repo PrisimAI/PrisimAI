@@ -105,13 +105,13 @@ export function Sidebar({
   }
 
   return (
-    <div className="flex h-full w-64 flex-col border-r bg-white/60 backdrop-blur-xl border-white/30 shadow-lg">
+    <div className="flex h-full w-64 flex-col border-r bg-slate-900/40 backdrop-blur-xl border-white/30 shadow-lg">
       <div className="flex items-center justify-between gap-2 p-6">
         <div className="flex items-center gap-2">
           <div className="prism-gradient rounded-lg p-2">
             <Sparkle className="text-white" size={24} weight="fill" />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight">PrisimAI</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-white">PrisimAI</h1>
         </div>
         <UserMenu 
           onOpenMemory={onOpenMemory}
@@ -201,13 +201,13 @@ export function Sidebar({
       <ScrollArea className="flex-1">
         <div className="space-y-1 p-3">
           {currentModeConversations.length === 0 && (
-            <p className="px-3 py-2 text-sm text-muted-foreground">
+            <p className="px-3 py-2 text-sm text-white/60">
               {mode === 'chat' ? 'No conversations yet' : mode === 'image' ? 'No image generations yet' : mode === 'video' ? 'No video generations yet' : 'No group chats yet'}
             </p>
           )}
           
           {currentModeConversations.length > 0 && sortedConversations.length === 0 && (
-            <p className="px-3 py-2 text-sm text-muted-foreground">
+            <p className="px-3 py-2 text-sm text-white/60">
               No results found for "{searchQuery}"
             </p>
           )}
@@ -222,11 +222,11 @@ export function Sidebar({
             >
               <div className="flex items-center gap-2">
                 {conversation.isPinned && (
-                  <PushPin size={12} className="text-muted-foreground shrink-0" weight="fill" />
+                  <PushPin size={12} className="text-white/70 shrink-0" weight="fill" />
                 )}
                 <button
                   onClick={() => onSelectConversation(conversation.id)}
-                  className="flex-1 truncate text-left"
+                  className="flex-1 truncate text-left text-white"
                 >
                   {conversation.title}
                 </button>
