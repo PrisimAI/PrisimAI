@@ -357,7 +357,10 @@ export async function generateText(
   }
 
   // Add optional parameters
-  if (options?.tools && options.tools.length > 0) {
+  // Note: gemini-search and other Gemini models from Vertex AI don't support multiple tools
+  // unless they are all search tools, so we disable tools for these models
+  const isGeminiModel = model.includes('gemini')
+  if (options?.tools && options.tools.length > 0 && !isGeminiModel) {
     requestBody.tools = options.tools
     requestBody.tool_choice = options.tool_choice || 'auto'
   }
