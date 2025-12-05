@@ -24,7 +24,7 @@ import { KeyboardShortcutsDialog } from './components/KeyboardShortcutsDialog'
 import { OfflineModeDialog } from './components/OfflineModeDialog'
 import { PWAInstallPrompt } from './components/PWAInstallPrompt'
 import { PremiumAccessDialog } from './components/PremiumAccessDialog'
-import { LiquidMetalBackground } from './components/LiquidMetalBackground'
+
 import { MessageTemplatesDialog } from './components/MessageTemplatesDialog'
 import { FeedbackPopup } from './components/FeedbackPopup'
 import { generateText, generateImage, generateVideo, type Message, type MessageContent, type TextContent, type ImageUrlContent, setOfflineMode, hasPremiumAccess } from './lib/pollinations-api'
@@ -788,8 +788,7 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background relative">
-      <LiquidMetalBackground opacity={0.2} />
+    <div className="flex h-screen overflow-hidden bg-white relative">
       <Sidebar
         conversations={conversationsList}
         currentConversationId={currentConversationId}

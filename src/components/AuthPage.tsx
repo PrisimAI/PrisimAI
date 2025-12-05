@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AuthForm } from '@/components/AuthForm'
-import { LiquidMetalBackground } from '@/components/LiquidMetalBackground'
+
 import { LanguageSelector } from '@/components/LanguageSelector'
 
 export function AuthPage() {
@@ -9,8 +9,7 @@ export function AuthPage() {
   const { t } = useTranslation()
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4 relative">
-      <LiquidMetalBackground opacity={0.4} />
+    <div className="flex min-h-screen items-center justify-center bg-white p-4 relative">
       <div className="absolute top-4 right-4 z-20">
         <LanguageSelector />
       </div>
