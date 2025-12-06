@@ -13,7 +13,7 @@ const HUGGINGFACE_CDN_PATTERN = /^https:\/\/huggingface\.co\/.*/i;
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/PrisimAI/',
+  base: './',
   plugins: [
     react(),
     tailwindcss(),
@@ -27,17 +27,17 @@ export default defineConfig({
         theme_color: '#667eea',
         background_color: '#ffffff',
         display: 'standalone',
-        scope: '/PrisimAI/',
-        start_url: '/PrisimAI/',
+        scope: './',
+        start_url: './',
         icons: [
           {
-            src: '/PrisimAI/icon-192x192.svg',
+            src: 'icon-192x192.svg',
             sizes: '192x192',
             type: 'image/svg+xml',
             purpose: 'any maskable'
           },
           {
-            src: '/PrisimAI/icon-512x512.svg',
+            src: 'icon-512x512.svg',
             sizes: '512x512',
             type: 'image/svg+xml',
             purpose: 'any maskable'
@@ -48,15 +48,15 @@ export default defineConfig({
             name: 'New Chat',
             short_name: 'Chat',
             description: 'Start a new AI chat conversation',
-            url: '/PrisimAI/?mode=chat',
-            icons: [{ src: '/PrisimAI/icon-192x192.svg', sizes: '192x192', type: 'image/svg+xml' }]
+            url: './?mode=chat',
+            icons: [{ src: 'icon-192x192.svg', sizes: '192x192', type: 'image/svg+xml' }]
           },
           {
             name: 'Generate Image',
             short_name: 'Image',
             description: 'Generate an AI image',
-            url: '/PrisimAI/?mode=image',
-            icons: [{ src: '/PrisimAI/icon-192x192.svg', sizes: '192x192', type: 'image/svg+xml' }]
+            url: './?mode=image',
+            icons: [{ src: 'icon-192x192.svg', sizes: '192x192', type: 'image/svg+xml' }]
           }
         ]
       },
@@ -172,7 +172,7 @@ export default defineConfig({
             }
           }
         ],
-        navigateFallback: '/PrisimAI/index.html',
+        navigateFallback: 'index.html',
         navigateFallbackDenylist: [/^\/api/],
         cleanupOutdatedCaches: true,
         skipWaiting: true,
